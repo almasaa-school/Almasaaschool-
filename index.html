@@ -30,6 +30,7 @@ body.sm{font-size:13px}body.lg{font-size:17px}body.xl{font-size:19px}
 </head>
 <body>
 
+<!-- واجهة الدخول -->
 <div id="login" class="fixed inset-0 bg-grad flex items-center justify-center p-4 z-[100]">
   <div class="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-md">
     <div class="text-center mb-6">
@@ -39,18 +40,16 @@ body.sm{font-size:13px}body.lg{font-size:17px}body.xl{font-size:19px}
     </div>
     <div class="space-y-3">
       <div><label class="block text-sm font-bold mb-1">اسم المستخدم</label>
-        <input id="lgU" value="almasaa" class="w-full rounded-xl border-2 border-slate-200 px-4 py-3 text-sm" placeholder="مثال: almasaa"></div>
+        <input id="lgU" class="w-full rounded-xl border-2 border-slate-200 px-4 py-3 text-sm" placeholder="اكتب اسم المستخدم هنا"></div>
       <div><label class="block text-sm font-bold mb-1">كلمة المرور <span class="text-xs text-slate-400">(اختيارية)</span></label>
-        <input id="lgP" type="password" onkeydown="if(event.key==='Enter')login()" class="w-full rounded-xl border-2 border-slate-200 px-4 py-3 text-sm" placeholder="اتركها فارغة"></div>
+        <input id="lgP" type="password" onkeydown="if(event.key==='Enter')login()" class="w-full rounded-xl border-2 border-slate-200 px-4 py-3 text-sm" placeholder="اكتب كلمة المرور"></div>
       <div id="lgE" class="hidden bg-red-50 text-red-600 p-3 rounded-xl text-sm font-bold"></div>
       <button onclick="login()" class="w-full bg-p text-white font-black py-3.5 rounded-xl shadow">🔐 دخول</button>
-      <div class="text-center text-xs text-slate-400 mt-2">
-        <div>المدير: <b>almasaa</b> (بدون كلمة مرور)</div>
-      </div>
     </div>
   </div>
 </div>
 
+<!-- التطبيق -->
 <div id="app" class="hidden min-h-screen flex flex-row-reverse relative z-10">
   <aside id="sb" class="fixed lg:static top-0 right-0 h-screen w-72 bg-white border-l z-40 transform translate-x-full lg:translate-x-0 transition flex flex-col overflow-y-auto np shadow-xl">
     <div class="p-4 border-b flex items-center gap-3">
@@ -70,7 +69,7 @@ body.sm{font-size:13px}body.lg{font-size:17px}body.xl{font-size:19px}
       <div id="usr" class="font-bold text-slate-500 mb-1">—</div>
       <div id="cloudStatus" class="text-[10px] text-slate-400 mb-1">☁️ جاهز</div>
       <div id="bkSt" class="text-slate-400 mb-1">—</div>
-      v11.0 (لائحة 234/2017)
+      v11.1
     </div>
   </aside>
   <main class="flex-1 overflow-x-hidden">
@@ -97,7 +96,7 @@ const CLOUD={enabled:!!sbClient,syncing:false,last:0,online:navigator.onLine};
 const TH={emerald:['#047857','#10B981','#065F46','#ECFDF5','#F1F5F9','زمردي'],sky:['#0284C7','#38BDF8','#075985','#F0F9FF','#F1F5F9','سماوي'],indigo:['#4F46E5','#818CF8','#3730A3','#EEF2FF','#F8FAFC','نيلي'],violet:['#7C3AED','#A78BFA','#5B21B6','#F5F3FF','#FAF5FF','بنفسجي'],rose:['#E11D48','#FB7185','#9F1239','#FFF1F2','#FFF5F5','وردي'],amber:['#D97706','#FBBF24','#92400E','#FFFBEB','#FFFBEB','ذهبي'],teal:['#0D9488','#2DD4BF','#115E59','#F0FDFA','#F0FDFA','تركواز'],slate:['#334155','#64748B','#1E293B','#F1F5F9','#F8FAFC','رمادي']};
 const GR=[5,6,7,8,9], SC=[1,2,3,4,5,6,7];
 
-// الإجراءات وفق اللائحة (لائحة شؤون الطلاب 234/2017)
+// الإجراءات وفق اللائحة (234/2017)
 const DEF_ACT=[
   {id:'A1',name:'نصح الطالب (شفهياً)',desc:'توجيه الطالب وإرشاده شفهياً نحو التزامه بقواعد الانتظام والانضباط السلوكي.'},
   {id:'A2',name:'نصح الطالب (ورقياً)',desc:'توجيه الطالب وإرشاده كتابياً نحو التزامه بقواعد الانتظام والانضباط السلوكي.'},
@@ -113,16 +112,13 @@ const DEF_ACT=[
   {id:'A12',name:'حرمان من امتحان العام الدراسي',desc:'حرمان من دخول امتحان العام الدراسي في الدور الأول والثاني ويعتبر راسباً.'}
 ];
 
-// السلوكيات مصنفة حسب اللائحة (تأخر، غياب، انضباط سلوكي 1-5، أخرى)
+// السلوكيات مصنفة
 const DEF_BEH=[
-  // التأخر الدراسي
   {id:'B_T1',name:'تأخر عن الطابور الصباحي (المرة الأولى)',cat:'تأخر دراسي',points:1,defActId:'A2'},
   {id:'B_T2',name:'تأخر عن الطابور الصباحي (المرة الثانية)',cat:'تأخر دراسي',points:1,defActId:'A3'},
   {id:'B_T3',name:'تأخر عن الطابور الصباحي (المرة الثالثة)',cat:'تأخر دراسي',points:2,defActId:'A4'},
   {id:'B_T4',name:'تأخر عن الطابور الصباحي (المرة الرابعة)',cat:'تأخر دراسي',points:2,defActId:'A5'},
   {id:'B_T5',name:'تأخر عن الطابور الصباحي (المرة الخامسة)',cat:'تأخر دراسي',points:3,defActId:'A6'},
-
-  // الغياب
   {id:'B_G1',name:'غياب بدون عذر (يومان متصلان أو منفصلان)',cat:'غياب',points:1,defActId:'A2'},
   {id:'B_G2',name:'غياب بدون عذر (5 أيام متصلة أو منفصلة)',cat:'غياب',points:2,defActId:'A3'},
   {id:'B_G3',name:'غياب بدون عذر (8 أيام متصلة أو منفصلة)',cat:'غياب',points:3,defActId:'A4'},
@@ -130,74 +126,68 @@ const DEF_BEH=[
   {id:'B_G5',name:'غياب بدون عذر (15 يوماً متصلاً)',cat:'غياب',points:5,defActId:'A10'},
   {id:'B_G6',name:'غياب بدون عذر (30 يوماً متصلاً)',cat:'غياب',points:6,defActId:'A11'},
   {id:'B_G7',name:'غياب بدون عذر (45 يوماً متصلاً)',cat:'غياب',points:7,defActId:'A12'},
-
-  // المستوى الأول (نصح)
-  {id:'B1',name:'الإخلال بنظام الطابور أو الحصص الدراسية أو الأنشطة المدرسية',cat:'الانضباط السلوكي',points:1,defActId:'A1'},
+  {id:'B1',name:'الإخلال بنظام الطابور أو الحصص أو الأنشطة',cat:'الانضباط السلوكي',points:1,defActId:'A1'},
   {id:'B2',name:'عدم الالتزام بالزي المدرسي',cat:'الانضباط السلوكي',points:1,defActId:'A1'},
-  {id:'B3',name:'العبث بمرافق المدرسة ووسائل النقل المدرسية',cat:'الانضباط السلوكي',points:1,defActId:'A1'},
+  {id:'B3',name:'العبث بمرافق المدرسة ووسائل النقل',cat:'الانضباط السلوكي',points:1,defActId:'A1'},
   {id:'B4',name:'الإساءة بالأقول إلى أحد زملائه',cat:'الانضباط السلوكي',points:1,defActId:'A1'},
-  {id:'B5',name:'عدم المحافظة على النظافة أو المظهر الشخصي مثل ارتداء الأقراط وعمل الوشم وقصات الشعر ومصاحبة التجمل للإناث وطالبة الشعر للذكور',cat:'الانضباط السلوكي',points:1,defActId:'A1'},
-  {id:'B6',name:'عدم الالتزام بإحضار الكتب والدفاتر والأدوات المدرسية',cat:'الانضباط السلوكي',points:1,defActId:'A1'},
-  {id:'B7',name:'عدم مراعاة الاحترام الواجب في التعامل مع معلمي وموظفي وإداري المدرسة وزوارها',cat:'الانضباط السلوكي',points:1,defActId:'A1'},
-  {id:'B8',name:'تناول المكولات والمشروبات في غير الوقت المخصص أو مضغ العلكة (اللبان)',cat:'الانضباط السلوكي',points:1,defActId:'A1'},
-  {id:'B9',name:'النوم في أثناء الحصص أو الأنشطة المدرسية',cat:'الانضباط السلوكي',points:1,defActId:'A1'},
-  {id:'B10',name:'عدم المحافظة على نظافة الفصل ومرافق المدرسة',cat:'الانضباط السلوكي',points:1,defActId:'A1'},
-  {id:'B11',name:'الإهمال في أداء الواجبات أو الأنشطة المدرسية',cat:'الانضباط السلوكي',points:1,defActId:'A1'},
-  {id:'B12',name:'عدم الالتزام بضوابط استخدام وسائل النقل المدرسية',cat:'الانضباط السلوكي',points:1,defActId:'A1'},
-  {id:'B13',name:'التسبب في الإزعاج بالقرب من الصفوف الدراسية',cat:'الانضباط السلوكي',points:1,defActId:'A1'},
-  {id:'B14',name:'عدم الالتزام بالتوجيهات الصادرة من المعلم',cat:'الانضباط السلوكي',points:1,defActId:'A1'},
-  {id:'B15',name:'القيام بأي سلوك يخالف الآداب والنظام العام',cat:'الانضباط السلوكي',points:1,defActId:'A1'},
-
-  // المستوى الثاني (تنبيه)
-  {id:'B16',name:'تكرار أحد السلوكيات المذكورة أعلاه والمتعلقة بالنصح',cat:'الانضباط السلوكي',points:2,defActId:'A3'},
-  {id:'B17',name:'تزوير أحد المحررات المدرسية',cat:'الانضباط السلوكي',points:2,defActId:'A3'},
-  {id:'B18',name:'تزوير توقيع ولي أمره',cat:'الانضباط السلوكي',points:2,defActId:'A3'},
-
-  // المستوى الثالث (إنذار)
-  {id:'B19',name:'تكرار أحد السلوكيات المذكورة أعلاه والمتعلقة بالتنبيه',cat:'الانضباط السلوكي',points:3,defActId:'A4'},
-  {id:'B20',name:'الشجار وتهديد زملائه',cat:'الانضباط السلوكي',points:3,defActId:'A4'},
-  {id:'B21',name:'الاعتداء بالألفاظ النابية على أحد زملائه',cat:'الانضباط السلوكي',points:3,defActId:'A4'},
-  {id:'B22',name:'الاستيلاء على المتعلقات الشخصية لزملائه',cat:'الانضباط السلوكي',points:3,defActId:'A4'},
-
-  // المستوى الرابع (فصل مؤقت)
-  {id:'B23',name:'تكرار أحد السلوكيات المذكورة أعلاه والمتعلقة بالإنذار',cat:'الانضباط السلوكي',points:4,defActId:'A7'},
-  {id:'B24',name:'إحضار الأجهزة السمعية والبصرية كالهواتف والكاميرات والمسجلات',cat:'الانضباط السلوكي',points:4,defActId:'A7'},
-  {id:'B25',name:'إساءة استخدام الحاسب الآلي في المدرسة',cat:'الانضباط السلوكي',points:4,defActId:'A7'},
-  {id:'B26',name:'حيازة أو تداول أو استعمال أي مواد ضارة كالكبريت والألعاب النارية والأدوات الحادة',cat:'الانضباط السلوكي',points:4,defActId:'A7'},
-  {id:'B27',name:'الاعتداء على الزملاء وإيذائهم بدنياً',cat:'الانضباط السلوكي',points:4,defActId:'A7'},
+  {id:'B5',name:'عدم المحافظة على النظافة أو المظهر',cat:'الانضباط السلوكي',points:1,defActId:'A1'},
+  {id:'B6',name:'عدم الالتزام بإحضار الكتب والدفاتر',cat:'الانضباط السلوكي',points:1,defActId:'A1'},
+  {id:'B7',name:'عدم الاحترام في التعامل مع المعلمين',cat:'الانضباط السلوكي',points:1,defActId:'A1'},
+  {id:'B8',name:'تناول المأكولات في غير وقتها أو العلكة',cat:'الانضباط السلوكي',points:1,defActId:'A1'},
+  {id:'B9',name:'النوم في أثناء الحصص',cat:'الانضباط السلوكي',points:1,defActId:'A1'},
+  {id:'B10',name:'عدم المحافظة على نظافة الفصل',cat:'الانضباط السلوكي',points:1,defActId:'A1'},
+  {id:'B11',name:'الإهمال في أداء الواجبات',cat:'الانضباط السلوكي',points:1,defActId:'A1'},
+  {id:'B12',name:'عدم الالتزام بضوابط النقل المدرسي',cat:'الانضباط السلوكي',points:1,defActId:'A1'},
+  {id:'B13',name:'التسبب في الإزعاج بالقرب من الصفوف',cat:'الانضباط السلوكي',points:1,defActId:'A1'},
+  {id:'B14',name:'عدم الالتزام بتوجيهات المعلم',cat:'الانضباط السلوكي',points:1,defActId:'A1'},
+  {id:'B15',name:'سلوك يخالف الآداب والنظام العام',cat:'الانضباط السلوكي',points:1,defActId:'A1'},
+  {id:'B16',name:'تكرار سلوكيات النصح',cat:'الانضباط السلوكي',points:2,defActId:'A3'},
+  {id:'B17',name:'تزوير محرر مدرسي',cat:'الانضباط السلوكي',points:2,defActId:'A3'},
+  {id:'B18',name:'تزوير توقيع ولي الأمر',cat:'الانضباط السلوكي',points:2,defActId:'A3'},
+  {id:'B19',name:'تكرار سلوكيات التنبيه',cat:'الانضباط السلوكي',points:3,defActId:'A4'},
+  {id:'B20',name:'الشجار وتهديد الزملاء',cat:'الانضباط السلوكي',points:3,defActId:'A4'},
+  {id:'B21',name:'الاعتداء بالألفاظ النابية',cat:'الانضباط السلوكي',points:3,defActId:'A4'},
+  {id:'B22',name:'الاستيلاء على متعلقات الزملاء',cat:'الانضباط السلوكي',points:3,defActId:'A4'},
+  {id:'B23',name:'تكرار سلوكيات الإنذار',cat:'الانضباط السلوكي',points:4,defActId:'A7'},
+  {id:'B24',name:'إحضار أجهزة سمعية وبصرية',cat:'الانضباط السلوكي',points:4,defActId:'A7'},
+  {id:'B25',name:'إساءة استخدام الحاسب الآلي',cat:'الانضباط السلوكي',points:4,defActId:'A7'},
+  {id:'B26',name:'حيازة مواد ضارة أو أدوات حادة',cat:'الانضباط السلوكي',points:4,defActId:'A7'},
+  {id:'B27',name:'الاعتداء على الزملاء بدنياً',cat:'الانضباط السلوكي',points:4,defActId:'A7'},
   {id:'B28',name:'الكتابة على جدران المدرسة',cat:'الانضباط السلوكي',points:4,defActId:'A7'},
   {id:'B29',name:'الهروب من المدرسة',cat:'الانضباط السلوكي',points:4,defActId:'A7'},
-
-  // المستوى الخامس (لجنة المديرية)
-  {id:'B30',name:'تكرار أحد السلوكيات المذكورة أعلاه والمتعلقة بالفصل المؤقت',cat:'الانضباط السلوكي',points:5,defActId:'A8'},
-  {id:'B31',name:'تعمد الإساءة بالقول أو الفعل أو التحريض إلى الرموز الوطنية بشكل مباشر أو غير مباشر',cat:'الانضباط السلوكي',points:5,defActId:'A8'},
-  {id:'B32',name:'عدم احترام الدين والتقاليد والإرث الثقافي في المجتمع العماني',cat:'الانضباط السلوكي',points:5,defActId:'A8'},
-  {id:'B33',name:'الترويج للأمور المذهبية أو أي أفكار من شأنها التأثير على وحدة المجتمع وقيمه',cat:'الانضباط السلوكي',points:5,defActId:'A8'},
+  {id:'B30',name:'تكرار سلوكيات الفصل المؤقت',cat:'الانضباط السلوكي',points:5,defActId:'A8'},
+  {id:'B31',name:'الإساءة للرموز الوطنية',cat:'الانضباط السلوكي',points:5,defActId:'A8'},
+  {id:'B32',name:'عدم احترام الدين والتقاليد',cat:'الانضباط السلوكي',points:5,defActId:'A8'},
+  {id:'B33',name:'الترويج للأفكار المذهبية',cat:'الانضباط السلوكي',points:5,defActId:'A8'},
   {id:'B34',name:'الاختلال بنظم سير الامتحانات',cat:'الانضباط السلوكي',points:5,defActId:'A8'},
-  {id:'B35',name:'الإساءة بالقول إلى موظفي المدرسة، أو العاملين، أو سائقي النقل المدرسي أو زوار المدرسة',cat:'الانضباط السلوكي',points:5,defActId:'A8'},
-  {id:'B36',name:'إتلاف متعلقات أي من زملائه، أو موظفي المدرسة، أو سائقي النقل المدرسي أو مرافق المدرسة',cat:'الانضباط السلوكي',points:5,defActId:'A8'},
-  {id:'B37',name:'التدخين أو تناول المخدرات والمؤثرات العقلية أو الحضور للمدرسة تحت تأثيرها',cat:'الانضباط السلوكي',points:5,defActId:'A8'},
-  {id:'B38',name:'التحريض على إثارة الفوضى أو الإضراب أو الاعتصام',cat:'الانضباط السلوكي',points:5,defActId:'A8'},
-  
-  // أخرى
+  {id:'B35',name:'الإساءة لموظفي المدرسة أو الزوار',cat:'الانضباط السلوكي',points:5,defActId:'A8'},
+  {id:'B36',name:'إتلاف متعلقات الآخرين',cat:'الانضباط السلوكي',points:5,defActId:'A8'},
+  {id:'B37',name:'التدخين أو المخدرات',cat:'الانضباط السلوكي',points:5,defActId:'A8'},
+  {id:'B38',name:'التحريض على الفوضى',cat:'الانضباط السلوكي',points:5,defActId:'A8'},
   {id:'B_OTHER',name:'سلوك آخر (كتابة حرة)',cat:'أخرى',points:1,defActId:'A1'}
 ];
+
+const DEF_STU=[['أحمد بن سالم الرواحي',5,1],['محمد بن خالد البلوشي',5,1],['يوسف بن علي المعمري',5,2],['عبدالله بن حمد الحارثي',5,2],['سعيد بن راشد الكندي',5,3],['خالد بن ناصر الفارسي',6,1],['سلطان بن ماجد الشكيلي',6,1],['حمزة بن ياسر العامري',6,2],['طلال بن سعيد الهنائي',6,2],['فهد بن عبدالرحمن الزدجالي',6,3],['بدر بن سليمان الريامي',7,1],['مازن بن حمدان الحجري',7,1],['معاذ بن طارق السعدي',7,2],['أيمن بن وليد المقبالي',7,2],['راشد بن سيف الخروصي',7,3],['هلال بن منصور الغافري',8,1],['نبيل بن عامر الحوسني',8,1],['قيس بن مروان الوهيبي',8,2],['زياد بن فارس اليعقوبي',8,2],['مروان بن أيمن السيابي',8,3],['حاتم بن صالح العبري',9,1],['عمار بن نبيل الجابري',9,1],['أنس بن كمال الرئيسي',9,2],['بلال بن هيثم المخيني',9,2],['جعفر بن عادل الشعيلي',9,3],['كرم بن رامي الصوافي',9,3],['ليث بن جابر الحسني',5,4],['مصعب بن أنور البوسعيدي',6,4],['نزار بن صقر الهاشمي',7,4],['وسام بن فاروق الأغبري',8,4],['ياسر بن رمزي العجمي',9,4],['يعقوب بن إسحاق النعماني',5,5],['أسامة بن زهير الكلباني',6,5],['إبراهيم بن نوح المسروري',7,5],['إسماعيل بن ياسين الحبسي',8,5],['بشار بن حكيم الشيباني',9,5]];
 
 const KEY='almasaa_v11';
 const DEF_CFG={schoolName:'مدرسة المسعى للبنين (٥-٩)',platformName:'منصة السلوك الطلابي',ministry:'وزارة التربية والتعليم — سلطنة عُمان',directorate:'المديرية العامة للتعليم بمحافظة شمال الباطنة',theme:'emerald',uiSize:'medium',printFont:'Cairo',printSize:'12',printWeight:'700',logoR:'',logoL:'',committee:'لجنة شؤون الطلبة',adminDept:'إدارة المدرسة',principalName:'حسن علي إبراهيم البلوشي',principalTitle:'مدير المدرسة',healthVisitorName:'',healthVisitorTitle:'الزائر الصحي',reportTitle:'إقرار مخالفة سلوكية وانتظام دراسي',reportFooter:'يُرجى من ولي الأمر التواصل مع إدارة المدرسة لمتابعة الحالة.',healthTitle:'خطاب تحويل للوحدة الصحية',healthRecipient:'الفاضل مدير مستشفى / مركز صحي: مجمع صحي السويق المحترم',healthGreeting:'السلام عليكم ورحمة الله وبركاته،',healthBody:'نحيل إليكم الطالب:',healthClosing:'آملين إجراء الكشف الطبي عليه وإفادتنا بالنتيجة، والله الموفق.',healthReturnNote:'يجب إعادة هذه الرسالة لإدارة المدرسة مختومة من المستشفى في اليوم التالي.',healthOptions:['مسؤول الغياب','يقبل العذر','لا يقبل العذر'],signatures:['توقيع المعلم','توقيع الأخصائي','توقيع مدير المدرسة'],waBehavior:'السلام عليكم ورحمة الله وبركاته\nولي أمر الطالب: {student}\nالصف: {grade} / الشعبة: {section}\n\nنحيطكم علماً بتسجيل إجراء بحق ابنكم:\n📋 السلوك: {behavior}\n⚠️ النقاط: {points}\n🎯 الإجراء: {action}\n📜 النص اللائحي: {desc}\n📅 {date}\n\n{school}',waHealth:'السلام عليكم ورحمة الله وبركاته\nولي أمر الطالب: {student}\nالصف: {grade} / الشعبة: {section}\n\nتم تحويل ابنكم للوحدة الصحية{reason}.\n📅 {date}\n\n{school}'};
 
 function seed(){return {config:{...DEF_CFG},users:[{id:'U1',name:'مدير النظام',title:'مدير',username:'almasaa',password:'',isAdmin:true},{id:'U2',name:'وكيل المدرسة',title:'وكيل',username:'wakil',password:'',isAdmin:false}],students:DEF_STU.map((x,i)=>({id:'S'+String(i+1).padStart(3,'0'),name:x[0],grade:x[1],section:x[2],phone:'',guardian:''})),behaviors:DEF_BEH.map(b=>({...b,active:true})),actions:DEF_ACT.map(a=>({...a})),health:[],referrals:[],records:[],followups:[],resolved:[]}}
 
-// بيانات افتراضية للطلاب (40 طالب)
-const DEF_STU=[['أحمد بن سالم الرواحي',5,1],['محمد بن خالد البلوشي',5,1],['يوسف بن علي المعمري',5,2],['عبدالله بن حمد الحارثي',5,2],['سعيد بن راشد الكندي',5,3],['خالد بن ناصر الفارسي',6,1],['سلطان بن ماجد الشكيلي',6,1],['حمزة بن ياسر العامري',6,2],['طلال بن سعيد الهنائي',6,2],['فهد بن عبدالرحمن الزدجالي',6,3],['بدر بن سليمان الريامي',7,1],['مازن بن حمدان الحجري',7,1],['معاذ بن طارق السعدي',7,2],['أيمن بن وليد المقبالي',7,2],['راشد بن سيف الخروصي',7,3],['هلال بن منصور الغافري',8,1],['نبيل بن عامر الحوسني',8,1],['قيس بن مروان الوهيبي',8,2],['زياد بن فارس اليعقوبي',8,2],['مروان بن أيمن السيابي',8,3],['حاتم بن صالح العبري',9,1],['عمار بن نبيل الجابري',9,1],['أنس بن كمال الرئيسي',9,2],['بلال بن هيثم المخيني',9,2],['جعفر بن عادل الشعيلي',9,3],['كرم بن رامي الصوافي',9,3],['ليث بن جابر الحسني',5,4],['مصعب بن أنور البوسعيدي',6,4],['نزار بن صقر الهاشمي',7,4],['وسام بن فاروق الأغبري',8,4],['ياسر بن رمزي العجمي',9,4],['يعقوب بن إسحاق النعماني',5,5],['أسامة بن زهير الكلباني',6,5],['إبراهيم بن نوح المسروري',7,5],['إسماعيل بن ياسين الحبسي',8,5],['بشار بن حكيم الشيباني',9,5]];
-
 let DB;
 try{DB=JSON.parse(localStorage.getItem(KEY))}catch(e){DB=null}
-if(!DB||!DB.students||!Array.isArray(DB.students)){DB=seed()}
+
+// 🛠️ فحص وتصحيح البيانات إذا كانت تالفة أو فارغة
+if(!DB||!DB.students||!Array.isArray(DB.students)||!DB.users||!Array.isArray(DB.users)){
+  DB=seed();
+}
+
 Object.keys(DEF_CFG).forEach(k=>{if(DB.config[k]===undefined)DB.config[k]=DEF_CFG[k]});
 ['health','referrals','records','followups','resolved'].forEach(k=>{if(!DB[k])DB[k]=[]});
+
 // ترحيل: إضافة behaviors و actions الجديدة إذا كانت النسخة قديمة
 if(!DB.behaviors||DB.behaviors.length<20||!DB.behaviors[0].cat){DB.behaviors=DEF_BEH.map(b=>({...b,active:true}));DB.actions=DEF_ACT.map(a=>({...a}))}
+
 const adm=DB.users.find(u=>u.username==='almasaa');
 if(adm){adm.password='';adm.isAdmin=true}else{DB.users.unshift({id:'U1',name:'مدير النظام',title:'مدير',username:'almasaa',password:'',isAdmin:true})}
 localStorage.setItem(KEY,JSON.stringify(DB));
@@ -275,20 +265,45 @@ theme();size();
 /* ============ الدخول ============ */
 let USER=null;
 function login(){
-  const conv=s=>String(s).replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d)).trim();
-  const u=conv(document.getElementById('lgU').value);
-  const p=conv(document.getElementById('lgP').value);
-  const e=document.getElementById('lgE');
-  if(!u){e.textContent='❌ أدخل اسم المستخدم';e.classList.remove('hidden');setTimeout(()=>e.classList.add('hidden'),4000);return}
-  const user=DB.users.find(x=>x.username===u);
-  if(!user){e.textContent='❌ اسم المستخدم غير موجود';e.classList.remove('hidden');setTimeout(()=>e.classList.add('hidden'),4000);return}
-  if(user.password&&user.password.trim()!==''&&user.password!==p){e.textContent='❌ كلمة المرور غير صحيحة';e.classList.remove('hidden');setTimeout(()=>e.classList.add('hidden'),4000);return}
-  USER=user;
-  sessionStorage.setItem('alm_sess',user.id);
-  document.getElementById('login').classList.add('hidden');
-  document.getElementById('app').classList.remove('hidden');
-  document.getElementById('usr').textContent=user.name;
-  boot();
+  try {
+    const conv=s=>String(s).replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d)).trim();
+    const u=conv(document.getElementById('lgU').value);
+    const p=conv(document.getElementById('lgP').value);
+    const e=document.getElementById('lgE');
+    
+    if(!u){
+      e.textContent='❌ أدخل اسم المستخدم';
+      e.classList.remove('hidden');
+      setTimeout(()=>e.classList.add('hidden'),4000);
+      return;
+    }
+    if(!DB || !DB.users){ alert('خطأ في تحميل البيانات، يرجى تحديث الصفحة'); return; }
+    
+    const user=DB.users.find(x=>x.username===u);
+    if(!user){
+      e.textContent='❌ اسم المستخدم غير موجود';
+      e.classList.remove('hidden');
+      setTimeout(()=>e.classList.add('hidden'),4000);
+      return;
+    }
+    
+    if(user.password&&user.password.trim()!==''&&user.password!==p){
+      e.textContent='❌ كلمة المرور غير صحيحة';
+      e.classList.remove('hidden');
+      setTimeout(()=>e.classList.add('hidden'),4000);
+      return;
+    }
+    
+    USER=user;
+    sessionStorage.setItem('alm_sess',user.id);
+    document.getElementById('login').classList.add('hidden');
+    document.getElementById('app').classList.remove('hidden');
+    document.getElementById('usr').textContent=user.name;
+    boot();
+  } catch(err) {
+    alert('حدث خطأ غير متوقع: ' + err.message);
+    console.error(err);
+  }
 }
 function logout(){if(!confirm('خروج؟'))return;USER=null;sessionStorage.removeItem('alm_sess');document.getElementById('app').classList.add('hidden');document.getElementById('login').classList.remove('hidden')}
 const isAdmin=()=>USER&&USER.isAdmin;
@@ -428,7 +443,6 @@ function st(t,v,i,g){return `<div class="text-white rounded-2xl p-4 relative ove
 let E={sid:'',bid:'',aid:'',note:'',uid:'',an:'',customBeh:'',customAct:''};
 function renderEntry(){
   if(!E.uid&&DB.users.length)E.uid=DB.users[0].id;
-  // تصنيف السلوكيات
   const cats=[...new Set(DB.behaviors.filter(b=>b.active).map(b=>b.cat||'أخرى'))];
   
   return `<div class="max-w-4xl space-y-4"><header><h1 style="font-size:24px;font-weight:900">✍️ تسجيل سلوك / مخالفة</h1><p style="font-size:13px;color:#64748b;margin-top:4px">📅 ${today()}</p></header><div class="bg-white rounded-2xl p-5 shadow-sm space-y-4">
@@ -782,8 +796,8 @@ function pkRS(sid){RP=sid;const s=gS(sid);document.getElementById('rS').value=s.
 function stuReportHTML(sid){const s=gS(sid);const recs=DB.records.filter(r=>r.studentId===sid).sort((a,b)=>b.createdAt-a.createdAt);const tp=recs.reduce((a,r)=>a+(r.points||0),0);const rows=recs.map(r=>`<tr><td style="border:1px solid #999;padding:5px;font-size:10px">${fmtD(r.createdAt)}</td><td style="border:1px solid #999;padding:5px;font-size:10px">${esc(r.behaviorName||'')}</td><td style="border:1px solid #999;padding:5px;font-size:10px;text-align:center;color:#DC2626;font-weight:bold">${r.points||0}</td><td style="border:1px solid #999;padding:5px;font-size:10px">${esc(r.actionName||'')}</td></tr>`).join('');return `<div style="max-width:900px;margin:auto">${rHdr()}<div style="text-align:center;font-size:15px;font-weight:900;margin-bottom:12px;background:var(--c-primary-soft);padding:8px;border-radius:6px">تقرير السلوك الشامل</div><table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:12px"><tr><td style="border:1px solid #999;padding:7px;background:#f5f5f5;font-weight:bold;width:20%">الطالب</td><td style="border:1px solid #999;padding:7px">${esc(s.name)}</td><td style="border:1px solid #999;padding:7px;background:#f5f5f5;font-weight:bold;width:15%">الصف</td><td style="border:1px solid #999;padding:7px">${s.grade}/${s.section}</td></tr><tr><td style="border:1px solid #999;padding:7px;background:#f5f5f5;font-weight:bold">المخالفات</td><td style="border:1px solid #999;padding:7px;font-weight:bold;color:#DC2626">${recs.length}</td><td style="border:1px solid #999;padding:7px;background:#f5f5f5;font-weight:bold">النقاط</td><td style="border:1px solid #999;padding:7px;font-weight:bold;color:#DC2626">${tp}</td></tr></table><table style="width:100%;border-collapse:collapse;font-size:10px"><thead><tr style="background:var(--c-primary);color:white"><th style="border:1px solid #999;padding:6px">التاريخ</th><th style="border:1px solid #999;padding:6px">المخالفة</th><th style="border:1px solid #999;padding:6px">النقاط</th><th style="border:1px solid #999;padding:6px">الإجراء</th></tr></thead><tbody>${rows||'<tr><td colspan="4" style="border:1px solid #999;padding:15px;text-align:center">لا مخالفات</td></tr>'}</tbody></table>${rFtr()}</div>`}
 function pRS(){if(!RP){toast('اختر','err');return}document.getElementById('mdl').innerHTML='';prt(stuReportHTML(RP))}
 function waRS(){if(!RP){toast('اختر','err');return}const s=gS(RP);if(!s.phone){toast('لا رقم','err');return}const recs=DB.records.filter(r=>r.studentId===RP);const tp=recs.reduce((a,r)=>a+(r.points||0),0);let msg=`السلام عليكم ورحمة الله وبركاته\nولي أمر الطالب: ${s.name}\nالصف: ${s.grade} / الشعبة: ${s.section}\n\n📋 تقرير السلوك:\nإجمالي المخالفات: ${recs.length}\nإجمالي النقاط: ${tp}\n\n${DB.config.schoolName}`;wa(s.phone,msg)}
-function rptGrade(){document.getElementById('mdl').innerHTML=`<div class="mdl" onclick="if(event.target===this)this.remove()"><div class="bg-white rounded-2xl p-6 w-full max-w-md"><h3 style="font-weight:900;font-size:18px;margin-bottom:16px">تقرير صف</h3><div style="display:flex;flex-direction:column;gap:12px"><div><label style="display:block;font-size:12px;font-weight:bold;margin-bottom:4px">الصف</label><select id="gG" class="w-full rounded-xl border-2 border-slate-200 px-3 py-2 text-sm font-bold bg-white">${GR.map(g=>`<option>${g}</option>`).join('')}</select></div><div><label style="display:block;font-size:12px;font-weight:bold;margin-bottom:4px">الشعبة</label><select id="gS2" class="w-full rounded-xl border-2 border-slate-200 px-3 py-2 text-sm font-bold bg-white"><option value="">كل الشعب</option>${SC.map(s=>`<option>${s}</option>`).join('')}</select></div></div><div style="display:flex;gap:8px;margin-top:16px"><button onclick="doGR()" class="flex-1 bg-p text-white font-bold py-2.5 rounded-xl">🖨️ طباعة</button><button onclick="this.closest('.mdl').remove()" class="px-4 bg-slate-100 font-bold py-2.5 rounded-xl">إلغاء</button></div></div></div>`}
-function doGR(){const g=+document.getElementById('gG').value;const s=document.getElementById('gS2').value;const stus=DB.students.filter(x=>x.grade===g&&(!s||x.section===+s)).sort((a,b)=>a.section-b.section||a.name.localeCompare(b.name,'ar'));const rows=stus.map((x,i)=>{const st=stats(x.id);return `<tr><td style="border:1px solid #999;padding:5px;text-align:center;font-size:10px">${i+1}</td><td style="border:1px solid #999;padding:5px;font-size:10px">${esc(x.name)}</td><td style="border:1px solid #999;padding:5px;text-align:center;font-size:10px">${x.section}</td><td style="border:1px solid #999;padding:5px;text-align:center;font-size:10px;color:#DC2626;font-weight:bold">${st.count}</td><td style="border:1px solid #999;padding:5px;text-align:center;font-size:10px;color:#DC2626;font-weight:bold">${st.points}</td></tr>`}).join('');document.getElementById('mdl').innerHTML='';prt(`<div style="max-width:900px;margin:auto">${rHdr()}<div style="text-align:center;font-size:14px;font-weight:900;margin-bottom:12px;background:var(--c-primary-soft);padding:8px;border-radius:6px">كشف السلوك — الصف ${g} ${s?'شعبة '+s:''}</div><table style="width:100%;border-collapse:collapse;font-size:10px"><thead><tr style="background:var(--c-primary);color:white"><th style="border:1px solid #999;padding:6px">#</th><th style="border:1px solid #999;padding:6px">الاسم</th><th style="border:1px solid #999;padding:6px">الشعبة</th><th style="border:1px solid #999;padding:6px">المخالفات</th><th style="border:1px solid #999;padding:6px">النقاط</th></tr></thead><tbody>${rows}</tbody></table>${rFtr()}</div>`)}
+function rptGrade(){document.getElementById('mdl').innerHTML=`<div class="mdl" onclick="if(event.target===this)this.remove()"><div class="bg-white rounded-2xl p-6 w-full max-w-md"><h3 style="font-weight:900;font-size:18px;margin-bottom:16px">تقرير صف</h3><div style="display:flex;flex-direction:column;gap:12px"><div><label style="display:block;font-size:12px;font-weight:bold;margin-bottom:4px">الصف</label><select id="gG" class="w-full rounded-xl border-2 border-slate-200 px-3 py-2 text-sm font-bold bg-white">${GR.map(g=>`<option>${g}</option>`).join('')}</select></div><div><label style="display:block;font-size:12px;font#-weight:bold;margin-bottom:4px</">الشعبة</labelth><><select id="gS2"th class="w-full rounded-xl border-2 border-slate-200 px-3 py-2 text-sm font-bold bg-white"><option value="">كل الشعب</option>${SC.map(s=>`<option>${s}</option>`).join('')}</select></div></div><div style="display:flex;gap:8px;margin-top:16px"><button onclick="doGR()" class="flex-1 bg-p text-white font-bold py-2.5 rounded-xl">🖨️ طباعة</button><button onclick="this.closest('.mdl').remove()" class="px-4 bg-slate-100 font-bold py-2.5 rounded-xl">إلغاء</button></div></div></div>`}
+function doGR(){const g=+document.getElementById('gG').value;const s=document.getElementById('gS2').value;const stus=DB.students.filter(x=>x.grade===g&&(!s||x.section===+s)).sort((a,b)=>a.section-b.section||a.name.localeCompare(b.name,'ar'));const rows=stus.map((x,i)=>{const st=stats(x.id);return `<tr><td style="border:1px solid #999;padding:5px;text-align:center;font-size:10px">${i+1}</td><td style="border:1px solid #999;padding:5px;font-size:10px">${esc(x.name)}</td><td style="border:1px solid #999;padding:5px;text-align:center;font-size:10px">${x.section}</td><td style="border:1px solid #999;padding:5px;text-align:center;font-size:10px;color:#DC2626;font-weight:bold">${st.count}</td><td style="border:1px solid #999;padding:5px;text-align:center;font-size:10px;color:#DC2626;font-weight:bold">${st.points}</td></tr>`}).join('');document.getElementById('mdl').innerHTML='';prt(`<div style="max-width:900px;margin:auto">${rHdr()}<div style="text-align:center;font-size:14px;font-weight:900;margin-bottom:12px;background:var(--c-primary-soft);padding:8px;border-radius:6px">كشف السلوك — الصف ${g} ${s?'شعبة '+s:''}</div><table style="width:100%;border-collapse:collapse;font-size:10px"><thead><tr style="background:var(--c-primary);color:white"><th style="border:1px solid #999;padding:6px"> style="border:1px solid #999;padding:6px">الاسم</th><th style="border:1px solid #999;padding:6px">الشعبة</th><th style="border:1px solid #999;padding:6px">المخالفات</th><th style="border:1px solid #999;padding:6px">النقاط</th></tr></thead><tbody>${rows}</tbody></table>${rFtr()}</div>`)}
 function cardsStu(){document.getElementById('mdl').innerHTML=`<div class="mdl" onclick="if(event.target===this)this.remove()"><div class="bg-white rounded-2xl p-6 w-full max-w-md"><h3 style="font-weight:900;font-size:18px;margin-bottom:16px">كشف طلبة</h3><div style="display:flex;flex-direction:column;gap:12px"><div><label style="display:block;font-size:12px;font-weight:bold;margin-bottom:4px">الصف</label><select id="cG" class="w-full rounded-xl border-2 border-slate-200 px-3 py-2 text-sm font-bold bg-white">${GR.map(g=>`<option>${g}</option>`).join('')}</select></div><div><label style="display:block;font-size:12px;font-weight:bold;margin-bottom:4px">الشعبة</label><select id="cS" class="w-full rounded-xl border-2 border-slate-200 px-3 py-2 text-sm font-bold bg-white"><option value="">كل الشعب</option>${SC.map(s=>`<option>${s}</option>`).join('')}</select></div></div><div style="display:flex;gap:8px;margin-top:16px"><button onclick="doCards()" class="flex-1 bg-p text-white font-bold py-2.5 rounded-xl">🖨️ طباعة</button><button onclick="this.closest('.mdl').remove()" class="px-4 bg-slate-100 font-bold py-2.5 rounded-xl">إلغاء</button></div></div></div>`}
 function doCards(){const g=+document.getElementById('cG').value;const s=document.getElementById('cS').value;const stus=DB.students.filter(x=>x.grade===g&&(!s||x.section===+s)).sort((a,b)=>a.section-b.section||a.name.localeCompare(b.name,'ar'));const rows=stus.map((x,i)=>`<tr><td style="border:1px solid #999;padding:5px;text-align:center;font-size:10px">${i+1}</td><td style="border:1px solid #999;padding:5px;font-size:10px">${esc(x.name)}</td><td style="border:1px solid #999;padding:5px;text-align:center;font-size:10px">${x.section}</td><td style="border:1px solid #999;padding:5px;text-align:center;font-size:10px">${x.phone?esc(x.phone):'—'}</td></tr>`).join('');document.getElementById('mdl').innerHTML='';prt(`<div style="max-width:900px;margin:auto">${rHdr()}<div style="text-align:center;font-weight:900;font-size:14px;margin-bottom:12px">كشف طلبة الصف ${g} ${s?'شعبة '+s:''} (${stus.length})</div><table style="width:100%;border-collapse:collapse;font-size:10px"><thead><tr style="background:var(--c-primary);color:white"><th style="border:1px solid #999;padding:6px;width:40px">#</th><th style="border:1px solid #999;padding:6px">الاسم</th><th style="border:1px solid #999;padding:6px;width:70px">الشعبة</th><th style="border:1px solid #999;padding:6px;width:110px">هاتف ولي الأمر</th></tr></thead><tbody>${rows}</tbody></table>${rFtr()}</div>`)}
 
@@ -804,7 +818,7 @@ function renderSettings(){
   const c=DB.config;
   return `<div class="space-y-5 max-w-4xl"><header><h1 style="font-size:24px;font-weight:900">⚙️ الإعدادات</h1><p style="font-size:13px;color:#64748b;margin-top:4px">للمدير فقط</p></header>
   <div class="bg-white rounded-2xl p-6 shadow-sm space-y-4"><h3 style="font-weight:900;padding-right:12px;border-right:4px solid var(--p);margin-bottom:16px">🎨 المظهر</h3><div><label style="display:block;font-size:14px;font-weight:bold;margin-bottom:8px">لون المنصة</label><div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px">${Object.entries(TH).map(([k,t])=>`<button onclick="DB.config.theme='${k}';save();theme();render()" style="padding:12px;border-radius:12px;border:2px solid ${c.theme===k?'#1e293b':'#e2e8f0'}"><div style="width:100%;height:26px;border-radius:8px;background:${t[0]};margin-bottom:6px"></div><div style="font-size:10px;font-weight:bold">${t[5]}</div></button>`).join('')}</div></div><div><label style="display:block;font-size:14px;font-weight:bold;margin-bottom:8px">حجم الواجهة</label><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">${[['small','صغير'],['medium','متوسط'],['large','كبير'],['xl','كبير جداً']].map(([v,l])=>`<button onclick="DB.config.uiSize='${v}';save();size();render()" style="padding:12px;border-radius:12px;border:2px solid ${c.uiSize===v?'var(--p)':'#e2e8f0'};background:${c.uiSize===v?'var(--s)':'#fff'};font-weight:bold;font-size:12px">${l}</button>`).join('')}</div></div></div>
-  <div class="bg-white rounded-2xl p-6 shadow-sm space-y-4"><h3 style="font-weight:900;padding-right:12px;border-right:4px solid var(--p);margin-bottom:16px">🖨️ الطباعة</h3><div><label style="display:block;font-size:14px;font-weight:bold;margin-bottom:8px">خط الطباعة</label><div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px">${['Cairo','Tajawal','Almarai','Amiri','Noto Kufi Arabic'].map(f=>`<button onclick="DB.config.printFont='${f}';save();render()" style="padding:12px;border-radius:12px;border:2px solid ${c.printFont===f?'var(--p)':'#e2e8f0'};background:${c.printFont===f?'var(--s)':'#fff'};font-family:'${f}',sans-serif;font-size:14px;font-weight:bold">${f}</button>`).join('')}</div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:16px"><div><label style="display:block;font-size:14px;font-weight:bold;margin-bottom:4px">حجم الخط</label><select onchange="DB.config.printSize=this.value;save();render()" class="w-full rounded-xl border-2 border-slate-200 px-3 py-2 text-sm font-bold bg-white">${[10,11,12,13,14,15,16,18].map(n=>`<option ${c.printSize==n?'selected':''}>${n}</option>`).join('')}</select></div><div><label style="display:block;font-size:14px;font-weight:bold;margin-bottom:4px">السماكة</label><select onchange="DB.config.printWeight=this.value;save();render()" class="w-full rounded-xl border-2 border-slatec-200 px-3 py-2 text-sm.print font-bold bg-white"><option value="400" ${c.printWeightWeight=='400'?'selected':''}>عادي=='</option><option value="600"600 ${'?'selected':''}>شبه عريض</option><option value="700" ${c.printWeight=='700'?'selected':''}>عريض</option><option value="900" ${c.printWeight=='900'?'selected':''}>عريض جداً</option></select></div></div></div>
+  <div class="bg-white rounded-2xl p-6 shadow-sm space-y-4"><h3 style="font-weight:900;padding-right:12px;border-right:4px solid var(--p);margin-bottom:16px">🖨️ الطباعة</h3><div><label style="display:block;font-size:14px;font-weight:bold;margin-bottom:8px">خط الطباعة</label><div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px">${['Cairo','Tajawal','Almarai','Amiri','Noto Kufi Arabic'].map(f=>`<button onclick="DB.config.printFont='${f}';save();render()" style="padding:12px;border-radius:12px;border:2px solid ${c.printFont===f?'var(--p)':'#e2e8f0'};background:${c.printFont===f?'var(--s)':'#fff'};font-family:'${f}',sans-serif;font-size:14px;font-weight:bold">${f}</button>`).join('')}</div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:16px"><div><label style="display:block;font-size:14px;font-weight:bold;margin-bottom:4px">حجم الخط</label><select onchange="DB.config.printSize=this.value;save();render()" class="w-full rounded-xl border-2 border-slate-200 px-3 py-2 text-sm font-bold bg-white">${[10,11,12,13,14,15,16,18].map(n=>`<option ${c.printSize==n?'selected':''}>${n}</option>`).join('')}</select></div><div><label style="display:block;font-size:14px;font-weight:bold;margin-bottom:4px">السماكة</label><select onchange="DB.config.printWeight=this.value;save();render()" class="w-full rounded-xl border-2 border-slate-200 px-3 py-2 text-sm font-bold bg-white"><option value="400" ${c.printWeight=='400'?'selected':''}>عادي</option><option value="600" ${c.printWeight=='600'?'selected':''}>شبه عريض</option><option value="700" ${c.printWeight=='700'?'selected':''}>عريض</option><option value="900" ${c.printWeight=='900'?'selected':''}>عريض جداً</option></select></div></div></div>
   <div class="bg-white rounded-2xl p-6 shadow-sm space-y-4"><h3 style="font-weight:900;padding-right:12px;border-right:4px solid var(--p);margin-bottom:16px">🏫 الهوية</h3><div><label style="display:block;font-size:14px;font-weight:bold;margin-bottom:4px">اسم المنصة</label><input id="sP" value="${esc(c.platformName)}" class="w-full rounded-xl border-2 border-slate-200 px-3 py-2 text-sm"></div><div><label style="display:block;font-size:14px;font-weight:bold;margin-bottom:4px">اسم المدرسة</label><input id="sS" value="${esc(c.schoolName)}" class="w-full rounded-xl border-2 border-slate-200 px-3 py-2 text-sm"></div><div><label style="display:block;font-size:14px;font-weight:bold;margin-bottom:4px">السطر الوزاري</label><input id="sM" value="${esc(c.ministry)}" class="w-full rounded-xl border-2 border-slate-200 px-3 py-2 text-sm"></div><div><label style="display:block;font-size:14px;font-weight:bold;margin-bottom:4px">المديرية</label><input id="sD" value="${esc(c.directorate)}" class="w-full rounded-xl border-2 border-slate-200 px-3 py-2 text-sm"></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:16px"><div><label style="display:block;font-size:14px;font-weight:bold;margin-bottom:4px">الشعار الأيمن</label><input type="file" id="sLR" accept="image/*" class="text-sm">${c.logoR?`<div style="margin-top:8px;display:flex;gap:8px;align-items:center"><img src="${c.logoR}" style="width:50px;height:50px;object-fit:contain;border-radius:8px;border:1px solid #e2e8f0"><button onclick="DB.config.logoR='';save();render()" style="font-size:12px;color:#dc2626;font-weight:bold">حذف</button></div>`:''}</div><div><label style="display:block;font-size:14px;font-weight:bold;margin-bottom:4px">الشعار الأيسر</label><input type="file" id="sLL" accept="image/*" class="text-sm">${c.logoL?`<div style="margin-top:8px;display:flex;gap:8px;align-items:center"><img src="${c.logoL}" style="width:50px;height:50px;object-fit:contain;border-radius:8px;border:1px solid #e2e8f0"><button onclick="DB.config.logoL='';save();render()" style="font-size:12px;color:#dc2626;font-weight:bold">حذف</button></div>`:''}</div></div></div>
   <div class="bg-white rounded-2xl p-6 shadow-sm space-y-4"><h3 style="font-weight:900;padding-right:12px;border-right:4px solid var(--p);margin-bottom:16px">📋 تذييل الطباعة</h3><div style="display:grid;grid-template-columns:1fr 1fr;gap:16px"><div><label style="display:block;font-size:12px;font-weight:bold;margin-bottom:4px">نص اللجنة</label><input id="sC" value="${esc(c.committee)}" class="w-full rounded-xl border-2 border-slate-200 px-3 py-2 text-sm"></div><div><label style="display:block;font-size:12px;font-weight:bold;margin-bottom:4px">القسم الإداري</label><input id="sAD" value="${esc(c.adminDept)}" class="w-full rounded-xl border-2 border-slate-200 px-3 py-2 text-sm"></div><div><label style="display:block;font-size:12px;font-weight:bold;margin-bottom:4px">مسمى المدير</label><input id="sPT" value="${esc(c.principalTitle)}" class="w-full rounded-xl border-2 border-slate-200 px-3 py-2 text-sm"></div><div><label style="display:block;font-size:12px;font-weight:bold;margin-bottom:4px">اسم المدير</label><input id="sPN" value="${esc(c.principalName)}" class="w-full rounded-xl border-2 border-slate-200 px-3 py-2 text-sm"></div><div><label style="display:block;font-size:12px;font-weight:bold;margin-bottom:4px">مسمى الزائر الصحي</label><input id="sHVT" value="${esc(c.healthVisitorTitle)}" class="w-full rounded-xl border-2 border-slate-200 px-3 py-2 text-sm"></div><div><label style="display:block;font-size:12px;font-weight:bold;margin-bottom:4px">اسم الزائر الصحي</label><input id="sHVN" value="${esc(c.healthVisitorName)}" class="w-full rounded-xl border-2 border-slate-200 px-3 py-2 text-sm"></div></div></div>
   <div class="bg-white rounded-2xl p-6 shadow-sm space-y-4"><h3 style="font-weight:900;padding-right:12px;border-right:4px solid var(--p);margin-bottom:16px">💬 قوالب واتساب</h3><div style="background:#eff6ff;border-right:4px solid #3b82f6;padding:12px;border-radius:12px;font-size:12px">المتغيرات: <code>{student}</code> <code>{grade}</code> <code>{section}</code> <code>{behavior}</code> <code>{points}</code> <code>{action}</code> <code>{desc}</code> (النص اللائحي) <code>{date}</code> <code>{school}</code> <code>{reason}</code></div><div><label style="display:block;font-size:14px;font-weight:bold;margin-bottom:4px">قالب رسالة المخالفة</label><textarea id="sWB" rows="8" class="w-full rounded-xl border-2 border-slate-200 px-3 py-2 text-xs font-mono">${esc(c.waBehavior)}</textarea></div><div><label style="display:block;font-size:14px;font-weight:bold;margin-bottom:4px">قالب رسالة التحويل الصحي</label><textarea id="sWH" rows="8" class="w-full rounded-xl border-2 border-slate-200 px-3 py-2 text-xs font-mono">${esc(c.waHealth)}</textarea></div></div>
