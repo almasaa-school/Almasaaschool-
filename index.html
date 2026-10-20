@@ -72,7 +72,7 @@ body.sm{font-size:13px}body.lg{font-size:17px}body.xl{font-size:19px}
         <span class="font-bold text-slate-500">أحمد بن عبدالله العلي</span><br>
         مساعد مدير المدرسة
       </div>
-      v12.3
+      v12.4
     </div>
   </aside>
   <main class="flex-1 overflow-x-hidden">
@@ -172,31 +172,33 @@ const DEF_BEH=[
 
 const DEF_STU=[['أحمد بن سالم الرواحي',5,1],['محمد بن خالد البلوشي',5,1],['يوسف بن علي المعمري',5,2],['عبدالله بن حمد الحارثي',5,2],['سعيد بن راشد الكندي',5,3],['خالد بن ناصر الفارسي',6,1],['سلطان بن ماجد الشكيلي',6,1],['حمزة بن ياسر العامري',6,2],['طلال بن سعيد الهنائي',6,2],['فهد بن عبدالرحمن الزدجالي',6,3],['بدر بن سليمان الريامي',7,1],['مازن بن حمدان الحجري',7,1],['معاذ بن طارق السعدي',7,2],['أيمن بن وليد المقبالي',7,2],['راشد بن سيف الخروصي',7,3],['هلال بن منصور الغافري',8,1],['نبيل بن عامر الحوسني',8,1],['قيس بن مروان الوهيبي',8,2],['زياد بن فارس اليعقوبي',8,2],['مروان بن أيمن السيابي',8,3],['حاتم بن صالح العبري',9,1],['عمار بن نبيل الجابري',9,1],['أنس بن كمال الرئيسي',9,2],['بلال بن هيثم المخيني',9,2],['جعفر بن عادل الشعيلي',9,3],['كرم بن رامي الصوافي',9,3],['ليث بن جابر الحسني',5,4],['مصعب بن أنور البوسعيدي',6,4],['نزار بن صقر الهاشمي',7,4],['وسام بن فاروق الأغبري',8,4],['ياسر بن رمزي العجمي',9,4],['يعقوب بن إسحاق النعماني',5,5],['أسامة بن زهير الكلباني',6,5],['إبراهيم بن نوح المسروري',7,5],['إسماعيل بن ياسين الحبسي',8,5],['بشار بن حكيم الشيباني',9,5]];
 
-const KEY='almasaa_v12_3';
+const KEY='almasaa_v12_4';
 const DEF_CFG={schoolName:'مدرسة المسعى للبنين (٥-٩)',platformName:'منصة السلوك الطلابي',ministry:'وزارة التربية والتعليم — سلطنة عُمان',directorate:'المديرية العامة للتعليم بمحافظة شمال الباطنة',theme:'emerald',uiSize:'medium',printFont:'Cairo',printSize:'12',printWeight:'700',logoR:'',logoL:'',committee:'لجنة شؤون الطلبة',adminDept:'إدارة المدرسة',principalName:'حسن علي إبراهيم البلوشي',principalTitle:'مدير المدرسة',healthVisitorName:'',healthVisitorTitle:'الزائر الصحي',reportTitle:'إقرار مخالفة سلوكية وانتظام دراسي',reportFooter:'يُرجى من ولي الأمر التواصل مع إدارة المدرسة لمتابعة الحالة.',healthTitle:'خطاب تحويل للوحدة الصحية',healthRecipient:'الفاضل مدير مستشفى / مركز صحي: مجمع صحي السويق المحترم',healthGreeting:'السلام عليكم ورحمة الله وبركاته،',healthBody:'نحيل إليكم الطالب:',healthClosing:'آملين إجراء الكشف الطبي عليه وإفادتنا بالنتيجة، والله الموفق.',healthReturnNote:'يجب إعادة هذه الرسالة لإدارة المدرسة مختومة من المستشفى في اليوم التالي.',healthOptions:['مسؤول الغياب','يقبل العذر','لا يقبل العذر'],signatures:['توقيع المعلم','توقيع الأخصائي','توقيع مدير المدرسة'],waBehavior:'السلام عليكم ورحمة الله وبركاته\nولي أمر الطالب: {student}\nالصف: {grade} / الشعبة: {section}\n\nنحيطكم علماً بتسجيل إجراء بحق ابنكم:\n📋 السلوك: {behavior}\n⚠️ النقاط: {points}\n🎯 الإجراء: {action}\n📜 النص اللائحي: {desc}\n📅 {date}\n\n{school}',waHealth:'السلام عليكم ورحمة الله وبركاته\nولي أمر الطالب: {student}\nالصف: {grade} / الشعبة: {section}\n\nتم تحويل ابنكم للوحدة الصحية{reason}.\n📅 {date}\n\n{school}'};
 
 function seed(){return {config:{...DEF_CFG},users:[{id:'U1',name:'مدير النظام',title:'مدير',username:'almasaa',password:'',isAdmin:true},{id:'U2',name:'وكيل المدرسة',title:'وكيل',username:'wakil',password:'',isAdmin:false}],students:DEF_STU.map((x,i)=>({id:'S'+String(i+1).padStart(3,'0'),name:x[0],grade:x[1],section:x[2],phone:'',guardian:''})),behaviors:DEF_BEH.map(b=>({...b,active:true})),actions:DEF_ACT.map(a=>({...a})),health:[],referrals:[],records:[],followups:[],resolved:[]}}
 
-try{DB=JSON.parse(localStorage.getItem(KEY))}catch(e){DB=null}
-if(!DB||!DB.config||!DB.students||!Array.isArray(DB.students)||!DB.users||!Array.isArray(DB.users)){DB=seed()}
-Object.keys(DEF_CFG).forEach(k=>{if(DB.config[k]===undefined)DB.config[k]=DEF_CFG[k]});
-['health','referrals','records','followups','resolved'].forEach(k=>{if(!DB[k])DB[k]=[]});
+// 🛡️ دالة الإصلاح التلقائي (تمنع انهيار النظام إذا كانت البيانات قديمة أو ناقصة)
+function fixDB(obj){
+  if(!obj) return;
+  if(!obj.config) obj.config={...DEF_CFG};
+  Object.keys(DEF_CFG).forEach(k=>{if(obj.config[k]===undefined)obj.config[k]=DEF_CFG[k]});
+  ['health','referrals','records','followups','resolved'].forEach(k=>{if(!obj[k] || !Array.isArray(obj[k]))obj[k]=[]});
+  if(!obj.students || !Array.isArray(obj.students)) obj.students=[];
+  if(!obj.users || !Array.isArray(obj.users)) obj.users=[];
+  if(!obj.behaviors || !Array.isArray(obj.behaviors)) obj.behaviors=[...DEF_BEH];
+  if(!obj.actions || !Array.isArray(obj.actions)) obj.actions=[...DEF_ACT];
+}
 
-let needsMigration = false;
-if(DB.behaviors && DB.behaviors.length > 0 && DB.behaviors[0].name.includes('(المرة')) {
-    needsMigration = true;
-}
-if(needsMigration || !DB.behaviors || DB.behaviors.length < 20) {
-    DB.behaviors = DEF_BEH.map(b => ({...b, active: true}));
-    DB.actions = DEF_ACT.map(a => ({...a}));
-}
+try{DB=JSON.parse(localStorage.getItem(KEY))}catch(e){DB=null}
+if(!DB){DB=seed()}
+fixDB(DB);
 
 const adm=DB.users.find(u=>u.username==='almasaa');
 if(adm){adm.password='';adm.isAdmin=true}else{DB.users.unshift({id:'U1',name:'مدير النظام',title:'مدير',username:'almasaa',password:'',isAdmin:true})}
 localStorage.setItem(KEY,JSON.stringify(DB));
 
 function save(){
-  try{localStorage.setItem(KEY,JSON.stringify(DB))}catch(e){}
+  try{fixDB(DB);localStorage.setItem(KEY,JSON.stringify(DB))}catch(e){}
   bkTick();
   if(CLOUD.enabled&&CLOUD.online)cloudPush();
 }
@@ -225,7 +227,10 @@ async function cloudPull(silent){
     const localHasData=DB.students.length>0||DB.records.length>0||DB.users.length>0;
     if(!cloudHasData&&localHasData){upCloud('⬆️ رفع أولي...');await cloudPush();return false}
     if(!cloudHasData&&!localHasData){upCloud('✅ جاهز');return false}
+    
     DB=p;
+    fixDB(DB); // إصلاح البيانات القادمة من السحابة
+    
     localStorage.setItem(KEY,JSON.stringify(DB));
     CLOUD.last=new Date(data.updated_at).getTime();
     if(!silent)upCloud('✅ محدّث');
@@ -361,7 +366,7 @@ function bk(){
 }
 function restore(){
   const i=document.createElement('input');i.type='file';i.accept='.json';
-  i.onchange=e=>{const f=e.target.files[0];if(!f)return;if(!confirm('استبدال البيانات؟'))return;const r=new FileReader();r.onload=ev=>{try{const d=JSON.parse(ev.target.result);DB=d.data||d;localStorage.setItem(KEY,JSON.stringify(DB));alert('✅ تم');location.reload()}catch(x){alert('خطأ')}};r.readAsText(f)};
+  i.onchange=e=>{const f=e.target.files[0];if(!f)return;if(!confirm('استبدال البيانات؟'))return;const r=new FileReader();r.onload=ev=>{try{const d=JSON.parse(ev.target.result);DB=d.data||d;fixDB(DB);localStorage.setItem(KEY,JSON.stringify(DB));alert('✅ تم');location.reload()}catch(x){alert('خطأ')}};r.readAsText(f)};
   i.click();
 }
 
@@ -577,32 +582,27 @@ function onBehChange(){
   suggestAction();
 }
 
-// 🧠 محرك التدرج التلقائي (Auto-Escalation Engine) المطور
 function suggestAction(){
   if(!E.sid || !E.bid) return;
   const b=gB(E.bid);
   if(!b) return;
   
-  // حساب عدد التكرارات السابقة لهذا السلوك تحديداً
   const pastIncidents = DB.records.filter(r => r.studentId === E.sid && r.behaviorId === E.bid);
   const occurrences = pastIncidents.length; 
   
-  // التدرج: المستوى الأساسي + عدد التكرارات
   let escalatedLevel = (b.level || 1) + occurrences;
   if (escalatedLevel > 7) escalatedLevel = 7;
   
   let suggestedActId = 'A1';
   
-  // توزيع الإجراءات بناءً على المستوى الناتج
-  if(escalatedLevel === 1) suggestedActId = 'A1'; // نصح شفهي
-  else if(escalatedLevel === 2) suggestedActId = 'A2'; // نصح ورقي
-  else if(escalatedLevel === 3) suggestedActId = 'A3'; // تنبيه ورقي
-  else if(escalatedLevel === 4) suggestedActId = 'A4'; // إنذار وتعهد
-  else if(escalatedLevel === 5) suggestedActId = 'A6'; // فصل مؤقت 3 أيام
-  else if(escalatedLevel === 6) suggestedActId = 'A8'; // رفع للجنة (فصل 5-10 أيام)
-  else if(escalatedLevel >= 7) suggestedActId = 'A10'; // حرمان من امتحان
+  if(escalatedLevel === 1) suggestedActId = 'A1'; 
+  else if(escalatedLevel === 2) suggestedActId = 'A2'; 
+  else if(escalatedLevel === 3) suggestedActId = 'A3'; 
+  else if(escalatedLevel === 4) suggestedActId = 'A4'; 
+  else if(escalatedLevel === 5) suggestedActId = 'A6'; 
+  else if(escalatedLevel === 6) suggestedActId = 'A8'; 
+  else if(escalatedLevel >= 7) suggestedActId = 'A10'; 
   
-  // استثناءات خاصة للغياب
   if(b.cat === 'غياب') {
      if(b.id === 'B_G1') suggestedActId = 'A2'; 
      if(b.id === 'B_G2') suggestedActId = 'A3'; 
@@ -721,7 +721,6 @@ function saveRec(){
   
   DB.followups=DB.followups.filter(f=>f.studentId!==E.sid||f.resolved);
   
-  // حساب عدد التكرارات لهذا السلوك
   const pastIncidents = DB.records.filter(r => r.studentId === E.sid && r.behaviorId === E.bid);
   const occurrenceCount = pastIncidents.length + 1;
 
