@@ -3,30 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>منصة السلوك الطلابي — المسعى v17</title>
+<title>منصة السلوك الطلابي — المسعى</title>
 <script src="https://cdn.tailwindcss.com"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
-body{font-family:'Cairo',sans-serif;background:#F1F5F9;margin:0}
-.hidden{display:none!important}
-.sidebar-open{transform:translateX(0)!important}
-@media print{.no-print{display:none!important}}
-/* Custom Scrollbar */
-::-webkit-scrollbar{width:6px;height:6px}
-::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:10px}
+  body { font-family: 'Cairo', sans-serif; background: #F1F5F9; }
+  .hidden { display: none !important; }
+  @media print { .no-print { display: none !important; } }
 </style>
 </head>
-<body>
+<body class="text-slate-800">
 
-<!-- ============ شاشة الدخول ============ -->
-<div id="loginScreen" class="fixed inset-0 bg-emerald-900 flex items-center justify-center p-4 z-[100] overflow-auto">
-  <div class="bg-white rounded-3xl p-8 w-full max-w-md shadow-2xl my-6">
+<!-- شاشة الدخول -->
+<div id="loginScreen" class="fixed inset-0 bg-emerald-800 flex items-center justify-center p-4 z-50">
+  <div class="bg-white rounded-3xl p-8 w-full max-w-md shadow-2xl">
     <div class="text-center mb-6">
       <div class="text-5xl mb-2">🏫</div>
       <h1 class="text-2xl font-black text-emerald-700">منصة السلوك الطلابي</h1>
@@ -38,1329 +28,435 @@ body{font-family:'Cairo',sans-serif;background:#F1F5F9;margin:0}
         <input type="text" id="loginUser" class="w-full border-2 border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-emerald-600" placeholder="almasaa">
       </div>
       <div>
-        <label class="block text-sm font-bold mb-1">كلمة المرور</label>
-        <input type="password" id="loginPass" class="w-full border-2 border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-emerald-600" placeholder="اتركها فارغة">
+        <label class="block text-sm font-bold mb-1">كلمة المرور (اتركها فارغة)</label>
+        <input type="password" id="loginPass" class="w-full border-2 border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-emerald-600">
       </div>
       <p id="loginErr" class="text-red-500 text-sm font-bold text-center hidden">بيانات الدخول غير صحيحة</p>
-      <button type="button" onclick="doLogin()" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-black py-3 rounded-xl shadow mt-2">دخول</button>
+      <button type="button" onclick="doLogin()" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-black py-3 rounded-xl shadow">دخول</button>
     </div>
   </div>
 </div>
 
-<!-- ============ التطبيق ============ -->
-<div id="appScreen" class="hidden min-h-screen flex flex-col lg:flex-row-reverse">
-  
-  <!-- الخلفية المعتمة للجوال -->
-  <div id="sidebarOverlay" class="fixed inset-0 bg-black/50 hidden z-40 lg:hidden" onclick="toggleSidebar()"></div>
-
-  <!-- القائمة الجانبية -->
-  <aside id="sidebar" class="fixed lg:sticky top-0 right-0 w-72 h-screen bg-white shadow-xl z-50 transform translate-x-full lg:translate-x-0 transition-transform duration-300 flex flex-col no-print">
-    <div class="p-5 border-b bg-emerald-50 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 bg-emerald-700 text-white rounded-xl flex items-center justify-center font-bold text-xl">م</div>
-        <div>
-          <div class="font-bold text-emerald-800 text-sm">مدرسة المسعى</div>
-          <div class="text-xs text-slate-500">منصة السلوك</div>
-        </div>
+<!-- التطبيق -->
+<div id="appScreen" class="hidden min-h-screen flex flex-col md:flex-row-reverse">
+  <aside class="w-full md:w-72 bg-white shadow-lg flex flex-col no-print">
+    <div class="p-4 border-b flex items-center gap-3">
+      <div class="w-10 h-10 bg-emerald-700 text-white rounded-xl flex items-center justify-center font-bold text-xl">م</div>
+      <div>
+        <div class="font-bold text-emerald-800 text-sm">مدرسة المسعى</div>
+        <div class="text-xs text-slate-500">منصة السلوك</div>
       </div>
-      <button onclick="toggleSidebar()" class="lg:hidden p-2 text-slate-500 hover:bg-slate-200 rounded-lg">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-      </button>
     </div>
-    
-    <nav class="flex-1 overflow-y-auto p-3 space-y-1" id="navMenu"></nav>
-    
-    <div class="p-4 border-t space-y-2 bg-slate-50">
-      <button onclick="manualSync()" id="syncBtn" class="w-full text-right px-4 py-2.5 rounded-xl text-sm font-bold bg-blue-100 text-blue-700 hover:bg-blue-200 transition">🔄 مزامنة السحابة</button>
-      <button onclick="doLogout()" class="w-full text-right px-4 py-2.5 rounded-xl text-sm font-bold bg-red-100 text-red-700 hover:bg-red-200 transition">🚪 تسجيل الخروج</button>
+    <nav class="flex-1 p-4 space-y-2" id="navMenu"></nav>
+    <div class="p-4 border-t text-center text-xs text-slate-400 leading-relaxed">
+      إعداد وتصميم<br>
+      <span class="font-bold text-slate-600">أحمد بن عبدالله العلي</span><br>
+      مساعد مدير المدرسة<br>
+      <span class="text-[10px]">v13.2 (تدرج دقيق + مراجعة الأستاذ)</span>
     </div>
   </aside>
 
-  <!-- المحتوى الرئيسي -->
-  <main class="flex-1 p-4 lg:p-8 overflow-x-hidden w-full">
-    <!-- شريط علوي للجوال -->
-    <header class="lg:hidden flex items-center justify-between mb-4 bg-white p-4 rounded-2xl shadow-sm">
-      <div class="flex items-center gap-2">
-        <div class="w-8 h-8 bg-emerald-700 rounded-lg flex items-center justify-center text-white font-bold text-sm">م</div>
-        <span class="font-bold text-emerald-800">منصة السلوك</span>
-      </div>
-      <button onclick="toggleSidebar()" class="p-2 bg-slate-100 rounded-lg text-slate-700">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
-      </button>
-    </header>
-
-    <div id="mainContent"></div>
-  </main>
+  <main class="flex-1 p-4 md:p-8" id="mainContent"></main>
 </div>
 
-<div id="modalRoot"></div>
-
 <script>
-/* ============================================================
-   1) الثوابت
-============================================================ */
-const SUPABASE_URL='https://pyuquzmknolznsanksml.supabase.co';
-const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB5dXF1em1rbm9sem5zYW5rc21sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEwNDQ0MDcsImV4cCI6MjEwNjYyMDQwN30.SG3a-9Ly_fZNSi8f8F0McvU5BNbjNIIO0wNxV-MXlgM';
-let sbClient=null; try{ if(window.supabase) sbClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY); }catch(e){}
-const CLOUD={enabled:!!sbClient,syncing:false,pendingPush:false};
-const GRADES=[5,6,7,8,9], SECTIONS=[1,2,3,4,5,6,7];
-
-const DEFAULT_ACTIONS=[
-  {id:'A1',name:'نصح الطالب (شفهياً)',level:1,desc:'توجيه الطالب وإرشاده شفهياً نحو التزامه بقواعد الانتظام والانضباط السلوكي.'},
-  {id:'A2',name:'نصح الطالب (ورقياً)',level:1,desc:'توجيه الطالب وإرشاده كتابياً نحو التزامه بقواعد الانتظام والانضباط السلوكي.'},
-  {id:'A3',name:'تنبيه الطالب (ورقياً)',level:2,desc:'توجيه الطالب كتابياً بعد نصحة لتجنب تكرار المخالفة.'},
-  {id:'A4',name:'إنذار الطالب وأخذ تعهد',level:3,desc:'تحذير الطالب كتابياً بعد تنبيهه لتجنب تكرار المخالفات، مع أخذ تعهد عليه وعلى ولي الأمر.'},
-  {id:'A5',name:'دراسة حالة الطالب',level:4,desc:'تشخيص الحالات السلوكية من قبل الأخصائي الاجتماعي.'},
-  {id:'A6',name:'فصل طالب مؤقتاً (3 أيام)',level:4,desc:'فصل الطالب مؤقتاً مدة لا تتجاوز 3 أيام دراسية فعلية وأخذ تعهد.'},
-  {id:'A8',name:'رفع للجنة بالمديرية (5-10 أيام)',level:5,desc:'رفع موضوع الطالب للجنة بالمديرية لإصدار قرار بفصله (5-10 أيام).'},
-  {id:'A11',name:'رفع للجنة بالمديرية (فصل نهائي)',level:6,desc:'رفع موضوع الطالب للجنة بالمديرية لإصدار قرار بفصله نهائياً.'}
+// ================= الثوابت =================
+const BEHAVIORS = [
+  {id:'B_T', name:'تأخر عن الطابور الصباحي', cat:'تأخر دراسي', points:1, level:1},
+  {id:'B_G1', name:'غياب بدون عذر (يومان)', cat:'غياب', points:1, level:1},
+  {id:'B_G2', name:'غياب بدون عذر (5 أيام)', cat:'غياب', points:2, level:2},
+  {id:'B_G3', name:'غياب بدون عذر (8 أيام)', cat:'غياب', points:3, level:3},
+  {id:'B_G4', name:'غياب بدون عذر (10 أيام)', cat:'غياب', points:4, level:4},
+  {id:'B1', name:'الإخلال بنظام الطابور أو الحصص', cat:'الانضباط السلوكي', points:1, level:1},
+  {id:'B2', name:'عدم الالتزام بالزي المدرسي', cat:'الانضباط السلوكي', points:1, level:1},
+  {id:'B3', name:'العبث بمرافق المدرسة', cat:'الانضباط السلوكي', points:1, level:1},
+  {id:'B4', name:'الإساءة بالأقول لزميل', cat:'الانضباط السلوكي', points:1, level:1},
+  {id:'B5', name:'عدم المحافظة على النظافة', cat:'الانضباط السلوكي', points:1, level:1},
+  {id:'B16', name:'تزوير محرر مدرسي أو توقيع', cat:'الانضباط السلوكي', points:2, level:2},
+  {id:'B18', name:'الشجار وتهديد الزملاء', cat:'الانضباط السلوكي', points:3, level:3},
+  {id:'B19', name:'الاعتداء بالألفاظ النابية', cat:'الانضباط السلوكي', points:3, level:3},
+  {id:'B21', name:'إحضار أجهزة سمعية وبصرية', cat:'الانضباط السلوكي', points:4, level:4},
+  {id:'B23', name:'حيازة مواد ضارة أو أدوات حادة', cat:'الانضباط السلوكي', points:4, level:4},
+  {id:'B24', name:'الاعتداء على الزملاء بدنياً', cat:'الانضباط السلوكي', points:4, level:4},
+  {id:'B27', name:'الإساءة للرموز الوطنية', cat:'الانضباط السلوكي', points:5, level:5},
+  {id:'B33', name:'التدخين أو المخدرات', cat:'الانضباط السلوكي', points:5, level:5},
+  {id:'B_OTHER', name:'سلوك آخر (يدوي)', cat:'أخرى', points:1, level:1}
 ];
 
-const DEFAULT_BEHAVIORS=[
-  {id:'B_T',name:'تأخر عن الطابور الصباحي',cat:'تأخر دراسي',points:1,level:1,escalation:['A1','A2','A3','A4','A5']},
-  {id:'B_G1',name:'غياب بدون عذر (يومان)',cat:'غياب',points:1,level:1,escalation:['A2','A3','A4','A5','A6']},
-  {id:'B_G2',name:'غياب بدون عذر (5 أيام)',cat:'غياب',points:2,level:2,escalation:['A3','A4','A5','A6','A8']},
-  {id:'B_G3',name:'غياب بدون عذر (8 أيام)',cat:'غياب',points:3,level:3,escalation:['A4','A5','A6','A8','A11']},
-  {id:'B_G4',name:'غياب بدون عذر (10 أيام)',cat:'غياب',points:4,level:4,escalation:['A5','A6','A8','A11']},
-  {id:'B1',name:'الإخلال بنظام الطابور',cat:'الانضباط السلوكي',points:1,level:1,escalation:['A1','A2','A3','A4','A5']},
-  {id:'B2',name:'عدم الالتزام بالزي المدرسي',cat:'الانضباط السلوكي',points:1,level:1,escalation:['A1','A2','A3','A4','A5']},
-  {id:'B3',name:'العبث بمرافق المدرسة',cat:'الانضباط السلوكي',points:1,level:1,escalation:['A1','A2','A3','A4','A5']},
-  {id:'B4',name:'الإساءة بالأقول لزميل',cat:'الانضباط السلوكي',points:1,level:1,escalation:['A1','A2','A3','A4','A5']},
-  {id:'B5',name:'عدم المحافظة على النظافة',cat:'الانضباط السلوكي',points:1,level:1,escalation:['A1','A2','A3','A4','A5']},
-  {id:'B6',name:'عدم إحضار الكتب والأدوات',cat:'الانضباط السلوكي',points:1,level:1,escalation:['A1','A2','A3','A4','A5']},
-  {id:'B16',name:'تزوير محرر مدرسي',cat:'الانضباط السلوكي',points:2,level:2,escalation:['A2','A3','A4','A5','A6']},
-  {id:'B18',name:'الشجار وتهديد الزملاء',cat:'الانضباط السلوكي',points:3,level:3,escalation:['A3','A4','A5','A6','A8']},
-  {id:'B21',name:'إحضار أجهزة سمعية وبصرية',cat:'الانضباط السلوكي',points:4,level:4,escalation:['A4','A5','A6','A8','A11']},
-  {id:'B23',name:'حيازة مواد ضارة',cat:'الانضباط السلوكي',points:4,level:4,escalation:['A4','A5','A6','A8','A11']},
-  {id:'B27',name:'الإساءة للرموز الوطنية',cat:'الانضباط السلوكي',points:5,level:5,escalation:['A5','A6','A8','A11']},
-  {id:'B33',name:'التدخين أو المخدرات',cat:'الانضباط السلوكي',points:5,level:5,escalation:['A5','A6','A8','A11']},
-  {id:'B_OTHER',name:'سلوك آخر (يدوي)',cat:'أخرى',points:1,level:1,escalation:['A1','A2','A3','A4','A5'],custom:true}
+const ACTIONS = [
+  {id:'A1', name:'نصح الطالب (شفهياً)', desc:'توجيه الطالب وإرشاده شفهياً نحو التزامه بقواعد الانتظام والانضباط السلوكي.'},
+  {id:'A2', name:'نصح الطالب (ورقياً)', desc:'توجيه الطالب وإرشاده كتابياً نحو التزامه بقواعد الانتظام والانضباط السلوكي.'},
+  {id:'A3', name:'تنبيه الطالب (ورقياً)', desc:'توجيه الطالب كتابياً بعد نصحة لتجنب تكرار المخالفة.'},
+  {id:'A4', name:'إنذار الطالب وأخذ تعهد', desc:'تحذير الطالب كتابياً بعد تنبيهه لتجنب تكرار المخالفات، مع أخذ تعهد عليه وعلى ولي الأمر.'},
+  {id:'A5', name:'دراسة حالة الطالب', desc:'تشخيص الحالات السلوكية من قبل الأخصائي الاجتماعي بالمدرسة.'},
+  {id:'A6', name:'فصل طالب مؤقتاً (3 أيام)', desc:'فصل الطالب مؤقتاً مدة لا تتجاوز 3 أيام دراسية فعلية وأخذ تعهد.'},
+  {id:'A7', name:'استدعاء ولي الأمر', desc:'إبلاغ ولي الأمر واستدعاؤه للمدرسة لمتابعة سلوك الطالب.'},
+  {id:'A8', name:'رفع للجنة بالمديرية (5-10 أيام)', desc:'رفع موضوع الطالب للجنة بالمديرية لإصدار قرار بفصله (5-10 أيام).'},
+  {id:'A11', name:'رفع للجنة بالمديرية (فصل نهائي)', desc:'رفع موضوع الطالب للجنة بالمديرية لإصدار قرار بفصله نهائياً.'}
 ];
 
-const DEFAULT_STUDENTS=[
+const DEFAULT_STUDENTS = [
   ['أحمد بن سالم الرواحي',5,1],['محمد بن خالد البلوشي',5,1],['يوسف بن علي المعمري',5,2],
   ['عبدالله بن حمد الحارثي',5,2],['سعيد بن راشد الكندي',5,3],['خالد بن ناصر الفارسي',6,1],
   ['سلطان بن ماجد الشكيلي',6,1],['حمزة بن ياسر العامري',6,2],['طلال بن سعيد الهنائي',6,2],
   ['فهد بن عبدالرحمن الزدجالي',6,3],['بدر بن سليمان الريامي',7,1],['مازن بن حمدان الحجري',7,1],
-  ['معاذ بن طارق السعدي',7,2],['أيمن بن وليد المقبالي',7,2],['راشد بن سيف الخروصي',7,3],
-  ['هلال بن منصور الغافري',8,1],['نبيل بن عامر الحوسني',8,1],['قيس بن مروان الوهيبي',8,2],
-  ['زياد بن فارس اليعقوبي',8,2],['مروان بن أيمن السيابي',8,3],['حاتم بن صالح العبري',9,1],
-  ['عمار بن نبيل الجابري',9,1],['أنس بن كمال الرئيسي',9,2],['بلال بن هيثم المخيني',9,2],
-  ['جعفر بن عادل الشعيلي',9,3]
+  ['معاذ بن طارق السعدي',7,2],['أيمن بن وليد المقبالي',7,2],['راشد بن سيف الخروصي',7,3]
 ];
 
-/* ============================================================
-   2) إدارة البيانات (الحل الجذري لمشكلة undefined)
-============================================================ */
-let DB = {};
-let session={role:null,studentId:null,name:'',userId:null};
-let currentPage='home', formDirty=false;
-let lastLocalSave=0;
-let charts = {};
+// ================= إدارة البيانات =================
+let DB = { students: [], records: [], settings: { schoolName: 'مدرسة المسعى للبنين (٥-٩)' } };
 
-function initDB(){
-  const defaultDB = {
-    students: DEFAULT_STUDENTS.map((s,i)=>({id:'S'+(i+1),name:s[0],grade:s[1],section:s[2],phone:'',health:{bloodType:'',allergies:'',chronic:'',medications:'',emergencyName:'',emergencyPhone:'',notes:''}})),
-    records: [],
-    behaviors: JSON.parse(JSON.stringify(DEFAULT_BEHAVIORS)),
-    actions: JSON.parse(JSON.stringify(DEFAULT_ACTIONS)),
-    users: [
-      { id: 'U1', username: 'almasaa', password: '', role: 'admin', name: 'مدير المدرسة' }
-    ],
-    healthReferrals: [],
-    alerts: [],
-    settings: { 
-      schoolName: 'مدرسة المسعى للبنين (٥-٩)', 
-      principal: 'حسن علي إبراهيم البلوشي',
-      directorate: 'المديرية العامة للتعليم بمحافظة شمال الباطنة'
-    }
-  };
-  
-  const saved = localStorage.getItem('almasaa_v17') || localStorage.getItem('almasaa_v16');
-  if(saved){
-    try{
-      const parsed = JSON.parse(saved);
-      DB = Object.assign({}, defaultDB, parsed);
-      // ضمان وجود المصفوفات لتجنب خطأ undefined
-      DB.students = Array.isArray(DB.students) ? DB.students : defaultDB.students;
-      DB.records = Array.isArray(DB.records) ? DB.records : [];
-      DB.behaviors = Array.isArray(DB.behaviors) ? DB.behaviors : defaultDB.behaviors;
-      DB.actions = Array.isArray(DB.actions) ? DB.actions : defaultDB.actions;
-      DB.users = Array.isArray(DB.users) ? DB.users : defaultDB.users;
-      DB.healthReferrals = Array.isArray(DB.healthReferrals) ? DB.healthReferrals : [];
-      DB.alerts = Array.isArray(DB.alerts) ? DB.alerts : [];
-      DB.settings = Object.assign({}, defaultDB.settings, DB.settings || {});
-    }catch(e){
-      DB = defaultDB;
-    }
-  }else{
-    DB = defaultDB;
+function initDB() {
+  const saved = localStorage.getItem('almasaa_v13_2');
+  if (saved) {
+    try { DB = JSON.parse(saved); } catch(e) {}
+  }
+  if (!DB.students || DB.students.length === 0) {
+    DB.students = DEFAULT_STUDENTS.map((s, i) => ({
+      id: 'S' + (i+1), name: s[0], grade: s[1], section: s[2], phone: ''
+    }));
   }
   saveDB();
 }
 
-function saveDB(){
-  lastLocalSave=Date.now();
-  localStorage.setItem('almasaa_v17',JSON.stringify(DB));
-  if(CLOUD.enabled&&navigator.onLine) cloudPush();
+function saveDB() {
+  localStorage.setItem('almasaa_v13_2', JSON.stringify(DB));
 }
 
-async function cloudPush(){
-  if(!sbClient) return;
-  if(CLOUD.syncing){ CLOUD.pendingPush=true; return; }
-  CLOUD.syncing=true;
-  try{ await sbClient.from('app_data').upsert({id:'main',payload:DB,updated_at:new Date().toISOString()}); }
-  catch(e){ console.warn('cloudPush',e); }
-  CLOUD.syncing=false;
-  if(CLOUD.pendingPush){ CLOUD.pendingPush=false; cloudPush(); }
-}
-
-async function cloudPull(silent=true){
-  if(!sbClient||CLOUD.syncing||!navigator.onLine) return;
-  if(Date.now()-lastLocalSave<3000){ return; }
-  try{
-    CLOUD.syncing=true;
-    const {data}=await sbClient.from('app_data').select('payload').eq('id','main').single();
-    if(data&&data.payload&&data.payload.students){
-      const incoming=JSON.stringify(data.payload), current=JSON.stringify(DB);
-      if(incoming!==current){
-        DB=data.payload;
-        if(!DB.records) DB.records=[];
-        localStorage.setItem('almasaa_v17',JSON.stringify(DB));
-        if(!formDirty&&!document.getElementById('appScreen').classList.contains('hidden')){
-          renderPage(currentPage);
-        }
-        if(!silent) showToast('تمت المزامنة ✓');
-      }
-    }
-  }catch(e){ console.warn('cloudPull',e); }
-  CLOUD.syncing=false;
-}
-
-function manualSync(){
-  const b=document.getElementById('syncBtn');
-  const old=b.textContent;
-  b.textContent='⏳ جارٍ المزامنة...'; b.disabled=true;
-  cloudPush().then(()=>{ lastLocalSave=0; return cloudPull(false); }).finally(()=>{ b.textContent=old; b.disabled=false; });
-}
-
-/* ============================================================
-   3) محرك التدرج السلوكي
-============================================================ */
-function getEscalation(behavior){
-  if(behavior&&Array.isArray(behavior.escalation)&&behavior.escalation.length) return behavior.escalation;
-  const map={1:['A1','A2','A3','A4','A5'],2:['A2','A3','A4','A5','A6'],3:['A3','A4','A5','A6','A8'],4:['A4','A5','A6','A8','A11'],5:['A5','A6','A8','A11'],6:['A8','A11']};
-  return map[behavior.level]||map[1];
-}
-
-function getEscalationState(studentId,behaviorId){
-  const behavior=DB.behaviors.find(b=>b.id===behaviorId);
-  if(!behavior) return null;
-  const esc=getEscalation(behavior);
-  const pastCount=DB.records.filter(r=>r.studentId===studentId&&r.behaviorId===behaviorId).length;
-  const stepIdx=Math.min(pastCount,esc.length-1);
-  return {behavior,esc,pastCount,stepIdx,suggestedActionId:esc[stepIdx]};
-}
-
-function getAtRiskStudents(){
-  const out=[];
-  DB.students.forEach(s=>{
-    DB.behaviors.forEach(b=>{
-      if(b.id==='B_OTHER') return;
-      const st=getEscalationState(s.id,b.id);
-      if(st&&st.pastCount>=st.esc.length-1){
-        const lastAct=DB.actions.find(a=>a.id===st.esc[st.esc.length-1]);
-        out.push({student:s,behavior:b,count:st.pastCount,total:st.esc.length,lastAction:lastAct});
-      }
-    });
-  });
-  return out;
-}
-
-/* ============================================================
-   4) الدخول والتنقل
-============================================================ */
-function doLogin(){
-  const u=document.getElementById('loginUser').value.trim();
-  const p=document.getElementById('loginPass').value.trim();
-  const found = DB.users.find(user => user.username === u && user.password === p);
+// ================= الدخول والتنقل =================
+function doLogin() {
+  const u = document.getElementById('loginUser').value.trim();
+  const p = document.getElementById('loginPass').value.trim();
   
-  if(found){
-    session={role:found.role, studentId:found.studentId, name:found.name, userId:found.id};
+  if (u === 'almasaa' && p === '') {
     document.getElementById('loginScreen').classList.add('hidden');
     document.getElementById('appScreen').classList.remove('hidden');
     renderMenu();
-    renderPage(found.role==='parent'?'myChild':'home');
-    cloudPull();
-  }else{
-    const err=document.getElementById('loginErr');
+    renderPage('home');
+  } else {
+    const err = document.getElementById('loginErr');
     err.classList.remove('hidden');
-    setTimeout(()=>err.classList.add('hidden'),3000);
+    setTimeout(() => err.classList.add('hidden'), 3000);
   }
 }
 
-function doLogout(){
-  if(!confirm('تسجيل الخروج؟')) return;
-  session={role:null,studentId:null,name:'',userId:null};
-  formDirty=false;
-  document.getElementById('appScreen').classList.add('hidden');
-  document.getElementById('loginScreen').classList.remove('hidden');
-  document.getElementById('loginUser').value='';
-  document.getElementById('loginPass').value='';
+let currentPage = 'home';
+
+function renderMenu() {
+  const items = [
+    { id: 'home', label: 'الرئيسية', icon: '🏠' },
+    { id: 'entry', label: 'تسجيل سلوك', icon: '✍️' },
+    { id: 'records', label: 'سجل السلوكيات', icon: '📋' }
+  ];
+  document.getElementById('navMenu').innerHTML = items.map(item => `
+    <button onclick="renderPage('${item.id}')" class="w-full text-right px-4 py-2 rounded-lg font-bold text-sm ${currentPage === item.id ? 'bg-emerald-700 text-white' : 'text-slate-700 hover:bg-emerald-50'}">
+      <span class="ml-2">${item.icon}</span> ${item.label}
+    </button>
+  `).join('');
 }
 
-function toggleSidebar(){
-  const sb = document.getElementById('sidebar');
-  const ov = document.getElementById('sidebarOverlay');
-  if(sb.classList.contains('translate-x-full')){
-    sb.classList.remove('translate-x-full');
-    sb.classList.add('translate-x-0');
-    ov.classList.remove('hidden');
-  }else{
-    sb.classList.add('translate-x-full');
-    sb.classList.remove('translate-x-0');
-    ov.classList.add('hidden');
-  }
-}
-
-const menuItems = [
-  { id: 'home', icon: '🏠', label: 'الرئيسية' },
-  { id: 'entry', icon: '✍️', label: 'تسجيل سلوك' },
-  { id: 'records', icon: '📋', label: 'سجل السلوكيات' },
-  { id: 'analysis', icon: '📈', label: 'التحليل المتقدم' },
-  { id: 'students', icon: '👥', label: 'إدارة الطلبة' },
-  { id: 'health_identity', icon: '❤️', label: 'هويتي الصحية' },
-  { id: 'health_transfer', icon: '🌙', label: 'تحويل للوحدة الصحية' },
-  { id: 'health_report', icon: '📊', label: 'تقرير الوحدة الصحية' },
-  { id: 'users', icon: '👤', label: 'إدارة المستخدمين' },
-  { id: 'behaviors', icon: '⚠️', label: 'إدارة السلوكيات' },
-  { id: 'actions', icon: '🎯', label: 'إدارة الإجراءات' },
-  { id: 'reports', icon: '📄', label: 'التقارير الرسمية' },
-  { id: 'alerts', icon: '🔔', label: 'التنبيهات والمتابعة' },
-  { id: 'settings', icon: '⚙️', label: 'الإعدادات' }
-];
-
-function renderMenu(){
-  const nav = document.getElementById('navMenu');
-  nav.innerHTML = menuItems.map(item => {
-    const isActive = currentPage === item.id;
-    let badge = '';
-    if(item.id === 'alerts'){
-      const atRiskCount = getAtRiskStudents().length;
-      if(atRiskCount > 0) badge = `<span class="bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full mr-auto">${atRiskCount}</span>`;
-    }
-    return `
-      <button onclick="renderPage('${item.id}')" class="w-full flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm transition ${isActive ? 'bg-emerald-700 text-white shadow-md' : 'text-slate-700 hover:bg-slate-100'}">
-        <div class="flex items-center gap-3">
-          <span class="text-lg">${item.icon}</span> ${item.label}
-        </div>
-        ${badge}
-      </button>
-    `;
-  }).join('');
-}
-
-function renderPage(page='home'){
-  currentPage=page;
-  formDirty=false;
+function renderPage(page = 'home') {
+  currentPage = page;
   renderMenu();
+  const main = document.getElementById('mainContent');
   
-  // إغلاق القائمة الجانبية في الجوال
-  const sb = document.getElementById('sidebar');
-  if(!sb.classList.contains('translate-x-full')) toggleSidebar();
-
-  const main=document.getElementById('mainContent');
-  if(page==='home') renderHome(main);
-  else if(page==='entry') renderEntry(main);
-  else if(page==='records') renderRecords(main);
-  else if(page==='analysis') renderAnalysis(main);
-  else if(page==='students') renderStudents(main);
-  else if(page==='health_identity') renderHealthIdentity(main);
-  else if(page==='health_transfer') renderHealthTransfer(main);
-  else if(page==='health_report') renderHealthReport(main);
-  else if(page==='users') renderUsers(main);
-  else if(page==='behaviors') renderBehaviors(main);
-  else if(page==='actions') renderActions(main);
-  else if(page==='reports') renderReports(main);
-  else if(page==='alerts') renderAlerts(main);
-  else if(page==='settings') renderSettings(main);
-  else if(page==='myChild') renderMyChild(main);
-}
-
-/* ============================================================
-   5) لوحة التحكم (الرئيسية) - مطابقة للصورة
-============================================================ */
-function renderHome(main){
-  const points = DB.records.reduce((sum, r) => sum + (r.points || 0), 0);
-  const currentMonth = new Date().getMonth();
-  const currentYear = new Date().getFullYear();
-  const monthlyViolations = DB.records.filter(r => {
-    const d = new Date(r.createdAt);
-    return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
-  }).length;
-  const atRisk = getAtRiskStudents();
-  const alertsCount = atRisk.length + DB.alerts.filter(a => !a.read).length;
-  const studentsCount = DB.students.length;
-  const followUpsCount = DB.records.filter(r => r.notes && r.notes.trim().length > 0).length;
-
-  const dateStr = new Date().toLocaleDateString('ar-OM', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-
-  main.innerHTML = `
-    <div class="bg-gradient-to-br from-[#0e7a5e] to-[#08503d] text-white p-6 rounded-3xl mb-6 shadow-lg relative overflow-hidden">
-      <div class="absolute -bottom-6 -right-6 opacity-10 text-9xl">🏫</div>
-      <div class="absolute top-4 left-4 opacity-20 text-5xl">📚</div>
-      <div class="relative z-10 text-center">
-        <p class="text-xs opacity-90">وزارة التربية والتعليم — سلطنة عمان</p>
-        <p class="text-xs opacity-90 mb-4">${DB.settings.directorate || ''}</p>
-        <h1 class="text-3xl font-black mb-1">منصة السلوك الطلابي</h1>
-        <p class="text-yellow-300 font-bold text-lg mb-4">${DB.settings.schoolName}</p>
-        <div class="inline-block bg-black/20 rounded-full px-5 py-2 text-sm font-bold backdrop-blur-sm">
-          📅 ${dateStr}
+  if (page === 'home') {
+    const last30 = DB.records.filter(r => Date.now() - r.createdAt <= 30 * 864e5).length;
+    main.innerHTML = `
+      <h2 class="text-2xl font-black mb-6">لوحة التحكم</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-emerald-700 text-white p-6 rounded-2xl shadow-md">
+          <div class="text-sm opacity-80">إجمالي السجلات</div>
+          <div class="text-4xl font-black mt-2">${DB.records.length}</div>
+        </div>
+        <div class="bg-blue-600 text-white p-6 rounded-2xl shadow-md">
+          <div class="text-sm opacity-80">مخالفات آخر 30 يوم</div>
+          <div class="text-4xl font-black mt-2">${last30}</div>
+        </div>
+        <div class="bg-amber-500 text-white p-6 rounded-2xl shadow-md">
+          <div class="text-sm opacity-80">إجمالي الطلبة</div>
+          <div class="text-4xl font-black mt-2">${DB.students.length}</div>
         </div>
       </div>
-    </div>
-
-    <div class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 mb-8">
-      <!-- النقاط -->
-      <div class="bg-gradient-to-br from-[#d92d3b] to-[#9b1823] text-white p-5 rounded-2xl shadow-md relative overflow-hidden flex flex-col justify-between h-32">
-        <div class="absolute -bottom-2 -left-2 opacity-30 text-6xl">⚠️</div>
-        <div class="text-sm font-bold opacity-90 z-10">النقاط</div>
-        <div class="text-4xl font-black z-10">${points}</div>
-      </div>
-      <!-- مخالفات الشهر -->
-      <div class="bg-gradient-to-br from-[#2c3e50] to-[#1a252f] text-white p-5 rounded-2xl shadow-md relative overflow-hidden flex flex-col justify-between h-32">
-        <div class="absolute -bottom-2 -left-2 opacity-20 text-6xl">📋</div>
-        <div class="text-sm font-bold opacity-90 z-10">مخالفات الشهر</div>
-        <div class="text-4xl font-black z-10">${monthlyViolations}</div>
-      </div>
-      <!-- تنبيهات -->
-      <div class="bg-gradient-to-br from-[#f39c12] to-[#d68910] text-white p-5 rounded-2xl shadow-md relative overflow-hidden flex flex-col justify-between h-32">
-        <div class="absolute -bottom-2 -left-2 opacity-20 text-6xl">🔔</div>
-        <div class="text-sm font-bold opacity-90 z-10">تنبيهات</div>
-        <div class="text-4xl font-black z-10">${alertsCount}</div>
-      </div>
-      <!-- الطلبة -->
-      <div class="bg-gradient-to-br from-[#11998e] to-[#0e7a5e] text-white p-5 rounded-2xl shadow-md relative overflow-hidden flex flex-col justify-between h-32">
-        <div class="absolute -bottom-2 -left-2 opacity-20 text-6xl">👥</div>
-        <div class="text-sm font-bold opacity-90 z-10">الطلبة</div>
-        <div class="text-4xl font-black z-10">${studentsCount}</div>
-      </div>
-      <!-- متابعات -->
-      <div class="bg-gradient-to-br from-[#e74c3c] to-[#c0392b] text-white p-5 rounded-2xl shadow-md relative overflow-hidden flex flex-col justify-between h-32">
-        <div class="absolute -bottom-2 -left-2 opacity-20 text-6xl">⏱️</div>
-        <div class="text-sm font-bold opacity-90 z-10">متابعات</div>
-        <div class="text-4xl font-black z-10">${followUpsCount}</div>
-      </div>
-    </div>
-
-    ${atRisk.length ? `
-    <div class="bg-red-50 border border-red-200 rounded-2xl p-5 shadow-sm">
-      <h3 class="font-black text-red-800 mb-3 flex items-center gap-2">🚨 طلبة يحتاجون تدخل عاجل</h3>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-        ${atRisk.slice(0,4).map(a => `
-          <div class="bg-white p-3 rounded-xl border border-red-100 flex justify-between items-center">
-            <div>
-              <div class="font-bold text-sm text-slate-800">${a.student.name}</div>
-              <div class="text-xs text-red-600">${a.behavior.name} (تكرار ${a.count})</div>
-            </div>
-            <button onclick="viewStudentDetail('${a.student.id}')" class="bg-red-100 text-red-700 text-xs font-bold px-3 py-1.5 rounded-lg">عرض</button>
+    `;
+  } 
+  else if (page === 'entry') {
+    const studentOptions = DB.students.map(s => `<option value="${s.id}">${s.name} (صف ${s.grade}/${s.section})</option>`).join('');
+    const behaviorOptions = BEHAVIORS.map(b => `<option value="${b.id}">${b.name} - [${b.cat}]</option>`).join('');
+    
+    main.innerHTML = `
+      <h2 class="text-2xl font-black mb-6">تسجيل سلوك</h2>
+      <div class="bg-white p-6 rounded-2xl shadow-md max-w-2xl">
+        <div class="space-y-4">
+          <div>
+            <label class="block font-bold mb-1">الطالب</label>
+            <select id="selStudent" class="w-full border-2 border-slate-200 rounded-xl p-3" onchange="suggestAction()">
+              <option value="">اختر الطالب...</option>
+              ${studentOptions}
+            </select>
           </div>
-        `).join('')}
+          <div>
+            <label class="block font-bold mb-1">السلوك</label>
+            <select id="selBehavior" class="w-full border-2 border-slate-200 rounded-xl p-3" onchange="suggestAction()">
+              <option value="">اختر السلوك...</option>
+              ${behaviorOptions}
+            </select>
+          </div>
+          <div>
+            <label class="block font-bold mb-1">الإجراء المقترح (تلقائي) <span class="text-xs text-emerald-600 font-normal" id="suggestHint"></span></label>
+            <select id="selAction" class="w-full border-2 border-emerald-300 bg-emerald-50 rounded-xl p-3" onchange="updateRegBox()">
+              ${ACTIONS.map(a => `<option value="${a.id}">${a.name}</option>`).join('')}
+            </select>
+          </div>
+          <div class="bg-amber-50 border-r-4 border-amber-500 p-3 rounded-lg text-sm hidden" id="regBox">
+            <strong>النص اللائحي:</strong> <span id="regText"></span>
+          </div>
+          <div>
+            <label class="block font-bold mb-1">يراجع الأستاذ:</label>
+            <input type="text" id="metPerson" placeholder="اسم المعلم المراجع..." class="w-full border-2 border-slate-200 rounded-xl p-3">
+          </div>
+          <button onclick="saveRecord()" class="w-full bg-emerald-700 text-white font-bold py-3 rounded-xl mt-4">حفظ السجل</button>
+        </div>
       </div>
-    </div>` : ''}
-  `;
+    `;
+  }
+  else if (page === 'records') {
+    const rows = DB.records.slice().reverse().map(r => {
+      const s = DB.students.find(x => x.id === r.studentId) || {name:'غير معروف', grade:'-', section:'-'};
+      return `
+        <tr class="border-b">
+          <td class="p-3 text-xs">${new Date(r.createdAt).toLocaleDateString('ar-OM')}</td>
+          <td class="p-3 font-bold">${s.name}</td>
+          <td class="p-3 text-xs">${s.grade}/${s.section}</td>
+          <td class="p-3 text-red-600 text-xs">${r.behaviorName}</td>
+          <td class="p-3 text-xs font-bold text-center">المرة ${r.occurrence}</td>
+          <td class="p-3 text-xs text-emerald-700">${r.actionName}</td>
+          <td class="p-3 text-xs no-print">
+             <button onclick="printRecord('${r.id}')" class="text-blue-500 hover:text-blue-700 mx-1">🖨️</button>
+             <button onclick="deleteRecord('${r.id}')" class="text-red-500 hover:text-red-700 mx-1">🗑️</button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+    
+    main.innerHTML = `
+      <h2 class="text-2xl font-black mb-6">سجل السلوكيات</h2>
+      <div class="bg-white rounded-2xl shadow-md overflow-hidden overflow-x-auto">
+        <table class="w-full text-right min-w-[600px]">
+          <thead class="bg-slate-100 text-sm">
+            <tr>
+              <th class="p-3">التاريخ</th><th class="p-3">الطالب</th><th class="p-3">الصف</th>
+              <th class="p-3">السلوك</th><th class="p-3 text-center">التكرار</th>
+              <th class="p-3">الإجراء</th><th class="p-3 no-print">إجراءات</th>
+            </tr>
+          </thead>
+          <tbody>${rows || '<tr><td colspan="7" class="p-6 text-center text-slate-400">لا توجد سجلات</td></tr>'}</tbody>
+        </table>
+      </div>
+    `;
+  }
 }
 
-/* ============================================================
-   6) تسجيل سلوك
-============================================================ */
-function renderEntry(main){
-  const studentOptions=DB.students.map(s=>`<option value="${s.id}">${s.name} (صف ${s.grade}/${s.section})</option>`).join('');
-  const behaviorOptions=DB.behaviors.map(b=>`<option value="${b.id}">${b.name} — [${b.cat}]</option>`).join('');
-  main.innerHTML=`
-    <h2 class="text-2xl font-black mb-6">تسجيل سلوك</h2>
-    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 max-w-3xl space-y-4">
-      <div><label class="block font-bold mb-1">الطالب <span class="text-red-500">*</span></label>
-        <select id="selStudent" class="w-full border-2 border-slate-200 rounded-xl p-3" onchange="onEntryChange()"><option value="">اختر الطالب...</option>${studentOptions}</select></div>
-      <div><label class="block font-bold mb-1">السلوك <span class="text-red-500">*</span></label>
-        <select id="selBehavior" class="w-full border-2 border-slate-200 rounded-xl p-3" onchange="onEntryChange()"><option value="">اختر السلوك...</option>${behaviorOptions}</select></div>
-      <div id="customBox" class="hidden"><label class="block font-bold mb-1">وصف السلوك (يدوي) <span class="text-red-500">*</span></label>
-        <input type="text" id="customName" class="w-full border-2 border-slate-200 rounded-xl p-3" placeholder="اكتب وصف السلوك بالتفصيل"></div>
-      <div id="escalationPreview" class="hidden bg-emerald-50 border-2 border-emerald-200 rounded-xl p-4"></div>
-      <div><label class="block font-bold mb-1">الإجراء المتخذ <span class="text-xs text-slate-500">(مقترح تلقائياً — يمكن تعديله)</span></label>
-        <select id="selAction" class="w-full border-2 border-emerald-300 bg-emerald-50 rounded-xl p-3" onchange="updateRegBox()">
-          ${DB.actions.map(a=>`<option value="${a.id}">${a.name}</option>`).join('')}
-        </select></div>
-      <div id="regBox" class="hidden bg-amber-50 border-r-4 border-amber-500 p-3 rounded-lg text-sm"><strong>النص اللائحي:</strong> <span id="regText"></span></div>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div><label class="block font-bold mb-1">من تتم مقابلته</label>
-          <input type="text" id="metWith" list="metList" class="w-full border-2 border-slate-200 rounded-xl p-3" placeholder="الطالب / ولي الأمر / كلاهما">
-          <datalist id="metList"><option value="الطالب"><option value="ولي الأمر"><option value="الطالب وولي الأمر"><option value="الأخصائي الاجتماعي"></datalist></div>
-        <div><label class="block font-bold mb-1">يراجع الأستاذ</label>
-          <input type="text" id="teacher" class="w-full border-2 border-slate-200 rounded-xl p-3" placeholder="اسم المعلم المراجع"></div>
-      </div>
-      <div><label class="block font-bold mb-1">ملاحظات</label>
-        <textarea id="notes" rows="2" class="w-full border-2 border-slate-200 rounded-xl p-3" placeholder="ملاحظات إضافية (اختياري)"></textarea></div>
-      <button onclick="saveRecord()" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-black py-3 rounded-xl mt-2 shadow-md">💾 حفظ السجل</button>
-    </div>
-  `;
-}
+// ================= محرك التدرج التلقائي =================
+function suggestAction() {
+  const sid = document.getElementById('selStudent').value;
+  const bid = document.getElementById('selBehavior').value;
+  const selAction = document.getElementById('selAction');
+  const hint = document.getElementById('suggestHint');
 
-function onEntryChange(){
-  const sid=document.getElementById('selStudent').value;
-  const bid=document.getElementById('selBehavior').value;
-  formDirty=!!(sid||bid);
-  document.getElementById('customBox').classList.toggle('hidden',bid!=='B_OTHER');
-  const preview=document.getElementById('escalationPreview');
-  if(!sid||!bid){preview.classList.add('hidden');updateRegBox();return;}
-  const state=getEscalationState(sid,bid);
-  if(!state){preview.classList.add('hidden');return;}
-  const student=DB.students.find(x=>x.id===sid);
-  const {behavior,esc,pastCount,stepIdx,suggestedActionId}=state;
-  document.getElementById('selAction').value=suggestedActionId;
-  const chain=esc.map((aid,i)=>{
-    const a=DB.actions.find(x=>x.id===aid) || {name:'غير معروف'};
-    const isPast=i<stepIdx, isCur=i===stepIdx;
-    const cls=isCur?'bg-emerald-600 text-white font-bold shadow':(isPast?'bg-emerald-100 text-emerald-700 line-through':'bg-slate-200 text-slate-500');
-    return `<span class="inline-block px-2 py-1 rounded text-xs ${cls}">${isPast?'✓':isCur?'▶':'○'} ${a.name}</span>`;
-  }).join('<span class="text-slate-400 text-xs mx-1">←</span>');
-  const cur=DB.actions.find(a=>a.id===suggestedActionId);
-  preview.classList.remove('hidden');
-  preview.innerHTML=`
-    <div class="flex items-center justify-between mb-2 flex-wrap gap-2">
-      <h4 class="font-black text-emerald-800 text-sm">📊 التسلسل التصاعدي لهذا السلوك</h4>
-      <span class="text-xs bg-emerald-700 text-white px-2 py-1 rounded-full font-bold">التكرار ${pastCount+1} — الخطوة ${stepIdx+1} من ${esc.length}</span>
-    </div>
-    <div class="flex flex-wrap items-center gap-1 mb-3">${chain}</div>
-    <div class="text-xs bg-white rounded-lg p-3 border border-emerald-200">
-      <div><strong>الطالب:</strong> ${student.name} — صف ${student.grade}/${student.section}</div>
-      <div class="mt-1"><strong>عدد التكرارات السابقة:</strong> ${pastCount}</div>
-      <div class="mt-1 text-emerald-800 font-bold">▶ الإجراء المقترح: ${cur.name}</div>
-    </div>`;
+  if (!sid || !bid) return;
+
+  const behavior = BEHAVIORS.find(b => b.id === bid);
+  if (!behavior) return;
+
+  const past = DB.records.filter(r => r.studentId === sid && r.behaviorId === bid);
+  const occurrences = past.length;
+
+  let suggestedActId = 'A1';
+
+  if (behavior.cat === 'تأخر دراسي') {
+    if (occurrences === 0) suggestedActId = 'A1'; 
+    else if (occurrences === 1) suggestedActId = 'A2'; 
+    else if (occurrences === 2) suggestedActId = 'A3'; 
+    else if (occurrences === 3) suggestedActId = 'A4'; 
+    else suggestedActId = 'A7'; 
+  } 
+  else if (behavior.cat === 'غياب') {
+    if (behavior.id === 'B_G1') suggestedActId = 'A2';
+    else if (behavior.id === 'B_G2') suggestedActId = 'A3';
+    else if (behavior.id === 'B_G3') suggestedActId = 'A4';
+    else if (behavior.id === 'B_G4') suggestedActId = 'A5';
+    else suggestedActId = 'A3';
+  } 
+  else {
+    let nextLevel = (behavior.level || 1) + occurrences;
+    if (nextLevel > 6) nextLevel = 6;
+    
+    if (nextLevel === 1) suggestedActId = 'A1';
+    else if (nextLevel === 2) suggestedActId = 'A3';
+    else if (nextLevel === 3) suggestedActId = 'A4';
+    else if (nextLevel === 4) suggestedActId = 'A6';
+    else if (nextLevel === 5) suggestedActId = 'A8';
+    else suggestedActId = 'A11';
+  }
+
+  selAction.value = suggestedActId;
+  if (occurrences > 0) {
+    hint.textContent = `(تكرار رقم ${occurrences + 1} - تدرج لائحي)`;
+  } else {
+    hint.textContent = '(المرة الأولى - تدرج لائحي)';
+  }
+  
   updateRegBox();
 }
 
-function updateRegBox(){
-  const actId=document.getElementById('selAction')?.value;
-  const act=DB.actions.find(a=>a.id===actId);
-  const box=document.getElementById('regBox'), text=document.getElementById('regText');
-  if(!box||!text) return;
-  if(act&&act.desc){box.classList.remove('hidden');text.textContent=act.desc;} else box.classList.add('hidden');
+function updateRegBox() {
+  const actId = document.getElementById('selAction').value;
+  const act = ACTIONS.find(a => a.id === actId);
+  const box = document.getElementById('regBox');
+  const text = document.getElementById('regText');
+  if (act && act.desc) {
+    box.classList.remove('hidden');
+    text.textContent = act.desc;
+  } else {
+    box.classList.add('hidden');
+  }
 }
 
-function saveRecord(){
-  const sid=document.getElementById('selStudent').value;
-  const bid=document.getElementById('selBehavior').value;
-  const aid=document.getElementById('selAction').value;
-  const customName=document.getElementById('customName')?.value.trim()||'';
-  const metWith=document.getElementById('metWith').value.trim();
-  const teacher=document.getElementById('teacher').value.trim();
-  const notes=document.getElementById('notes').value.trim();
-  if(!sid||!bid) return showToast('⚠️ يرجى اختيار الطالب والسلوك','error');
-  if(bid==='B_OTHER'&&!customName) return showToast('⚠️ يرجى كتابة وصف السلوك','error');
+// ================= حفظ وطباعة السجلات =================
+function saveRecord() {
+  const sid = document.getElementById('selStudent').value;
+  const bid = document.getElementById('selBehavior').value;
+  const aid = document.getElementById('selAction').value;
+  const metPerson = document.getElementById('metPerson').value.trim();
+
+  if (!sid || !bid) {
+    alert('يرجى اختيار الطالب والسلوك');
+    return;
+  }
+
+  const b = BEHAVIORS.find(x => x.id === bid);
+  const a = ACTIONS.find(x => x.id === aid);
   
-  const behavior=DB.behaviors.find(x=>x.id===bid);
-  const action=DB.actions.find(x=>x.id===aid);
-  if(!action) return showToast('⚠️ الإجراء غير صحيح','error');
-  
-  const state=getEscalationState(sid,bid);
-  const record={
-    id:'R'+Date.now()+Math.floor(Math.random()*1000),
-    studentId:sid, behaviorId:bid,
-    behaviorName:customName||behavior.name,
-    customBehaviorName:customName||'',
-    actionId:aid, actionName:action.name,
-    regulationText:action.desc,
-    points:behavior.points || 1,
-    escalationPath:state.esc.slice(),
-    escalationStep:state.stepIdx+1,
-    escalationTotal:state.esc.length,
-    metWith, teacher, notes,
-    createdAt:Date.now()
+  const past = DB.records.filter(r => r.studentId === sid && r.behaviorId === bid);
+  const occurrence = past.length + 1;
+
+  const record = {
+    id: 'R' + Date.now(),
+    studentId: sid,
+    behaviorId: bid,
+    behaviorName: b.name,
+    actionId: aid,
+    actionName: a.name,
+    regulationText: a.desc,
+    occurrence: occurrence,
+    metPerson: metPerson,
+    points: b.points,
+    createdAt: Date.now()
   };
+
   DB.records.push(record);
-  saveDB(); formDirty=false;
-  showToast(`✅ تم التسجيل (خطوة ${record.escalationStep} من ${record.escalationTotal})`);
+  saveDB();
+  
+  alert('تم تسجيل السلوك بنجاح ✓');
   renderPage('records');
 }
 
-/* ============================================================
-   7) سجل السلوكيات
-============================================================ */
-function renderRecords(main){
-  const gradeOpts=[`<option value="">كل الصفوف</option>`].concat(GRADES.map(g=>`<option value="${g}">صف ${g}</option>`)).join('');
-  const catOpts=[`<option value="">كل التصنيفات</option>`].concat(
-    [...new Set(DB.behaviors.map(b=>b.cat))].map(c=>`<option value="${c}">${c}</option>`)
-  ).join('');
-  main.innerHTML=`
-    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-6">
-      <h2 class="text-2xl font-black">سجل السلوكيات</h2>
-      <button onclick="exportExcel()" class="bg-emerald-700 hover:bg-emerald-800 text-white font-bold px-4 py-2 rounded-xl text-sm no-print">📊 تصدير Excel</button>
-    </div>
-    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 mb-6 space-y-3">
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
-        <input type="text" id="filterSearch" placeholder="🔎 بحث بالاسم..." class="border-2 border-slate-200 rounded-xl p-2.5 text-sm" oninput="applyRecordsFilters()">
-        <select id="filterGrade" class="border-2 border-slate-200 rounded-xl p-2.5 text-sm" onchange="applyRecordsFilters()">${gradeOpts}</select>
-        <select id="filterCat" class="border-2 border-slate-200 rounded-xl p-2.5 text-sm" onchange="applyRecordsFilters()">${catOpts}</select>
-        <input type="month" id="filterMonth" class="border-2 border-slate-200 rounded-xl p-2.5 text-sm" onchange="applyRecordsFilters()">
-      </div>
-    </div>
-    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-x-auto">
-      <table class="w-full text-right min-w-[850px]">
-        <thead class="bg-slate-50 text-sm">
-          <tr><th class="p-3">التاريخ</th><th class="p-3">الطالب</th><th class="p-3">الصف</th><th class="p-3">السلوك</th><th class="p-3">الإجراء</th><th class="p-3 text-center">الخطوة</th><th class="p-3 no-print">إجراءات</th></tr>
-        </thead>
-        <tbody id="recordsBody"></tbody>
-      </table>
-    </div>
-    <div id="recordsCount" class="mt-3 text-sm text-slate-500 text-center"></div>
-  `;
-  applyRecordsFilters();
-}
-
-function applyRecordsFilters(){
-  const q=(document.getElementById('filterSearch')?.value||'').trim().toLowerCase();
-  const grade=document.getElementById('filterGrade')?.value||'';
-  const cat=document.getElementById('filterCat')?.value||'';
-  const month=document.getElementById('filterMonth')?.value||'';
-  
-  const filtered=DB.records.slice().reverse().filter(r=>{
-    const s=DB.students.find(x=>x.id===r.studentId)||{};
-    if(q && !(s.name||'').toLowerCase().includes(q)) return false;
-    if(grade && String(s.grade)!==grade) return false;
-    const b=DB.behaviors.find(x=>x.id===r.behaviorId);
-    if(cat && b && b.cat!==cat) return false;
-    if(month){
-      const d=new Date(r.createdAt);
-      const m=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
-      if(m!==month) return false;
-    }
-    return true;
-  });
-  
-  const body=document.getElementById('recordsBody');
-  const count=document.getElementById('recordsCount');
-  if(!body) return;
-  
-  body.innerHTML=filtered.length?filtered.map(r=>{
-    const s=DB.students.find(x=>x.id===r.studentId)||{name:'—',grade:'—',section:'—'};
-    const stepInfo=r.escalationStep?`${r.escalationStep}/${r.escalationTotal}`:'—';
-    return `<tr class="border-b hover:bg-slate-50">
-      <td class="p-3 text-xs whitespace-nowrap">${new Date(r.createdAt).toLocaleDateString('ar-OM')}</td>
-      <td class="p-3 font-bold text-sm">${s.name}</td>
-      <td class="p-3 text-xs whitespace-nowrap">${s.grade}/${s.section}</td>
-      <td class="p-3 text-red-600 text-xs">${r.behaviorName}</td>
-      <td class="p-3 text-emerald-700 text-xs">${r.actionName}</td>
-      <td class="p-3 text-xs text-center"><span class="bg-amber-100 text-amber-800 px-2 py-1 rounded-full font-bold">${stepInfo}</span></td>
-      <td class="p-3 text-xs no-print whitespace-nowrap">
-        <button onclick="openPrintModal('${r.id}')" class="text-blue-600 hover:text-blue-800 ml-2" title="طباعة">🖨️</button>
-        <button onclick="deleteRecord('${r.id}')" class="text-red-500 hover:text-red-700" title="حذف">🗑️</button>
-      </td>
-    </tr>`;
-  }).join(''):'<tr><td colspan="7" class="p-8 text-center text-slate-400">لا توجد سجلات مطابقة</td></tr>';
-  
-  if(count) count.textContent=`عرض ${filtered.length} من ${DB.records.length} سجل`;
-}
-
-function deleteRecord(id){
-  if(!confirm('حذف هذا السجل نهائياً؟')) return;
-  DB.records=DB.records.filter(r=>r.id!==id);
-  saveDB(); showToast('تم الحذف'); renderPage(currentPage);
-}
-
-/* ============================================================
-   8) التحليل المتقدم (الرسوم البيانية)
-============================================================ */
-function renderAnalysis(main){
-  main.innerHTML = `
-    <h2 class="text-2xl font-black mb-6">التحليل المتقدم</h2>
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-      <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-        <h3 class="font-bold text-emerald-800 mb-4">المخالفات حسب الصف</h3>
-        <div style="height:300px"><canvas id="chartGrade"></canvas></div>
-      </div>
-      <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-        <h3 class="font-bold text-emerald-800 mb-4">التوزيع حسب التصنيف</h3>
-        <div style="height:300px"><canvas id="chartCat"></canvas></div>
-      </div>
-    </div>
-    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-      <h3 class="font-bold text-emerald-800 mb-4">منحنى المخالفات (آخر 6 أشهر)</h3>
-      <div style="height:300px"><canvas id="chartTrend"></canvas></div>
-    </div>
-  `;
-
-  // Data prep
-  const byGrade={}; GRADES.forEach(g=>byGrade[g]=0);
-  const byCat={};
-  const monthly={};
-  
-  for(let i=5; i>=0; i--){
-    const d = new Date(); d.setMonth(d.getMonth()-i);
-    const key = d.toLocaleDateString('ar-OM', {month:'short'});
-    monthly[key] = 0;
+function deleteRecord(id) {
+  if (confirm('حذف هذا السجل؟')) {
+    DB.records = DB.records.filter(r => r.id !== id);
+    saveDB();
+    renderPage('records');
   }
-
-  DB.records.forEach(r=>{
-    const s=DB.students.find(x=>x.id===r.studentId);
-    if(s) byGrade[s.grade]=(byGrade[s.grade]||0)+1;
-    
-    const b=DB.behaviors.find(x=>x.id===r.behaviorId);
-    const c=b?b.cat:'أخرى';
-    byCat[c]=(byCat[c]||0)+1;
-
-    const d = new Date(r.createdAt);
-    const key = d.toLocaleDateString('ar-OM', {month:'short'});
-    if(monthly[key] !== undefined) monthly[key]++;
-  });
-
-  // Draw
-  if(charts.grade) charts.grade.destroy();
-  charts.grade = new Chart(document.getElementById('chartGrade'), {
-    type:'bar',
-    data:{labels:GRADES.map(g=>'صف '+g),datasets:[{label:'عدد المخالفات',data:GRADES.map(g=>byGrade[g]||0),backgroundColor:'#059669',borderRadius:8}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}
-  });
-
-  if(charts.cat) charts.cat.destroy();
-  charts.cat = new Chart(document.getElementById('chartCat'), {
-    type:'doughnut',
-    data:{labels:Object.keys(byCat).length?Object.keys(byCat):['لا توجد'],datasets:[{data:Object.keys(byCat).length?Object.values(byCat):[1],backgroundColor:['#059669','#3B82F6','#F59E0B','#EF4444','#8B5CF6']}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}}}
-  });
-
-  if(charts.trend) charts.trend.destroy();
-  charts.trend = new Chart(document.getElementById('chartTrend'), {
-    type:'line',
-    data:{labels:Object.keys(monthly),datasets:[{label:'المخالفات',data:Object.values(monthly),borderColor:'#3B82F6',backgroundColor:'rgba(59,130,246,0.1)',fill:true,tension:0.4}]},
-    options:{responsive:true,maintainAspectRatio:false}
-  });
 }
 
-/* ============================================================
-   9) الوحدة الصحية (Health Module)
-============================================================ */
-function renderHealthIdentity(main){
-  const studentOptions=DB.students.map(s=>`<option value="${s.id}">${s.name} (صف ${s.grade}/${s.section})</option>`).join('');
-  main.innerHTML=`
-    <h2 class="text-2xl font-black mb-6">هويتي الصحية</h2>
-    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 max-w-3xl space-y-4">
-      <div>
-        <label class="block font-bold mb-1">اختر الطالب</label>
-        <select id="healthStudent" class="w-full border-2 border-slate-200 rounded-xl p-3" onchange="loadHealthData()">
-          <option value="">اختر...</option>${studentOptions}
-        </select>
+// دالة الطباعة المضمونة للآيفون (تفتح نافذة جديدة وتطبع فوراً)
+function printRecord(id) {
+  const r = DB.records.find(x => x.id === id);
+  if (!r) return;
+  const s = DB.students.find(x => x.id === r.studentId) || {name:'غير معروف', grade:'-', section:'-'};
+
+  const html = `
+    <html dir="rtl">
+    <head>
+      <meta charset="UTF-8">
+      <title>طباعة إقرار مخالفة</title>
+      <style>
+        body { font-family: 'Cairo', sans-serif; padding: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        th, td { border: 1px solid #000; padding: 10px; text-align: right; }
+        th { background-color: #f3f4f6; width: 25%; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header h1 { margin: 0; font-size: 22px; color: #047857; }
+        .header h2 { margin: 10px 0; font-size: 18px; }
+        .signatures { display: flex; justify-content: space-between; margin-top: 60px; text-align: center; }
+        .signatures div { width: 45%; }
+        .signatures .line { border-top: 1px dotted #000; margin-top: 40px; padding-top: 5px; }
+        .footer { margin-top: 50px; text-align: center; font-size: 12px; color: #666; border-top: 1px solid #ccc; padding-top: 10px; }
+      </style>
+    </head>
+    <body>
+      <div class="header">
+        <h1>مدرسة المسعى للتعليم الأساسي للبنين (٥-٩)</h1>
+        <h2>إقرار مخالفة سلوكية</h2>
       </div>
-      <div id="healthForm" class="space-y-4 hidden">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div><label class="block font-bold mb-1">فصيلة الدم</label><input type="text" id="hBlood" class="w-full border-2 border-slate-200 rounded-xl p-3"></div>
-          <div><label class="block font-bold mb-1">الحساسية</label><input type="text" id="hAllergies" class="w-full border-2 border-slate-200 rounded-xl p-3"></div>
-          <div><label class="block font-bold mb-1">أمراض مزمنة</label><input type="text" id="hChronic" class="w-full border-2 border-slate-200 rounded-xl p-3"></div>
-          <div><label class="block font-bold mb-1">أدوية يتناولها</label><input type="text" id="hMeds" class="w-full border-2 border-slate-200 rounded-xl p-3"></div>
-          <div><label class="block font-bold mb-1">اسم شخص للطوارئ</label><input type="text" id="hEmName" class="w-full border-2 border-slate-200 rounded-xl p-3"></div>
-          <div><label class="block font-bold mb-1">رقم الطوارئ</label><input type="text" id="hEmPhone" class="w-full border-2 border-slate-200 rounded-xl p-3"></div>
+      <table>
+        <tr>
+          <th>اسم الطالب</th>
+          <td>${s.name}</td>
+          <th>الصف / الشعبة</th>
+          <td>${s.grade} / ${s.section}</td>
+        </tr>
+        <tr>
+          <th>السلوك / المخالفة</th>
+          <td>${r.behaviorName}</td>
+          <th>تكرار السلوك</th>
+          <td>المرة ${r.occurrence}</td>
+        </tr>
+        <tr>
+          <th>الإجراء المتخذ</th>
+          <td colspan="3">${r.actionName}</td>
+        </tr>
+        <tr>
+          <th>النص اللائحي</th>
+          <td colspan="3">${r.regulationText || 'لا يوجد'}</td>
+        </tr>
+        <tr>
+          <th>يراجع الأستاذ:</th>
+          <td colspan="3">${r.metPerson || '...................................................'}</td>
+        </tr>
+      </table>
+      <div class="signatures">
+        <div>
+          <strong>توقيع المراجع</strong>
+          <div class="line">....................................</div>
         </div>
-        <div><label class="block font-bold mb-1">ملاحظات صحية أخرى</label><textarea id="hNotes" rows="2" class="w-full border-2 border-slate-200 rounded-xl p-3"></textarea></div>
-        <button onclick="saveHealthData()" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-black py-3 rounded-xl mt-2 shadow-md">💾 حفظ البيانات الصحية</button>
-      </div>
-    </div>
-  `;
-}
-
-function loadHealthData(){
-  const sid = document.getElementById('healthStudent').value;
-  const form = document.getElementById('healthForm');
-  if(!sid){ form.classList.add('hidden'); return; }
-  form.classList.remove('hidden');
-  const s = DB.students.find(x => x.id === sid);
-  const h = s.health || {};
-  document.getElementById('hBlood').value = h.bloodType || '';
-  document.getElementById('hAllergies').value = h.allergies || '';
-  document.getElementById('hChronic').value = h.chronic || '';
-  document.getElementById('hMeds').value = h.medications || '';
-  document.getElementById('hEmName').value = h.emergencyName || '';
-  document.getElementById('hEmPhone').value = h.emergencyPhone || '';
-  document.getElementById('hNotes').value = h.notes || '';
-}
-
-function saveHealthData(){
-  const sid = document.getElementById('healthStudent').value;
-  const s = DB.students.find(x => x.id === sid);
-  s.health = {
-    bloodType: document.getElementById('hBlood').value.trim(),
-    allergies: document.getElementById('hAllergies').value.trim(),
-    chronic: document.getElementById('hChronic').value.trim(),
-    medications: document.getElementById('hMeds').value.trim(),
-    emergencyName: document.getElementById('hEmName').value.trim(),
-    emergencyPhone: document.getElementById('hEmPhone').value.trim(),
-    notes: document.getElementById('hNotes').value.trim()
-  };
-  saveDB();
-  showToast('تم حفظ البيانات الصحية ✓');
-}
-
-function renderHealthTransfer(main){
-  const studentOptions=DB.students.map(s=>`<option value="${s.id}">${s.name} (صف ${s.grade}/${s.section})</option>`).join('');
-  main.innerHTML=`
-    <h2 class="text-2xl font-black mb-6">تحويل للوحدة الصحية</h2>
-    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 max-w-3xl space-y-4">
-      <div><label class="block font-bold mb-1">اختر الطالب</label>
-        <select id="refStudent" class="w-full border-2 border-slate-200 rounded-xl p-3"><option value="">اختر...</option>${studentOptions}</select></div>
-      <div><label class="block font-bold mb-1">سبب التحويل</label>
-        <input type="text" id="refReason" class="w-full border-2 border-slate-200 rounded-xl p-3" placeholder="مثال: صداع مستمر، إصابة أثناء الرياضة..."></div>
-      <div><label class="block font-bold mb-1">ملاحظات</label>
-        <textarea id="refNotes" rows="2" class="w-full border-2 border-slate-200 rounded-xl p-3"></textarea></div>
-      <button onclick="saveHealthTransfer()" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-black py-3 rounded-xl mt-2 shadow-md">💾 حفظ التحويل</button>
-    </div>
-  `;
-}
-
-function saveHealthTransfer(){
-  const sid = document.getElementById('refStudent').value;
-  const reason = document.getElementById('refReason').value.trim();
-  const notes = document.getElementById('refNotes').value.trim();
-  if(!sid || !reason) return showToast('⚠️ يرجى اختيار الطالب وكتابة السبب', 'error');
-  
-  const ref = {
-    id: 'H'+Date.now(),
-    studentId: sid,
-    reason: reason,
-    notes: notes,
-    date: Date.now(),
-    status: 'pending'
-  };
-  DB.healthReferrals.push(ref);
-  saveDB();
-  showToast('تم حفظ التحويل بنجاح ✓');
-  renderPage('health_report');
-}
-
-function renderHealthReport(main){
-  const refs = DB.healthReferrals.slice().reverse();
-  main.innerHTML=`
-    <h2 class="text-2xl font-black mb-6">تقرير الوحدة الصحية</h2>
-    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-x-auto">
-      <table class="w-full text-right min-w-[700px]">
-        <thead class="bg-slate-50 text-sm">
-          <tr><th class="p-3">التاريخ</th><th class="p-3">الطالب</th><th class="p-3">الصف</th><th class="p-3">السبب</th><th class="p-3">الحالة</th></tr>
-        </thead>
-        <tbody>
-          ${refs.length ? refs.map(r => {
-            const s = DB.students.find(x => x.id === r.studentId) || {name:'—', grade:'—', section:'—'};
-            return `<tr class="border-b">
-              <td class="p-3 text-xs">${new Date(r.date).toLocaleDateString('ar-OM')}</td>
-              <td class="p-3 font-bold text-sm">${s.name}</td>
-              <td class="p-3 text-xs">${s.grade}/${s.section}</td>
-              <td class="p-3 text-xs text-red-600">${r.reason}</td>
-              <td class="p-3 text-xs"><span class="bg-amber-100 text-amber-800 px-2 py-1 rounded-full">قيد المعالجة</span></td>
-            </tr>`;
-          }).join('') : '<tr><td colspan="5" class="p-6 text-center text-slate-400">لا توجد تحويلات</td></tr>'}
-        </tbody>
-      </table>
-    </div>
-  `;
-}
-
-/* ============================================================
-   10) إدارة المستخدمين والسلوكيات والإجراءات
-============================================================ */
-function renderUsers(main){
-  main.innerHTML=`
-    <div class="flex justify-between items-center mb-6">
-      <h2 class="text-2xl font-black">إدارة المستخدمين</h2>
-      <button onclick="openUserModal()" class="bg-emerald-700 text-white font-bold px-4 py-2 rounded-xl text-sm">+ إضافة مستخدم</button>
-    </div>
-    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-x-auto">
-      <table class="w-full text-right min-w-[600px]">
-        <thead class="bg-slate-50 text-sm"><tr><th class="p-3">الاسم</th><th class="p-3">المستخدم</th><th class="p-3">الدور</th><th class="p-3">إجراءات</th></tr></thead>
-        <tbody>
-          ${DB.users.map(u => `<tr class="border-b">
-            <td class="p-3 font-bold">${u.name}</td>
-            <td class="p-3 text-sm">${u.username}</td>
-            <td class="p-3 text-xs">${u.role === 'admin' ? 'مدير' : u.role === 'teacher' ? 'معلم' : 'ولي أمر'}</td>
-            <td class="p-3"><button onclick="deleteUser('${u.id}')" class="text-red-500">🗑️</button></td>
-          </tr>`).join('')}
-        </tbody>
-      </table>
-    </div>
-  `;
-}
-
-function openUserModal(){
-  showModal(`
-    <h3 class="text-xl font-black mb-4">إضافة مستخدم</h3>
-    <div class="space-y-3">
-      <div><label class="block text-sm font-bold">الاسم</label><input id="uName" class="w-full border-2 rounded-xl p-2"></div>
-      <div><label class="block text-sm font-bold">اسم المستخدم</label><input id="uUsername" class="w-full border-2 rounded-xl p-2"></div>
-      <div><label class="block text-sm font-bold">كلمة المرور</label><input id="uPass" class="w-full border-2 rounded-xl p-2"></div>
-      <div><label class="block text-sm font-bold">الدور</label><select id="uRole" class="w-full border-2 rounded-xl p-2"><option value="admin">مدير</option><option value="teacher">معلم</option><option value="parent">ولي أمر</option></select></div>
-      <button onclick="saveUser()" class="w-full bg-emerald-700 text-white font-bold py-2 rounded-xl">حفظ</button>
-    </div>
-  `);
-}
-
-function saveUser(){
-  const name = document.getElementById('uName').value;
-  const username = document.getElementById('uUsername').value;
-  const password = document.getElementById('uPass').value;
-  const role = document.getElementById('uRole').value;
-  if(!name || !username) return showToast('أكمل البيانات', 'error');
-  DB.users.push({id:'U'+Date.now(), name, username, password, role});
-  saveDB(); closeModal(); renderPage('users'); showToast('تمت الإضافة');
-}
-
-function deleteUser(id){
-  if(id === session.userId) return showToast('لا يمكنك حذف حسابك', 'error');
-  if(!confirm('حذف المستخدم؟')) return;
-  DB.users = DB.users.filter(u => u.id !== id);
-  saveDB(); renderPage('users');
-}
-
-function renderBehaviors(main){
-  main.innerHTML=`
-    <div class="flex justify-between items-center mb-6">
-      <h2 class="text-2xl font-black">إدارة السلوكيات</h2>
-      <button onclick="openBehaviorModal()" class="bg-emerald-700 text-white font-bold px-4 py-2 rounded-xl text-sm">+ إضافة سلوك</button>
-    </div>
-    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-x-auto">
-      <table class="w-full text-right min-w-[600px]">
-        <thead class="bg-slate-50 text-sm"><tr><th class="p-3">السلوك</th><th class="p-3">التصنيف</th><th class="p-3">النقاط</th><th class="p-3">إجراءات</th></tr></thead>
-        <tbody>
-          ${DB.behaviors.map(b => `<tr class="border-b">
-            <td class="p-3 font-bold">${b.name}</td>
-            <td class="p-3 text-sm">${b.cat}</td>
-            <td class="p-3 font-bold text-red-600">${b.points}</td>
-            <td class="p-3"><button onclick="deleteBehavior('${b.id}')" class="text-red-500">🗑️</button></td>
-          </tr>`).join('')}
-        </tbody>
-      </table>
-    </div>
-  `;
-}
-
-function openBehaviorModal(){
-  showModal(`
-    <h3 class="text-xl font-black mb-4">إضافة سلوك</h3>
-    <div class="space-y-3">
-      <div><label class="block text-sm font-bold">الاسم</label><input id="bName" class="w-full border-2 rounded-xl p-2"></div>
-      <div><label class="block text-sm font-bold">التصنيف</label><input id="bCat" class="w-full border-2 rounded-xl p-2"></div>
-      <div><label class="block text-sm font-bold">النقاط</label><input type="number" id="bPoints" value="1" class="w-full border-2 rounded-xl p-2"></div>
-      <div><label class="block text-sm font-bold">تسلسل الإجراءات (مفصولة بفاصلة)</label><input id="bEsc" class="w-full border-2 rounded-xl p-2" placeholder="A1, A2, A3"></div>
-      <button onclick="saveBehavior()" class="w-full bg-emerald-700 text-white font-bold py-2 rounded-xl">حفظ</button>
-    </div>
-  `);
-}
-
-function saveBehavior(){
-  const name = document.getElementById('bName').value;
-  const cat = document.getElementById('bCat').value;
-  const points = parseInt(document.getElementById('bPoints').value) || 1;
-  const escStr = document.getElementById('bEsc').value;
-  if(!name) return showToast('أدخل اسم السلوك', 'error');
-  const esc = escStr.split(',').map(s => s.trim()).filter(s => s);
-  DB.behaviors.push({id:'B'+Date.now(), name, cat, points, level:1, escalation:esc});
-  saveDB(); closeModal(); renderPage('behaviors'); showToast('تمت الإضافة');
-}
-
-function deleteBehavior(id){
-  if(!confirm('حذف السلوك؟')) return;
-  DB.behaviors = DB.behaviors.filter(b => b.id !== id);
-  saveDB(); renderPage('behaviors');
-}
-
-function renderActions(main){
-  main.innerHTML=`
-    <div class="flex justify-between items-center mb-6">
-      <h2 class="text-2xl font-black">إدارة الإجراءات</h2>
-      <button onclick="openActionModal()" class="bg-emerald-700 text-white font-bold px-4 py-2 rounded-xl text-sm">+ إضافة إجراء</button>
-    </div>
-    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-x-auto">
-      <table class="w-full text-right min-w-[600px]">
-        <thead class="bg-slate-50 text-sm"><tr><th class="p-3">الإجراء</th><th class="p-3">المستوى</th><th class="p-3">الوصف</th><th class="p-3">إجراءات</th></tr></thead>
-        <tbody>
-          ${DB.actions.map(a => `<tr class="border-b">
-            <td class="p-3 font-bold">${a.name}</td>
-            <td class="p-3 text-sm">${a.level}</td>
-            <td class="p-3 text-xs text-slate-500 max-w-xs truncate">${a.desc}</td>
-            <td class="p-3"><button onclick="deleteAction('${a.id}')" class="text-red-500">🗑️</button></td>
-          </tr>`).join('')}
-        </tbody>
-      </table>
-    </div>
-  `;
-}
-
-function openActionModal(){
-  showModal(`
-    <h3 class="text-xl font-black mb-4">إضافة إجراء</h3>
-    <div class="space-y-3">
-      <div><label class="block text-sm font-bold">الاسم</label><input id="aName" class="w-full border-2 rounded-xl p-2"></div>
-      <div><label class="block text-sm font-bold">المستوى</label><input type="number" id="aLevel" value="1" class="w-full border-2 rounded-xl p-2"></div>
-      <div><label class="block text-sm font-bold">الوصف</label><input id="aDesc" class="w-full border-2 rounded-xl p-2"></div>
-      <button onclick="saveAction()" class="w-full bg-emerald-700 text-white font-bold py-2 rounded-xl">حفظ</button>
-    </div>
-  `);
-}
-
-function saveAction(){
-  const name = document.getElementById('aName').value;
-  const level = parseInt(document.getElementById('aLevel').value) || 1;
-  const desc = document.getElementById('aDesc').value;
-  if(!name) return showToast('أدخل اسم الإجراء', 'error');
-  DB.actions.push({id:'A'+Date.now(), name, level, desc});
-  saveDB(); closeModal(); renderPage('actions'); showToast('تمت الإضافة');
-}
-
-function deleteAction(id){
-  if(!confirm('حذف الإجراء؟')) return;
-  DB.actions = DB.actions.filter(a => a.id !== id);
-  saveDB(); renderPage('actions');
-}
-
-/* ============================================================
-   11) التنبيهات والإعدادات والتقارير
-============================================================ */
-function renderAlerts(main){
-  const atRisk = getAtRiskStudents();
-  main.innerHTML=`
-    <h2 class="text-2xl font-black mb-6">التنبيهات والمتابعة</h2>
-    <div class="space-y-4">
-      ${atRisk.length ? atRisk.map(a => `
-        <div class="bg-red-50 border border-red-200 p-4 rounded-xl flex justify-between items-center">
-          <div>
-            <div class="font-bold text-red-800">${a.student.name} — صف ${a.student.grade}/${a.student.section}</div>
-            <div class="text-sm text-red-600">وصل للخطوة الأخيرة في: ${a.behavior.name} (تكرار ${a.count})</div>
-          </div>
-          <button onclick="viewStudentDetail('${a.student.id}')" class="bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-bold">متابعة</button>
+        <div>
+          <strong>مدير المدرسة</strong>
+          <div class="line">....................................</div>
         </div>
-      `).join('') : '<div class="bg-white p-8 text-center text-slate-400 rounded-xl shadow-sm">لا توجد تنبيهات حالياً — كل الطلبة بخير 🌟</div>'}
-    </div>
-  `;
-}
-
-function renderReports(main){
-  main.innerHTML=`
-    <h2 class="text-2xl font-black mb-6">التقارير الرسمية</h2>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col items-center justify-center gap-3">
-        <div class="text-4xl">📊</div>
-        <h3 class="font-bold">التقرير الشهري</h3>
-        <button onclick="printMonthlyReport()" class="bg-emerald-700 text-white px-6 py-2 rounded-xl font-bold">استخراج</button>
       </div>
-      <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col items-center justify-center gap-3">
-        <div class="text-4xl">📁</div>
-        <h3 class="font-bold">تصدير كافة البيانات</h3>
-        <button onclick="exportExcel()" class="bg-blue-600 text-white px-6 py-2 rounded-xl font-bold">Excel</button>
+      <div class="footer">
+        إعداد وتصميم: أحمد بن عبدالله العلي - مساعد مدير المدرسة
       </div>
-    </div>
+      <script>
+        window.onload = function() { window.print(); window.close(); }
+      <\/script>
+    </body>
+    </html>
   `;
+
+  const printWindow = window.open('', '_blank');
+  if (printWindow) {
+    printWindow.document.write(html);
+    printWindow.document.close();
+  } else {
+    alert('يرجى السماح بالنوافذ المنبثقة (Pop-ups) في المتصفح لتعمل الطباعة.');
+  }
 }
 
-function renderSettings(main){
-  main.innerHTML=`
-    <h2 class="text-2xl font-black mb-6">الإعدادات</h2>
-    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 max-w-lg space-y-4">
-      <div><label class="block font-bold mb-1">اسم المدرسة</label><input type="text" id="setSchool" value="${DB.settings.schoolName||''}" class="w-full border-2 border-slate-200 rounded-xl p-3"></div>
-      <div><label class="block font-bold mb-1">المديرية</label><input type="text" id="setDirectorate" value="${DB.settings.directorate||''}" class="w-full border-2 border-slate-200 rounded-xl p-3"></div>
-      <div><label class="block font-bold mb-1">اسم المدير</label><input type="text" id="setPrincipal" value="${DB.settings.principal||''}" class="w-full border-2 border-slate-200 rounded-xl p-3"></div>
-      <button onclick="saveSettings()" class="w-full bg-emerald-700 text-white font-bold py-3 rounded-xl shadow-md">حفظ الإعدادات</button>
-    </div>
-  `;
-}
-
-function saveSettings(){
-  DB.settings.schoolName=document.getElementById('setSchool').value.trim();
-  DB.settings.directorate=document.getElementById('setDirectorate').value.trim();
-  DB.settings.principal=document.getElementById('setPrincipal').value.trim();
-  saveDB(); showToast('تم الحفظ ✓');
-}
-
-/* ============================================================
-   12) إدارة الطلبة وتفاصيلهم
-============================================================ */
-function renderStudents(main){
-  const cards=DB.students.map(s=>{
-    const cnt=DB.records.filter(r=>r.studentId===s.id).length;
-    return `<div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100">
-      <div class="min-w-0">
-        <div class="font-bold text-emerald-800 text-sm truncate">${s.name}</div>
-        <div class="text-xs text-slate-500 mt-1">صف ${s.grade} / شعبة ${s.section}</div>
-        <div class="text-xs mt-1 ${cnt?'text-red-600 font-bold':'text-slate-400'}">${cnt} سجل سلوكي</div>
-      </div>
-      <div class="flex gap-1 mt-3">
-        <button onclick="viewStudentDetail('${s.id}')" class="flex-1 bg-blue-100 text-blue-700 font-bold text-xs py-1.5 rounded-lg">👁️ تفاصيل</button>
-        <button onclick="deleteStudent('${s.id}')" class="bg-red-100 text-red-700 font-bold text-xs px-2 py-1.5 rounded-lg">🗑️</button>
-      </div>
-    </div>`;
-  }).join('');
-  main.innerHTML=`
-    <div class="flex justify-between items-center mb-6 flex-wrap gap-2">
-      <h2 class="text-2xl font-black">إدارة الطلبة (${DB.students.length})</h2>
-    </div>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">${cards||'<div class="text-slate-400 p-8 col-span-3 text-center">لا يوجد طلبة</div>'}</div>
-  `;
-}
-
-function deleteStudent(id){
-  if(DB.records.some(r=>r.studentId===id)) return showToast('⚠️ لا يمكن الحذف — الطالب لديه سجلات','error');
-  if(!confirm('حذف هذا الطالب؟')) return;
-  DB.students=DB.students.filter(x=>x.id!==id);
-  saveDB(); showToast('تم الحذف'); renderPage('students');
-}
-
-function viewStudentDetail(id){
-  const s=DB.students.find(x=>x.id===id); if(!s) return;
-  const recs=DB.records.filter(r=>r.studentId===id).sort((a,b)=>b.createdAt-a.createdAt);
-  showModal(`
-    <div class="flex justify-between items-center mb-4 flex-wrap gap-2 no-print">
-      <h3 class="text-xl font-black">${s.name} — صف ${s.grade}/${s.section}</h3>
-      <button onclick="closeModal()" class="bg-slate-200 text-slate-700 font-bold px-3 py-2 rounded-lg text-sm">إغلاق</button>
-    </div>
-    <div class="bg-slate-50 rounded-xl p-3 mb-4"><div class="text-sm"><strong>إجمالي السجلات:</strong> ${recs.length}</div></div>
-    <div class="overflow-x-auto max-h-[60vh]">
-      <table class="w-full text-right text-xs"><thead class="bg-slate-100 sticky top-0"><tr>
-        <th class="p-2">التاريخ</th><th class="p-2">السلوك</th><th class="p-2">الإجراء</th><th class="p-2 text-center">الخطوة</th>
-      </tr></thead><tbody>
-      ${recs.length?recs.map(r=>`<tr class="border-b">
-        <td class="p-2 whitespace-nowrap">${new Date(r.createdAt).toLocaleDateString('ar-OM')}</td>
-        <td class="p-2 text-red-600">${r.behaviorName}</td>
-        <td class="p-2 text-emerald-700">${r.actionName}</td>
-        <td class="p-2 text-center"><span class="bg-amber-100 px-2 py-0.5 rounded-full">${r.escalationStep||'—'}/${r.escalationTotal||'—'}</span></td>
-      </tr>`).join(''):'<tr><td colspan="4" class="p-4 text-center text-slate-400">لا يوجد سجلات</td></tr>'}
-      </tbody></table>
-    </div>`);
-}
-
-/* ============================================================
-   13) ولي الأمر
-============================================================ */
-function renderMyChild(main){
-  const s=DB.students.find(x=>x.id===session.studentId);
-  if(!s){main.innerHTML='<div class="bg-white p-8 rounded-2xl shadow-md text-center text-slate-500">الطالب غير موجود. تواصل مع المدرسة.</div>';return;}
-  const recs=DB.records.filter(r=>r.studentId===s.id).sort((a,b)=>b.createdAt-a.createdAt);
-  const atRiskInfo=[];
-  DB.behaviors.forEach(b=>{
-    if(b.id==='B_OTHER') return;
-    const st=getEscalationState(s.id,b.id);
-    if(st&&st.pastCount>=st.esc.length-1) atRiskInfo.push({behavior:b,count:st.pastCount,total:st.esc.length});
-  });
-  
-  main.innerHTML=`
-    <div class="bg-gradient-to-l from-emerald-700 to-emerald-900 text-white rounded-2xl p-6 mb-6 shadow-lg">
-      <div class="text-sm opacity-80">أهلاً بك</div>
-      <div class="text-2xl font-black mt-1">${s.name}</div>
-      <div class="text-sm opacity-90 mt-1">صف ${s.grade} / شعبة ${s.section}</div>
-    </div>
-    ${atRiskInfo.length?`<div class="bg-red-50 border-2 border-red-300 rounded-2xl p-4 mb-6">
-      <div class="font-black text-red-800 text-sm mb-2">🚨 تنبيه مهم — وصل ابنكم للخطوة الأخيرة في:</div>
-      ${atRiskInfo.map(a=>`<div class="text-sm text-red-700 mb-1">• ${a.behavior.name} — تكرار ${a.count} مرة</div>`).join('')}
-    </div>`:''}
-    <h3 class="font-black text-lg mb-3">📋 سجل السلوكيات (${recs.length})</h3>
-    <div class="space-y-3">
-      ${recs.length?recs.map(r=>`
-        <div class="bg-white rounded-xl p-4 shadow-sm border-r-4 border-emerald-600">
-          <div class="flex justify-between items-start mb-2 flex-wrap gap-2">
-            <div class="font-bold text-slate-800">${r.behaviorName}</div>
-            <div class="text-xs text-slate-500">${new Date(r.createdAt).toLocaleDateString('ar-OM',{year:'numeric',month:'long',day:'numeric'})}</div>
-          </div>
-          <div class="text-sm text-emerald-700 font-bold">▸ ${r.actionName}</div>
-          ${r.notes?`<div class="text-xs text-slate-600 mt-2 bg-slate-50 p-2 rounded">📝 ${r.notes}</div>`:''}
-        </div>`).join(''):'<div class="bg-white p-8 rounded-xl shadow-md text-center text-slate-400">لا يوجد سجلات — نأمل أن يبقى ابنكم متفوقاً سلوكياً 🌟</div>'}
-    </div>
-  `;
-}
-
-/* ============================================================
-   14) أدوات مساعدة (Modal, Toast, Print)
-============================================================ */
-function showModal(content){
-  document.getElementById('modalRoot').innerHTML=`
-    <div class="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center p-4" onclick="if(event.target===this) closeModal()">
-      <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[92vh] overflow-auto p-6">${content}</div>
-    </div>`;
-}
-function closeModal(){document.getElementById('modalRoot').innerHTML='';}
-
-let toastTimer=null;
-function showToast(msg,type='success'){
-  const old=document.getElementById('toastBox'); if(old) old.remove();
-  const bg=type==='error'?'bg-red-600':'bg-emerald-700';
-  const box=document.createElement('div');
-  box.id='toastBox';
-  box.className=`fixed top-4 left-1/2 -translate-x-1/2 ${bg} text-white font-bold px-6 py-3 rounded-xl shadow-2xl z-[110] text-sm`;
-  box.textContent=msg; document.body.appendChild(box);
-  clearTimeout(toastTimer); toastTimer=setTimeout(()=>box.remove(),3000);
-}
-
-function openPrintModal(recordId){
-  const record=DB.records.find(x=>x.id===recordId); if(!record) return;
-  const student=DB.students.find(x=>x.id===record.studentId)||{name:'—',grade:'—',section:'—'};
-  const behavior=DB.behaviors.find(x=>x.id===record.behaviorId)||{name:record.behaviorName,cat:'—'};
-  const esc=record.escalationPath||getEscalation(behavior);
-  const stepIdx=(record.escalationStep||1)-1;
-  const html=buildPrintSheet(record,student,behavior,esc,stepIdx);
-  showModal(`
-    <div class="flex justify-between items-center mb-4 no-print flex-wrap gap-2">
-      <h3 class="text-xl font-black">معاينة التقرير</h3>
-      <div class="flex gap-2">
-        <button onclick="doPrint('${recordId}')" class="bg-emerald-700 text-white font-bold px-4 py-2 rounded-lg text-sm">🖨️ طباعة</button>
-        <button onclick="closeModal()" class="bg-slate-200 text-slate-700 font-bold px-4 py-2 rounded-lg text-sm">إغلاق</button>
-      </div>
-    </div>
-    <div class="bg-white border rounded-lg overflow-auto" style="max-height:75vh">
-      ${html.replace(/<\/?html[^>]*>|<\/?head[^>]*>|<style>[\s\S]*?<\/style>|<\/?body[^>]*>|<\/?meta[^>]*>|<!DOCTYPE[^>]*>/gi,'')}
-    </div>`);
-}
-
-function buildPrintSheet(record,student,behavior,esc,stepIdx){
-  const schoolName=DB.settings.schoolName||'مدرسة المسعى';
-  const dateStr=new Date(record.createdAt).toLocaleDateString('ar-OM',{year:'numeric',month:'long',day:'numeric'});
-  const pastCount=(record.escalationStep||1)-1;
-  const escHTML=esc.map((aid,i)=>{
-    const a=DB.actions.find(x=>x.id===aid) || {name:'—'};
-    const isCur=i===stepIdx, isPast=i<stepIdx;
-    const bg=isCur?'#059669':(isPast?'#D1FAE5':'#F1F5F9');
-    const color=isCur?'white':(isPast?'#065F46':'#64748B');
-    return `<div style="display:inline-block;padding:5px 10px;margin:3px;border-radius:6px;background:${bg};color:${color};font-size:11px;font-weight:${isCur?'bold':'normal'};border:1px solid ${isCur?'#047857':'#E2E8F0'}">${isPast?'✓':isCur?'▶':'○'} ${i+1}. ${a.name}</div>`;
-  }).join('');
-  return `<!DOCTYPE html><html dir="rtl"><head><meta charset="utf-8"><style>
-    @page{size:A4;margin:15mm}*{box-sizing:border-box}
-    body{font-family:'Cairo','Segoe UI',Tahoma,Arial,sans-serif;color:#1E293B;margin:0;font-size:12px;line-height:1.5}
-    .header{text-align:center;border-bottom:3px double #059669;padding-bottom:10px;margin-bottom:16px}
-    .header h1{font-size:17px;margin:4px 0;color:#065F46}.header .sub{font-size:11px;color:#475569}
-    .title{text-align:center;font-size:15px;font-weight:bold;margin:14px 0;background:#ECFDF5;padding:8px;border-radius:6px;border:1px solid #A7F3D0}
-    .section{margin:12px 0}.section h3{font-size:12px;color:#065F46;margin:0 0 6px;padding-right:8px;border-right:4px solid #059669}
-    .grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-    .field{padding:6px 10px;background:#F8FAFC;border-radius:5px;font-size:11px;border:1px solid #E2E8F0}
-    .field strong{color:#475569}
-    .escalation{padding:10px;background:#F8FAFC;border-radius:6px;border:1px solid #E2E8F0}
-    .reason{padding:10px;background:#FEF3C7;border-right:4px solid #F59E0B;border-radius:6px;font-size:11px;margin-top:8px;line-height:1.7}
-    .signature{margin-top:28px;display:grid;grid-template-columns:1fr 1fr;gap:40px;font-size:11px}
-    .signature div{padding-top:25px;border-top:1px dashed #94A3B8;text-align:center}
-    .footer{text-align:center;margin-top:25px;font-size:9px;color:#94A3B8;border-top:1px solid #E2E8F0;padding-top:8px}
-  </style></head><body>
-    <div class="header">
-      <div class="sub">بسم الله الرحمن الرحيم</div><div class="sub">سلطنة عُمان — وزارة التربية والتعليم</div>
-      <h1>${schoolName}</h1><div class="sub">تقرير إجراء سلوكي طلابي</div>
-    </div>
-    <div class="title">تقرير سلوك — ${record.behaviorName}</div>
-    <div class="section"><h3>بيانات الطالب</h3><div class="grid">
-      <div class="field"><strong>الاسم:</strong> ${student.name}</div>
-      <div class="field"><strong>الصف / الشعبة:</strong> ${student.grade} / ${student.section}</div>
-      <div class="field"><strong>التاريخ:</strong> ${dateStr}</div>
-      <div class="field"><strong>رقم السجل:</strong> ${record.id}</div>
-    </div></div>
-    <div class="section"><h3>تفاصيل المخالفة</h3><div class="grid">
-      <div class="field"><strong>السلوك:</strong> ${record.behaviorName}</div>
-      <div class="field"><strong>التصنيف:</strong> ${behavior.cat}</div>
-      <div class="field"><strong>التكرارات السابقة:</strong> ${pastCount}</div>
-      <div class="field"><strong>هذا التكرار رقم:</strong> ${record.escalationStep} من ${record.escalationTotal}</div>
-    </div></div>
-    <div class="section"><h3>التسلسل التصاعدي للإجراءات (${record.escalationTotal} خطوات)</h3>
-      <div class="escalation">${escHTML}</div>
-      <div class="reason"><strong>الإجراء المتخذ:</strong> ${record.actionName}<br>
-        <strong>السبب:</strong> تطبيقاً للتسلسل التصاعدي المعتمد لهذا السلوك، ووصولاً للخطوة <strong>${record.escalationStep}</strong> من <strong>${record.escalationTotal}</strong> بعد <strong>${pastCount}</strong> تكرار سابق.</div>
-    </div>
-    ${record.regulationText?`<div class="section"><h3>النص اللائحي</h3><div class="field">${record.regulationText}</div></div>`:''}
-    <div class="section"><h3>ملاحظات ومتابعة</h3>
-      <div class="field"><strong>من تتم مقابلته:</strong> ${record.metWith||'—'}</div>
-      <div class="field" style="margin-top:6px"><strong>ملاحظات:</strong> ${record.notes||'—'}</div>
-    </div>
-    <div class="signature">
-      <div>يراجع الأستاذ: ${record.teacher||'—'}</div>
-      <div>مدير المدرسة / المساعد</div>
-    </div>
-    <div class="footer">تم إنشاء هذا التقرير آلياً من منصة السلوك الطلابي — مدرسة المسعى<br>${new Date().toLocaleString('ar-OM')}</div>
-  </body></html>`;
-}
-
-function doPrint(recordId){
-  const record=DB.records.find(x=>x.id===recordId); if(!record) return;
-  const student=DB.students.find(x=>x.id===record.studentId)||{};
-  const behavior=DB.behaviors.find(x=>x.id===record.behaviorId)||{};
-  const esc=record.escalationPath||getEscalation(behavior);
-  const stepIdx=(record.escalationStep||1)-1;
-  const html=buildPrintSheet(record,student,behavior,esc,stepIdx);
-  const iframe=document.createElement('iframe');
-  iframe.style.cssText='position:fixed;right:0;bottom:0;width:0;height:0;border:0';
-  document.body.appendChild(iframe);
-  iframe.contentDocument.write(html); iframe.contentDocument.close();
-  setTimeout(()=>{iframe.contentWindow.focus();iframe.contentWindow.print();setTimeout(()=>iframe.remove(),1500);},400);
-}
-
-function printMonthlyReport(){
-  const d = new Date();
-  const month = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
-  const recs = DB.records.filter(r => {
-    const rd = new Date(r.createdAt);
-    return `${rd.getFullYear()}-${String(rd.getMonth()+1).padStart(2,'0')}` === month;
-  });
-  if(!recs.length) return showToast('لا توجد سجلات لهذا الشهر', 'error');
-  
-  const schoolName=DB.settings.schoolName||'مدرسة المسعى';
-  const monthName=d.toLocaleDateString('ar-OM',{month:'long',year:'numeric'});
-  
-  const html = `<!DOCTYPE html><html dir="rtl"><head><meta charset="utf-8"><style>
-    @page{size:A4;margin:12mm}*{box-sizing:border-box}
-    body{font-family:'Cairo',Tahoma,sans-serif;color:#1E293B;margin:0;font-size:11px}
-    .header{text-align:center;border-bottom:3px double #059669;padding-bottom:8px;margin-bottom:12px}
-    .header h1{font-size:16px;margin:2px 0;color:#065F46}.header .sub{font-size:10px;color:#475569}
-    .title{text-align:center;font-size:14px;font-weight:bold;margin:10px 0;padding:8px;background:#ECFDF5;border-radius:6px}
-    table{width:100%;border-collapse:collapse;font-size:10px;margin-top:10px}
-    th{background:#ECFDF5;padding:5px;border:1px solid #A7F3D0;text-align:right}
-    td{padding:4px 5px;border:1px solid #E2E8F0}
-    tbody tr:nth-child(even){background:#F8FAFC}
-    .center{text-align:center}
-  </style></head><body>
-    <div class="header"><div class="sub">بسم الله الرحمن الرحيم — وزارة التربية والتعليم</div>
-      <h1>${schoolName}</h1><div class="sub">التقرير الشهري للسلوك الطلابي</div></div>
-    <div class="title">شهر: ${monthName}</div>
-    <table><thead><tr><th>التاريخ</th><th>الطالب</th><th>الصف</th><th>السلوك</th><th>الإجراء</th><th class="center">الخطوة</th></tr></thead><tbody>
-    ${recs.map(r=>{const s=DB.students.find(x=>x.id===r.studentId)||{};return `<tr><td>${new Date(r.createdAt).toLocaleDateString('ar-OM')}</td><td>${s.name||'—'}</td><td>${s.grade||'—'}/${s.section||'—'}</td><td>${r.behaviorName}</td><td>${r.actionName}</td><td class="center">${r.escalationStep||'—'}/${r.escalationTotal||'—'}</td></tr>`;}).join('')}
-    </tbody></table>
-    <div style="text-align:center;margin-top:20px;font-size:9px;color:#94A3B8">تم الإنشاء: ${new Date().toLocaleString('ar-OM')}</div>
-  </body></html>`;
-  
-  const iframe=document.createElement('iframe');
-  iframe.style.cssText='position:fixed;right:0;bottom:0;width:0;height:0;border:0';
-  document.body.appendChild(iframe);
-  iframe.contentDocument.write(html); iframe.contentDocument.close();
-  setTimeout(()=>{iframe.contentWindow.focus();iframe.contentWindow.print();setTimeout(()=>iframe.remove(),1500);},400);
-}
-
-function exportExcel(){
-  if(!DB.records.length) return showToast('لا توجد سجلات','error');
-  const data=DB.records.map(r=>{
-    const s=DB.students.find(x=>x.id===r.studentId)||{};
-    return {
-      'التاريخ':new Date(r.createdAt).toLocaleDateString('ar-OM'),
-      'الطالب':s.name||'','الصف':s.grade||'','الشعبة':s.section||'',
-      'السلوك':r.behaviorName,'الإجراء':r.actionName,
-      'الخطوة':r.escalationStep?`${r.escalationStep}/${r.escalationTotal}`:'',
-      'ملاحظات':r.notes||''
-    };
-  });
-  const ws=XLSX.utils.json_to_sheet(data);
-  const wb=XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb,ws,'السجلات');
-  XLSX.writeFile(wb,`سجلات-المسعى-${new Date().toISOString().split('T')[0]}.xlsx`);
-  showToast('تم التصدير ✓');
-}
-
-/* ============================================================
-   15) بدء التشغيل
-============================================================ */
+// ================= بدء التشغيل =================
 initDB();
-
-setInterval(()=>{
-  if(!navigator.onLine) return;
-  if(document.getElementById('appScreen').classList.contains('hidden')) return;
-  if(!formDirty) cloudPull(true);
-},60000);
-
-window.addEventListener('online',()=>showToast('عاد الاتصال بالإنترنت'));
-window.addEventListener('offline',()=>showToast('⚠️ وضع عدم الاتصال','error'));
-
 </script>
 </body>
 </html>
