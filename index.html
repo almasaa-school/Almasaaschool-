@@ -72,7 +72,7 @@ body.sm{font-size:13px}body.lg{font-size:17px}body.xl{font-size:19px}
         <span class="font-bold text-slate-500">أحمد بن عبدالله العلي</span><br>
         مساعد مدير المدرسة
       </div>
-      v13.0
+      v13.1
     </div>
   </aside>
   <main class="flex-1 overflow-x-hidden">
@@ -172,41 +172,49 @@ const DEF_BEH=[
 
 const DEF_STU=[['أحمد بن سالم الرواحي',5,1],['محمد بن خالد البلوشي',5,1],['يوسف بن علي المعمري',5,2],['عبدالله بن حمد الحارثي',5,2],['سعيد بن راشد الكندي',5,3],['خالد بن ناصر الفارسي',6,1],['سلطان بن ماجد الشكيلي',6,1],['حمزة بن ياسر العامري',6,2],['طلال بن سعيد الهنائي',6,2],['فهد بن عبدالرحمن الزدجالي',6,3],['بدر بن سليمان الريامي',7,1],['مازن بن حمدان الحجري',7,1],['معاذ بن طارق السعدي',7,2],['أيمن بن وليد المقبالي',7,2],['راشد بن سيف الخروصي',7,3],['هلال بن منصور الغافري',8,1],['نبيل بن عامر الحوسني',8,1],['قيس بن مروان الوهيبي',8,2],['زياد بن فارس اليعقوبي',8,2],['مروان بن أيمن السيابي',8,3],['حاتم بن صالح العبري',9,1],['عمار بن نبيل الجابري',9,1],['أنس بن كمال الرئيسي',9,2],['بلال بن هيثم المخيني',9,2],['جعفر بن عادل الشعيلي',9,3],['كرم بن رامي الصوافي',9,3],['ليث بن جابر الحسني',5,4],['مصعب بن أنور البوسعيدي',6,4],['نزار بن صقر الهاشمي',7,4],['وسام بن فاروق الأغبري',8,4],['ياسر بن رمزي العجمي',9,4],['يعقوب بن إسحاق النعماني',5,5],['أسامة بن زهير الكلباني',6,5],['إبراهيم بن نوح المسروري',7,5],['إسماعيل بن ياسين الحبسي',8,5],['بشار بن حكيم الشيباني',9,5]];
 
-const KEY='almasaa_v13_0';
+const KEY='almasaa_v13_1';
 const DEF_CFG={schoolName:'مدرسة المسعى للبنين (٥-٩)',platformName:'منصة السلوك الطلابي',ministry:'وزارة التربية والتعليم — سلطنة عُمان',directorate:'المديرية العامة للتعليم بمحافظة شمال الباطنة',theme:'emerald',uiSize:'medium',printFont:'Cairo',printSize:'12',printWeight:'700',logoR:'',logoL:'',committee:'لجنة شؤون الطلبة',adminDept:'إدارة المدرسة',principalName:'حسن علي إبراهيم البلوشي',principalTitle:'مدير المدرسة',healthVisitorName:'',healthVisitorTitle:'الزائر الصحي',reportTitle:'إقرار مخالفة سلوكية وانتظام دراسي',reportFooter:'يُرجى من ولي الأمر التواصل مع إدارة المدرسة لمتابعة الحالة.',healthTitle:'خطاب تحويل للوحدة الصحية',healthRecipient:'الفاضل مدير مستشفى / مركز صحي: مجمع صحي السويق المحترم',healthGreeting:'السلام عليكم ورحمة الله وبركاته،',healthBody:'نحيل إليكم الطالب:',healthClosing:'آملين إجراء الكشف الطبي عليه وإفادتنا بالنتيجة، والله الموفق.',healthReturnNote:'يجب إعادة هذه الرسالة لإدارة المدرسة مختومة من المستشفى في اليوم التالي.',healthOptions:['مسؤول الغياب','يقبل العذر','لا يقبل العذر'],signatures:['توقيع المعلم','توقيع الأخصائي','توقيع مدير المدرسة'],waBehavior:'السلام عليكم ورحمة الله وبركاته\nولي أمر الطالب: {student}\nالصف: {grade} / الشعبة: {section}\n\nنحيطكم علماً بتسجيل إجراء بحق ابنكم:\n📋 السلوك: {behavior}\n⚠️ النقاط: {points}\n🎯 الإجراء: {action}\n📜 النص اللائحي: {desc}\n📅 {date}\n\n{school}',waHealth:'السلام عليكم ورحمة الله وبركاته\nولي أمر الطالب: {student}\nالصف: {grade} / الشعبة: {section}\n\nتم تحويل ابنكم للوحدة الصحية{reason}.\n📅 {date}\n\n{school}'};
 
 function seed(){return {config:{...DEF_CFG},users:[{id:'U1',name:'مدير النظام',title:'مدير',username:'almasaa',password:'',isAdmin:true},{id:'U2',name:'وكيل المدرسة',title:'وكيل',username:'wakil',password:'',isAdmin:false}],students:DEF_STU.map((x,i)=>({id:'S'+String(i+1).padStart(3,'0'),name:x[0],grade:x[1],section:x[2],phone:'',guardian:''})),behaviors:DEF_BEH.map(b=>({...b,active:true})),actions:DEF_ACT.map(a=>({...a})),health:[],referrals:[],records:[],followups:[],resolved:[]}}
 
-// 🛡️ دالة الإصلاح التلقائي
+// 🛡️ درع الحماية الشامل (يمنع مسح البيانات)
 function fixDB(obj){
   if(!obj) return;
   if(!obj.config) obj.config={...DEF_CFG};
   Object.keys(DEF_CFG).forEach(k=>{if(obj.config[k]===undefined)obj.config[k]=DEF_CFG[k]});
-  ['health','referrals','records','followups','resolved'].forEach(k=>{if(!obj[k] || !Array.isArray(obj[k]))obj[k]=[]});
-  if(!obj.students || !Array.isArray(obj.students)) obj.students=[];
   
+  ['health','referrals','records','followups','resolved'].forEach(k=>{if(!obj[k] || !Array.isArray(obj[k]))obj[k]=[]});
+  
+  // إصلاح المستخدمين
   if(!obj.users || !Array.isArray(obj.users) || obj.users.length===0) {
       obj.users=[{id:'U1',name:'مدير النظام',title:'مدير',username:'almasaa',password:'',isAdmin:true},{id:'U2',name:'وكيل المدرسة',title:'وكيل',username:'wakil',password:'',isAdmin:false}];
   }
 
-  if(!obj.behaviors || !Array.isArray(obj.behaviors)) obj.behaviors=[];
+  // إصلاح السلوكيات وإجبارها على أن تكون نشطة
+  if(!obj.behaviors || !Array.isArray(obj.behaviors) || obj.behaviors.length===0) obj.behaviors=[];
   DEF_BEH.forEach(def => {
-      const existing = obj.behaviors.find(b => b.id === def.id);
+      let existing = obj.behaviors.find(b => b.id === def.id);
       if(!existing) {
           obj.behaviors.push({...def, active: true});
       } else {
-          if(existing.active === undefined) existing.active = true;
+          existing.active = true; // إجبار التنشيط لتجنب اختفاء القائمة
           if(!existing.cat) existing.cat = def.cat;
           if(!existing.level) existing.level = def.level;
       }
   });
 
-  if(!obj.actions || !Array.isArray(obj.actions)) obj.actions=[];
+  // إصلاح الإجراءات
+  if(!obj.actions || !Array.isArray(obj.actions) || obj.actions.length===0) obj.actions=[];
   DEF_ACT.forEach(def => {
       if(!obj.actions.find(a => a.id === def.id)) {
           obj.actions.push({...def});
       }
   });
+
+  // إصلاح الطلبة (إذا اختفت الأسماء)
+  if(!obj.students || !Array.isArray(obj.students) || obj.students.length === 0){
+      obj.students = DEF_STU.map((x,i)=>({id:'S'+String(i+1).padStart(3,'0'),name:x[0],grade:x[1],section:x[2],phone:'',guardian:''}));
+  }
 }
 
 try{DB=JSON.parse(localStorage.getItem(KEY))}catch(e){DB=null}
@@ -616,60 +624,50 @@ function suggestAction(){
   // 1. معالجة التأخير (المادة 29 و 30)
   if (b.id === 'B_T') {
       const totalTardies = occurrences + 1;
-      const equivalentAbsenceDays = Math.floor(totalTardies / 5); 
       
-      if (totalTardies <= 5) {
-          if(totalTardies === 1) suggestedActId = 'A1'; // نصح شفهي
-          else if(totalTardies === 2) suggestedActId = 'A2'; // نصح ورقي
-          else if(totalTardies === 3) suggestedActId = 'A3'; // تنبيه
-          else if(totalTardies === 4) suggestedActId = 'A4'; // إنذار
-          else if(totalTardies === 5) {
-              suggestedActId = 'A5'; // دراسة حالة
-              isAbsenceEquiv = true; // يعادل يوم غياب
-          }
-          
-          if (totalTardies === 5) {
-              msg = `<span style="color:#dc2626">⚠️ تنبيه هام:</span> هذا التأخر رقم 5. ووفقاً للائحة يُعد غياباً ليوم دراسي كامل. تم تطبيق إجراء "دراسة حالة الطالب" وفقاً للمادة (29).`;
-          } else {
-              msg = `✨ تأخر رقم ${totalTardies}. (يُحسب كل 5 تأخيرات كيوم غياب).`;
-          }
-      } else {
-          // تجاوز 5 مرات (يحسب كغياب)
+      if (totalTardies === 1) { suggestedActId = 'A1'; msg = `✨ تأخر رقم 1. الإجراء: نصح شفهي.`; }
+      else if (totalTardies === 2) { suggestedActId = 'A2'; msg = `✨ تأخر رقم 2. الإجراء: نصح ورقي.`; }
+      else if (totalTardies === 3) { suggestedActId = 'A3'; msg = `✨ تأخر رقم 3. الإجراء: تنبيه ورقي.`; }
+      else if (totalTardies === 4) { suggestedActId = 'A4'; msg = `✨ تأخر رقم 4. الإجراء: إنذار وتعهد.`; }
+      else if (totalTardies === 5) { 
+          suggestedActId = 'A5'; 
           isAbsenceEquiv = true;
-          if (equivalentAbsenceDays === 1) suggestedActId = 'A2'; // 2 days absence = A2
-          else if (equivalentAbsenceDays === 2) suggestedActId = 'A3'; // 5 days absence = A3
-          else if (equivalentAbsenceDays === 3) suggestedActId = 'A4'; // 8 days absence = A4
-          else if (equivalentAbsenceDays === 4) suggestedActId = 'A5'; // 10 days absence = A5
-          else if (equivalentAbsenceDays === 5) suggestedActId = 'A9'; // 15 days absence = A9
-          else if (equivalentAbsenceDays >= 6) suggestedActId = 'A10'; // 30 days absence = A10
+          msg = `<span style="color:#dc2626">⚠️ تنبيه هام:</span> هذا التأخر رقم 5. ووفقاً للائحة يُعد غياباً ليوم دراسي كامل. الإجراء: دراسة حالة.`;
+      } else {
+          isAbsenceEquiv = true;
+          const absDays = Math.floor(totalTardies / 5);
+          if (absDays === 1) suggestedActId = 'A2'; // 2 days absence (level 1)
+          else if (absDays === 2) suggestedActId = 'A3'; // 5 days absence (level 2)
+          else if (absDays === 3) suggestedActId = 'A4'; // 8 days absence (level 3)
+          else if (absDays === 4) suggestedActId = 'A5'; // 10 days absence (level 4)
+          else if (absDays >= 5) suggestedActId = 'A9'; // 15+ days absence (level 5)
           
-          msg = `<span style="color:#dc2626">⚠️ تنبيه هام:</span> هذا التأخر رقم ${totalTardies}، ويعادل <b>${equivalentAbsenceDays} يوم/أيام غياب</b> بدون عذر. تم تصعيد الإجراء إلى إجراءات الغياب بناءً على اللائحة.`;
+          msg = `<span style="color:#dc2626">⚠️ تنبيه هام:</span> هذا التأخر رقم ${totalTardies}، ويعادل ${absDays} يوم غياب. تم تصعيد الإجراء إلى إجراءات الغياب بناءً على اللائحة.`;
       }
   } 
   // 2. معالجة الغياب (المادة 33)
   else if (b.cat === 'غياب') {
-      if(b.id === 'B_G1') suggestedActId = 'A2'; // يومان -> نصح ورقي
-      if(b.id === 'B_G2') suggestedActId = 'A3'; // 5 أيام -> تنبيه
-      if(b.id === 'B_G3') suggestedActId = 'A4'; // 8 أيام -> إنذار
-      if(b.id === 'B_G4') suggestedActId = 'A5'; // 10 أيام -> دراسة حالة
-      if(b.id === 'B_G5') suggestedActId = 'A9'; // 15 يوم -> تخفيض 10%
-      if(b.id === 'B_G6') suggestedActId = 'A10'; // 30 يوم -> حرمان فصل
-      if(b.id === 'B_G7') suggestedActId = 'A12'; // 45 يوم -> حرمان عام
+      if(b.id === 'B_G1') suggestedActId = 'A2'; // يومان
+      if(b.id === 'B_G2') suggestedActId = 'A3'; // 5 أيام
+      if(b.id === 'B_G3') suggestedActId = 'A4'; // 8 أيام
+      if(b.id === 'B_G4') suggestedActId = 'A5'; // 10 أيام
+      if(b.id === 'B_G5') suggestedActId = 'A9'; // 15 يوم
+      if(b.id === 'B_G6') suggestedActId = 'A10'; // 30 يوم
+      if(b.id === 'B_G7') suggestedActId = 'A12'; // 45 يوم
       msg = `✨ تم اقتراح الإجراء وفقاً لجدول الغياب في اللائحة.`;
   } 
-  // 3. التدرج العام لبقية السلوكيات
+  // 3. التدرج العام لبقية السلوكيات (وفق المادة 39)
   else {
       let escalatedLevel = (b.level || 1) + occurrences;
       if (escalatedLevel > 7) escalatedLevel = 7;
       
-      // توزيع الإجراءات بناءً على التصنيف (أ، ب، ج، د، هـ...)
-      if(escalatedLevel === 1) suggestedActId = 'A1'; // نصح شفهي
-      else if(escalatedLevel === 2) suggestedActId = 'A3'; // تكرار (أ) -> تنبيه
-      else if(escalatedLevel === 3) suggestedActId = 'A4'; // تكرار (ب) -> إنذار
-      else if(escalatedLevel === 4) suggestedActId = 'A5'; // تكرار (ج) -> دراسة حالة
-      else if(escalatedLevel === 5) suggestedActId = 'A6'; // تكرار (د) -> فصل 3 أيام
-      else if(escalatedLevel === 6) suggestedActId = 'A8'; // تكرار (هـ) -> رفع للجنة
-      else if(escalatedLevel >= 7) suggestedActId = 'A10'; // تكرار (و) -> حرمان
+      if(escalatedLevel === 1) suggestedActId = 'A2'; // نصيحة ورقية (المادة 39 أ)
+      else if(escalatedLevel === 2) suggestedActId = 'A3'; // تنبيه (تكرار أ أو بادئة ب)
+      else if(escalatedLevel === 3) suggestedActId = 'A4'; // إنذار (تكرار ب أو بادئة ج)
+      else if(escalatedLevel === 4) suggestedActId = 'A5'; // دراسة حالة (تكرار ج أو د)
+      else if(escalatedLevel === 5) suggestedActId = 'A6'; // فصل 3 أيام (تكرار د أو هـ)
+      else if(escalatedLevel === 6) suggestedActId = 'A8'; // رفع للجنة (تكرار هـ أو و)
+      else if(escalatedLevel >= 7) suggestedActId = 'A11'; // نقل/فصل نهائي (تكرار و أو ز)
       
       if(occurrences > 0) {
         msg = `✨ تدرج تلقائي بناءً على:<br>
@@ -968,7 +966,7 @@ function renderBehaviors(){
       <thead style="background:#f8fafc;border-bottom:1px solid #e2e8f0"><tr style="text-align:right"><th style="padding:12px;font-weight:900;font-size:12px">التصنيف</th><th style="padding:12px;font-weight:900;font-size:12px">البند</th><th style="padding:12px;font-weight:900;font-size:12px">المستوى</th><th style="padding:12px;font-weight:900;font-size:12px">التدرج المتوقع (تكرار)</th><th style="padding:12px;font-weight:900;font-size:12px">النقاط</th><th style="padding:12px;font-weight:900;font-size:12px">الحالة</th><th style="padding:12px;font-weight:900;font-size:12px">إجراءات</th></tr></thead>
       <tbody>${cats.map(cat=>DB.behaviors.filter(b=>b.cat===cat).map(b=>{
         let escStr = `<span style="background:#ecfdf5;color:#047857;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:bold">م${b.level}</span> ➔ <span style="background:#fef3c7;color:#d97706;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:bold">م${b.level+1}</span> ➔ <span style="background:#fee2e2;color:#dc2626;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:bold">م${b.level+2}</span>`;
-        if(b.id==='B_T') escStr = `<span style="font-size:10px;color:#dc2626;font-weight:bold">كل 5 مرات = يوم غياب</span>`;
+        if(b.id==='B_T') escStr = `<span style="font-size:10px;color:#dc2626;font-weight:bold;line-height:1.5;display:block">1:نصح شفهي ➔ 2:نصح ورقي ➔ 3:تنبيه ➔ 4:إنذار ➔ 5:دراسة حالة (يعادل غياب)</span>`;
         if(b.cat==='غياب') escStr = `<span style="font-size:10px;color:#dc2626;font-weight:bold">حسب أيام الغياب</span>`;
         return `<tr style="border-bottom:1px solid #f1f5f9">
           <td style="padding:12px;font-size:11px;font-weight:bold;color:var(--p)">${cat}</td>
