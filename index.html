@@ -72,7 +72,7 @@ body.sm{font-size:13px}body.lg{font-size:17px}body.xl{font-size:19px}
         <span class="font-bold text-slate-500">أحمد بن عبدالله العلي</span><br>
         مساعد مدير المدرسة
       </div>
-      v12.4
+      v12.7
     </div>
   </aside>
   <main class="flex-1 overflow-x-hidden">
@@ -84,7 +84,7 @@ body.sm{font-size:13px}body.lg{font-size:17px}body.xl{font-size:19px}
 <div id="mdl"></div>
 
 <script>
-/* ============ تعريفات أساسية لمنع مشكلة USER ============ */
+/* ============ تعريفات أساسية ============ */
 let USER = null; 
 let DB;
 
@@ -172,21 +172,24 @@ const DEF_BEH=[
 
 const DEF_STU=[['أحمد بن سالم الرواحي',5,1],['محمد بن خالد البلوشي',5,1],['يوسف بن علي المعمري',5,2],['عبدالله بن حمد الحارثي',5,2],['سعيد بن راشد الكندي',5,3],['خالد بن ناصر الفارسي',6,1],['سلطان بن ماجد الشكيلي',6,1],['حمزة بن ياسر العامري',6,2],['طلال بن سعيد الهنائي',6,2],['فهد بن عبدالرحمن الزدجالي',6,3],['بدر بن سليمان الريامي',7,1],['مازن بن حمدان الحجري',7,1],['معاذ بن طارق السعدي',7,2],['أيمن بن وليد المقبالي',7,2],['راشد بن سيف الخروصي',7,3],['هلال بن منصور الغافري',8,1],['نبيل بن عامر الحوسني',8,1],['قيس بن مروان الوهيبي',8,2],['زياد بن فارس اليعقوبي',8,2],['مروان بن أيمن السيابي',8,3],['حاتم بن صالح العبري',9,1],['عمار بن نبيل الجابري',9,1],['أنس بن كمال الرئيسي',9,2],['بلال بن هيثم المخيني',9,2],['جعفر بن عادل الشعيلي',9,3],['كرم بن رامي الصوافي',9,3],['ليث بن جابر الحسني',5,4],['مصعب بن أنور البوسعيدي',6,4],['نزار بن صقر الهاشمي',7,4],['وسام بن فاروق الأغبري',8,4],['ياسر بن رمزي العجمي',9,4],['يعقوب بن إسحاق النعماني',5,5],['أسامة بن زهير الكلباني',6,5],['إبراهيم بن نوح المسروري',7,5],['إسماعيل بن ياسين الحبسي',8,5],['بشار بن حكيم الشيباني',9,5]];
 
-const KEY='almasaa_v12_4';
+const KEY='almasaa_v12_7';
 const DEF_CFG={schoolName:'مدرسة المسعى للبنين (٥-٩)',platformName:'منصة السلوك الطلابي',ministry:'وزارة التربية والتعليم — سلطنة عُمان',directorate:'المديرية العامة للتعليم بمحافظة شمال الباطنة',theme:'emerald',uiSize:'medium',printFont:'Cairo',printSize:'12',printWeight:'700',logoR:'',logoL:'',committee:'لجنة شؤون الطلبة',adminDept:'إدارة المدرسة',principalName:'حسن علي إبراهيم البلوشي',principalTitle:'مدير المدرسة',healthVisitorName:'',healthVisitorTitle:'الزائر الصحي',reportTitle:'إقرار مخالفة سلوكية وانتظام دراسي',reportFooter:'يُرجى من ولي الأمر التواصل مع إدارة المدرسة لمتابعة الحالة.',healthTitle:'خطاب تحويل للوحدة الصحية',healthRecipient:'الفاضل مدير مستشفى / مركز صحي: مجمع صحي السويق المحترم',healthGreeting:'السلام عليكم ورحمة الله وبركاته،',healthBody:'نحيل إليكم الطالب:',healthClosing:'آملين إجراء الكشف الطبي عليه وإفادتنا بالنتيجة، والله الموفق.',healthReturnNote:'يجب إعادة هذه الرسالة لإدارة المدرسة مختومة من المستشفى في اليوم التالي.',healthOptions:['مسؤول الغياب','يقبل العذر','لا يقبل العذر'],signatures:['توقيع المعلم','توقيع الأخصائي','توقيع مدير المدرسة'],waBehavior:'السلام عليكم ورحمة الله وبركاته\nولي أمر الطالب: {student}\nالصف: {grade} / الشعبة: {section}\n\nنحيطكم علماً بتسجيل إجراء بحق ابنكم:\n📋 السلوك: {behavior}\n⚠️ النقاط: {points}\n🎯 الإجراء: {action}\n📜 النص اللائحي: {desc}\n📅 {date}\n\n{school}',waHealth:'السلام عليكم ورحمة الله وبركاته\nولي أمر الطالب: {student}\nالصف: {grade} / الشعبة: {section}\n\nتم تحويل ابنكم للوحدة الصحية{reason}.\n📅 {date}\n\n{school}'};
 
 function seed(){return {config:{...DEF_CFG},users:[{id:'U1',name:'مدير النظام',title:'مدير',username:'almasaa',password:'',isAdmin:true},{id:'U2',name:'وكيل المدرسة',title:'وكيل',username:'wakil',password:'',isAdmin:false}],students:DEF_STU.map((x,i)=>({id:'S'+String(i+1).padStart(3,'0'),name:x[0],grade:x[1],section:x[2],phone:'',guardian:''})),behaviors:DEF_BEH.map(b=>({...b,active:true})),actions:DEF_ACT.map(a=>({...a})),health:[],referrals:[],records:[],followups:[],resolved:[]}}
 
-// 🛡️ دالة الإصلاح التلقائي (تمنع انهيار النظام إذا كانت البيانات قديمة أو ناقصة)
+// 🛡️ دالة الإصلاح التلقائي (تمنع اختفاء البيانات وانهيار النظام)
 function fixDB(obj){
   if(!obj) return;
   if(!obj.config) obj.config={...DEF_CFG};
   Object.keys(DEF_CFG).forEach(k=>{if(obj.config[k]===undefined)obj.config[k]=DEF_CFG[k]});
   ['health','referrals','records','followups','resolved'].forEach(k=>{if(!obj[k] || !Array.isArray(obj[k]))obj[k]=[]});
   if(!obj.students || !Array.isArray(obj.students)) obj.students=[];
-  if(!obj.users || !Array.isArray(obj.users)) obj.users=[];
-  if(!obj.behaviors || !Array.isArray(obj.behaviors)) obj.behaviors=[...DEF_BEH];
-  if(!obj.actions || !Array.isArray(obj.actions)) obj.actions=[...DEF_ACT];
+  
+  if(!obj.users || !Array.isArray(obj.users) || obj.users.length===0) {
+      obj.users=[{id:'U1',name:'مدير النظام',title:'مدير',username:'almasaa',password:'',isAdmin:true},{id:'U2',name:'وكيل المدرسة',title:'وكيل',username:'wakil',password:'',isAdmin:false}];
+  }
+  if(!obj.behaviors || !Array.isArray(obj.behaviors) || obj.behaviors.length===0) obj.behaviors=[...DEF_BEH];
+  if(!obj.actions || !Array.isArray(obj.actions) || obj.actions.length===0) obj.actions=[...DEF_ACT];
 }
 
 try{DB=JSON.parse(localStorage.getItem(KEY))}catch(e){DB=null}
@@ -229,7 +232,7 @@ async function cloudPull(silent){
     if(!cloudHasData&&!localHasData){upCloud('✅ جاهز');return false}
     
     DB=p;
-    fixDB(DB); // إصلاح البيانات القادمة من السحابة
+    fixDB(DB); 
     
     localStorage.setItem(KEY,JSON.stringify(DB));
     CLOUD.last=new Date(data.updated_at).getTime();
@@ -469,19 +472,22 @@ function fill(t,v){let o=t;Object.entries(v).forEach(([k,x])=>{o=o.replace(new R
 function recordHTML(r){
   const s=gS(r.studentId);const c=DB.config;
   const occurrences = r.occurrenceCount || 1;
-  const historyNote = occurrences > 1 ? `<div style="background:#fee2e2;border:1px solid #fca5a5;color:#991b1b;padding:8px;margin-bottom:12px;font-size:11px;border-radius:6px;text-align:center;font-weight:bold">⚠️ ملاحظة هامة: هذا السلوك يتكرر للمرة (${occurrences}) لهذا الطالب. لذلك تم اتخاذ الإجراء التالي بناءً على لائحة شؤون الطلبة وتدرج العقوبات.</div>` : '';
+  
+  // بناء تنبيه التدرج بدقة
+  let historyNote = '';
+  if (r.behaviorId === 'B_T' && r.isAbsenceEquiv) {
+      historyNote = `<div style="background:#fee2e2;border:1px solid #fca5a5;color:#991b1b;padding:8px;margin-bottom:12px;font-size:11px;border-radius:6px;text-align:center;font-weight:bold">⚠️ تنبيه هام: هذا التأخر رقم (${occurrences}) للطالب. ووفقاً للائحة يُحسب كل 5 مرات تأخر كيوم غياب بدون عذر. تم اتخاذ إجراء الغياب بناءً على ذلك.</div>`;
+  } else if (occurrences > 1) {
+      historyNote = `<div style="background:#fee2e2;border:1px solid #fca5a5;color:#991b1b;padding:8px;margin-bottom:12px;font-size:11px;border-radius:6px;text-align:center;font-weight:bold">⚠️ ملاحظة هامة: هذا السلوك يتكرر للمرة (${occurrences}) لهذا الطالب. لذلك تم تصعيد الإجراء واتخاذ العقوبة التالية بناءً على تدرج لائحة شؤون الطلبة.</div>`;
+  }
 
   return `<div style="max-width:760px;margin:auto">${rHdr()}<div style="text-align:center;font-size:16px;font-weight:900;margin:12px 0;background:var(--c-primary-soft);padding:8px;border-radius:6px">${esc(c.reportTitle)}</div>
   ${historyNote}
-  <table style="width:100%;font-size:12px;margin-bottom:12px"><tr><td style="background:#f5f5f5;font-weight:bold;width:22%">الطالب</td><td>${s?esc(s.name):''}</td><td style="background:#f5f5f5;width:15%;font-weight:bold">الصف</td><td>${s?s.grade:''}</td></tr><tr><td style="background:#f5f5f5;font-weight:bold">الشعبة</td><td>${s?s.section:''}</td><td style="background:#f5f5f5;font-weight:bold">الهاتف</td><td>${s&&s.phone?esc(s.phone):'—'}</td></tr><tr><td style="background:#f5f5f5;font-weight:bold">التاريخ</td><td>${fmtDT(r.createdAt)}</td><td style="background:#f5f5f5;font-weight:bold">تكرار السلوك</td><td style="color:#DC2626;font-weight:bold">المرة ${occurrences}</td></tr></table>
+  <table style="width:100%;font-size:12px;margin-bottom:12px"><tr><td style="background:#f5f5f5;font-weight:bold;width:22%">الطالب</td><td>${s?esc(s.name):''}</td><td style="background:#f5f5f5;width:15%;font-weight:bold">الصف</td><td>${s?s.grade:''}</td></tr><tr><td style="background:#f5f5f5;font-weight:bold">الشعبة</td><td>${s?s.section:''}</td><td style="background:#f5f5f5;font-weight:bold">الهاتف</td><td>${s&&s.phone?esc(s.phone):'—'}</td></tr><tr><td style="background:#f5f5f5;font-weight:bold">التاريخ</td><td>${fmtDT(r.createdAt)}</td><td style="background:#f5f5f5;font-weight:bold">المسجل</td><td>${esc(r.userName||'—')} (${esc(r.userTitle||'')})</td></tr><tr><td style="background:#f5f5f5;font-weight:bold">تكرار السلوك</td><td colspan="3" style="color:#DC2626;font-weight:bold">المرة ${occurrences}</td></tr></table>
   <table style="width:100%;font-size:12px;margin-bottom:12px"><tr><td style="background:#fef2f2;font-weight:bold;width:22%">السلوك / المخالفة</td><td>${esc(r.behaviorName||'')}</td><td style="background:#fef2f2;font-weight:bold;width:15%">النقاط</td><td style="color:#DC2626;font-weight:bold">${r.points||0} نقطة</td></tr><tr><td style="background:#fffbeb;font-weight:bold;vertical-align:top">الإجراء المتخذ</td><td colspan="3"><div style="font-weight:bold;margin-bottom:4px">${esc(r.actionName||'')}</div><div style="font-size:11px;color:#333;background:#fff;padding:6px;border:1px solid #eee;border-radius:4px;line-height:1.6"><b>النص اللائحي (قرار 234/2017):</b> ${esc(r.regulationText||gA(r.actionId)?.desc||'—')}</div></td></tr>${r.actionNote?`<tr><td style="background:#fffbeb;font-weight:bold">ملاحظات الإجراء</td><td colspan="3">${esc(r.actionNote)}</td></tr>`:''}</table>
   
-  <div style="display:flex;justify-content:space-between;font-size:11px;margin-top:15px;margin-bottom:15px;background:#f8fafc;padding:10px;border-radius:8px;border:1px dashed #cbd5e1">
-      <div style="text-align:center;width:45%">
-          <div style="font-weight:bold;color:#64748b;margin-bottom:4px">من تتم مقابلته</div>
-          <div style="font-weight:900;color:var(--c-primary);font-size:13px">${esc(r.meetWith || '...................................')}</div>
-      </div>
-      <div style="text-align:center;width:45%">
+  <div style="display:flex;justify-content:center;font-size:11px;margin-top:15px;margin-bottom:15px;background:#f8fafc;padding:10px;border-radius:8px;border:1px dashed #cbd5e1">
+      <div style="text-align:center;width:100%">
           <div style="font-weight:bold;color:#64748b;margin-bottom:4px">يراجع الأستاذ</div>
           <div style="font-weight:900;color:var(--c-primary);font-size:13px">${esc(r.reviewedBy || '...................................')}</div>
       </div>
@@ -490,7 +496,7 @@ function recordHTML(r){
   <div style="background:var(--c-primary-soft);border-right:3px solid var(--c-primary);padding:8px;margin-bottom:12px;font-size:11px">${esc(c.reportFooter)}</div><div style="display:flex;justify-content:space-between;margin-top:20px;font-size:11px">${c.signatures.map(s=>`<div style="text-align:center"><div style="font-weight:bold;margin-bottom:35px">${esc(s)}</div><div style="border-top:1px solid #999;padding-top:2px;min-width:130px">................</div></div>`).join('')}</div>${rFtr()}</div>`;
 }
 
-function healthHTML(sid,reason){const s=gS(sid);const c=DB.config;const r=c.logoR?`<img src="${c.logoR}" style="width:70px;height:70px;object-fit:contain">`:'',l=c.logoL?`<img src="${c.logoL}" style="width:70px;height:70px;object-fit:contain">`:'';return `<div style="max-width:800px;margin:auto"><div style="border:2px solid #000;padding:12px"><div style="display:flex;justify-content:space-between;margin-bottom:8px"><div style="width:75px">${r}</div><div style="text-align:center;flex:1"><div style="font-size:11px">${esc(c.ministry)}</div><div style="font-size:10px;color:#666">${esc(c.directorate)}</div><div style="font-size:14px;font-weight:900;margin-top:3px">${esc(c.schoolName)}</div></div><div style="width:75px;text-align:right">${l}</div></div><div style="text-align:center;font-size:16px;font-weight:900;border-top:2px solid #000;border-bottom:2px solid #000;padding:6px;margin:8px 0">🌙 ${esc(c.healthTitle)} 🌙</div><div style="font-size:13px;font-weight:bold;margin:10px 0">${esc(c.healthRecipient)}</div><div style="font-size:13px;margin-bottom:8px">${esc(c.healthGreeting)}</div><div style="font-size:13px;margin-bottom:6px">${esc(c.healthBody)}</div><div style="font-size:13px;padding-right:20px;margin:8px 0">${s?esc(s.name):'...................'}</div><div style="font-size:13px;margin-bottom:8px">المقيد بالصف: <b>${s?s.grade+' / '+s.section:'........'}</b></div><div style="font-size:13px;margin:10px 0">${esc(c.healthClosing)}</div>${reason?`<div style="font-size:12px;background:#FEF3C7;padding:6px;border-right:3px solid #F59E0B;margin:8px 0">سبب التحويل: ${esc(reason)}</div>`:''}<div style="display:flex;justify-content:space-between;margin-top:18px;font-size:12px"><div style="text-align:center"><div style="font-weight:bold">${esc(c.healthVisitorTitle)}</div><div style="font-weight:900">${esc(c.healthVisitorName||'...............')}</div><div style="border-top:1px solid #000;padding-top:2px;margin-top:20px;min-width:150px">......................</div></div><div style="text-align:center"><div style="font-weight:bold">${esc(c.principalTitle)}</div><div style="font-weight:900">${esc(c.principalName||'...............')}</div><div style="border-top:1px solid #000;padding-top:2px;margin-top:20px;min-width:150px">......................</div></div></div></div><div style="border:2px solid #000;border-top:0;padding:12px"><div style="font-size:14px;font-weight:900;margin-bottom:10px">النتيجة:</div><div style="min-height:80px;border-bottom:1px dotted #666;margin-bottom:8px"></div><div style="min-height:60px;border-bottom:1px dotted #666;margin-bottom:15px"></div><div style="display:flex;justify-content:space-between;font-size:12px"><div style="text-align:center"><div style="font-weight:bold">توقيع وختم المستشفى</div><div style="min-height:60px"></div><div style="border-top:1px solid #000;padding-top:2px;min-width:150px">......................</div></div><div style="text-align:center"><div style="font-weight:bold">اسم الطبيب: التوقيع</div><div style="min-height:60px"></div><div style="border-top:1px solid #000;padding-top:2px;min-width:150px">......................</div></div></div></div><div style="font-size:11px;margin-top:8px;text-align:center">* ${esc(c.healthReturnNote)}</div><div style="display:flex;justify-content:space-between;font-size:11px;margin-top:6px;padding:6px;border:1px solid #999">${c.healthOptions.map(o=>`<span>☐ ${esc(o)}</span>`).join('')}</div></div>`}
+function healthHTML(sid,reason){const s=gS(sid);const c=DB.config;const r=c.logoR?`<img src="${c.logoR}" style="width:70px;height:70px;object-fit:contain">`:'',l=c.logoL?`<img src="${c.logoL}" style="width:70px;height:70px;object-fit:contain">`:'';return `<div style="max-width:800px;margin:auto"><div style="border:2px solid #000;padding:12px"><div style="display:flex;justify-content:space-between;margin-bottom:8px"><div style="width:75px">${r}</div><div style="text-align:center;flex:1"><div style="font-size:11px">${esc(c.ministry)}</div><div style="font-size:10px;color:#666">${esc(c.directorate)}</div><div style="font-size:14px;font-weight:900;margin-top:3px">${esc(c.schoolName)}</div></div><div style="width:75px;text-align:right">${l}</div></div><div style="text-align:center;font-size:16px;font-weight:900;border-top:2px solid #000;border-bottom:2px solid #000;padding:6px;margin:8px 0">${esc(c.healthTitle)}</div><div style="font-size:13px;font-weight:bold;margin:10px 0">${esc(c.healthRecipient)}</div><div style="font-size:13px;margin-bottom:8px">${esc(c.healthGreeting)}</div><div style="font-size:13px;margin-bottom:6px">${esc(c.healthBody)}</div><div style="font-size:13px;padding-right:20px;margin:8px 0">${s?esc(s.name):'...................'}</div><div style="font-size:13px;margin-bottom:8px">المقيد بالصف: <b>${s?s.grade+' / '+s.section:'........'}</b></div><div style="font-size:13px;margin:10px 0">${esc(c.healthClosing)}</div>${reason?`<div style="font-size:12px;background:#FEF3C7;padding:6px;border-right:3px solid #F59E0B;margin:8px 0">سبب التحويل: ${esc(reason)}</div>`:''}<div style="display:flex;justify-content:space-between;margin-top:18px;font-size:12px"><div style="text-align:center"><div style="font-weight:bold">${esc(c.healthVisitorTitle)}</div><div style="font-weight:900">${esc(c.healthVisitorName||'...............')}</div><div style="border-top:1px solid #000;padding-top:2px;margin-top:20px;min-width:150px">......................</div></div><div style="text-align:center"><div style="font-weight:bold">${esc(c.principalTitle)}</div><div style="font-weight:900">${esc(c.principalName||'...............')}</div><div style="border-top:1px solid #000;padding-top:2px;margin-top:20px;min-width:150px">......................</div></div></div></div><div style="border:2px solid #000;border-top:0;padding:12px"><div style="font-size:14px;font-weight:900;margin-bottom:10px">النتيجة:</div><div style="min-height:80px;border-bottom:1px dotted #666;margin-bottom:8px"></div><div style="min-height:60px;border-bottom:1px dotted #666;margin-bottom:15px"></div><div style="display:flex;justify-content:space-between;font-size:12px"><div style="text-align:center"><div style="font-weight:bold">توقيع وختم المستشفى</div><div style="min-height:60px"></div><div style="border-top:1px solid #000;padding-top:2px;min-width:150px">......................</div></div><div style="text-align:center"><div style="font-weight:bold">اسم الطبيب: التوقيع</div><div style="min-height:60px"></div><div style="border-top:1px solid #000;padding-top:2px;min-width:150px">......................</div></div></div></div><div style="font-size:11px;margin-top:8px;text-align:center">* ${esc(c.healthReturnNote)}</div><div style="display:flex;justify-content:space-between;font-size:11px;margin-top:6px;padding:6px;border:1px solid #999">${c.healthOptions.map(o=>`<span>☐ ${esc(o)}</span>`).join('')}</div></div>`}
 
 /* ============ الرئيسية ============ */
 function renderHome(){
@@ -522,7 +528,7 @@ function hc(id,ic,t,d,g){return `<button onclick="go('${id}')" class="card text-
 function st(t,v,i,g){return `<div class="text-white rounded-2xl p-4 relative overflow-hidden" style="background:linear-gradient(135deg,${g})"><div style="position:absolute;left:-8px;bottom:-8px;opacity:.15;font-size:70px">${i}</div><div style="position:relative"><div style="font-size:12px;opacity:.95;font-weight:600">${t}</div><div style="font-size:28px;font-weight:900;margin-top:4px">${v}</div></div></div>`}
 
 /* ============ تسجيل السلوك ============ */
-let E={sid:'',bid:'',aid:'',note:'',uid:'',an:'',customBeh:'',customAct:'',meetWith:'',reviewedBy:''};
+let E={sid:'',bid:'',aid:'',note:'',uid:'',an:'',customBeh:'',customAct:'',reviewedBy:''};
 function renderEntry(){
   if(!E.uid&&DB.users.length)E.uid=DB.users[0].id;
   const cats=[...new Set(DB.behaviors.filter(b=>b.active).map(b=>b.cat||'أخرى'))];
@@ -561,11 +567,7 @@ function renderEntry(){
 
   <div id="aX" class="hidden bg-slate-50 rounded-xl p-4" style="border-right:4px solid #64748b"><div style="font-size:14px;font-weight:bold;color:#334155;margin-bottom:8px">📋 ملاحظات الإجراء</div><input id="fAN" oninput="E.an=this.value" value="${esc(E.an)}" placeholder="اختياري..." class="w-full rounded-xl border-2 border-slate-200 px-3 py-2 text-sm"></div>
   
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-slate-200 pt-4">
-    <div>
-      <label style="display:block;font-size:14px;font-weight:bold;margin-bottom:8px">👤 من تتم مقابلته</label>
-      <input id="fMeet" oninput="E.meetWith=this.value" value="${esc(E.meetWith)}" placeholder="مثال: ولي الأمر / الطالب..." class="w-full rounded-xl border-2 border-slate-200 px-3 py-2.5 text-sm bg-blue-50">
-    </div>
+  <div class="grid grid-cols-1 gap-4 border-t border-slate-200 pt-4">
     <div>
       <label style="display:block;font-size:14px;font-weight:bold;margin-bottom:8px">📝 يراجع الأستاذ</label>
       <input id="fRev" oninput="E.reviewedBy=this.value" value="${esc(E.reviewedBy)}" placeholder="اسم المعلم المراجع..." class="w-full rounded-xl border-2 border-slate-200 px-3 py-2.5 text-sm bg-blue-50">
@@ -574,7 +576,7 @@ function renderEntry(){
 
   <div class="grid grid-cols-1 md:grid-cols-2 gap-4"><div><label style="display:block;font-size:14px;font-weight:bold;margin-bottom:8px">المستخدم *</label><select id="fU" class="w-full rounded-xl border-2 border-slate-200 px-3 py-3 text-sm font-bold bg-white">${DB.users.map(u=>`<option value="${u.id}" ${E.uid===u.id?'selected':''}>${esc(u.name)} — ${esc(u.title)}</option>`).join('')}</select></div><div><label style="display:block;font-size:14px;font-weight:bold;margin-bottom:8px">ملاحظات عامة</label><input id="fN" oninput="E.note=this.value" value="${esc(E.note)}" placeholder="اختياري..." class="w-full rounded-xl border-2 border-slate-200 px-3 py-3 text-sm"></div></div>
   
-  <div class="flex gap-2"><button onclick="saveRec()" class="flex-1 bg-p text-white font-black py-3.5 rounded-xl shadow">💾 حفظ السجل</button><button onclick="E={sid:'',bid:'',aid:'',note:'',uid:DB.users[0]?.id||'',an:'',customBeh:'',customAct:'',meetWith:'',reviewedBy:''};render()" class="px-5 bg-slate-100 font-bold py-3.5 rounded-xl">مسح</button></div></div></div>`;
+  <div class="flex gap-2"><button onclick="saveRec()" class="flex-1 bg-p text-white font-black py-3.5 rounded-xl shadow">💾 حفظ السجل</button><button onclick="E={sid:'',bid:'',aid:'',note:'',uid:DB.users[0]?.id||'',an:'',customBeh:'',customAct:'',reviewedBy:''};render()" class="px-5 bg-slate-100 font-bold py-3.5 rounded-xl">مسح</button></div></div></div>`;
 }
 
 function onBehChange(){
@@ -582,6 +584,7 @@ function onBehChange(){
   suggestAction();
 }
 
+// 🧠 محرك التدرج الذكي (يدعم الغياب والتأخير 5 مرات = يوم غياب)
 function suggestAction(){
   if(!E.sid || !E.bid) return;
   const b=gB(E.bid);
@@ -590,27 +593,64 @@ function suggestAction(){
   const pastIncidents = DB.records.filter(r => r.studentId === E.sid && r.behaviorId === E.bid);
   const occurrences = pastIncidents.length; 
   
-  let escalatedLevel = (b.level || 1) + occurrences;
-  if (escalatedLevel > 7) escalatedLevel = 7;
-  
   let suggestedActId = 'A1';
+  let msg = '';
+  let isAbsenceEquiv = false;
   
-  if(escalatedLevel === 1) suggestedActId = 'A1'; 
-  else if(escalatedLevel === 2) suggestedActId = 'A2'; 
-  else if(escalatedLevel === 3) suggestedActId = 'A3'; 
-  else if(escalatedLevel === 4) suggestedActId = 'A4'; 
-  else if(escalatedLevel === 5) suggestedActId = 'A6'; 
-  else if(escalatedLevel === 6) suggestedActId = 'A8'; 
-  else if(escalatedLevel >= 7) suggestedActId = 'A10'; 
-  
-  if(b.cat === 'غياب') {
-     if(b.id === 'B_G1') suggestedActId = 'A2'; 
-     if(b.id === 'B_G2') suggestedActId = 'A3'; 
-     if(b.id === 'B_G3') suggestedActId = 'A4'; 
-     if(b.id === 'B_G4') suggestedActId = 'A5'; 
-     if(b.id === 'B_G5') suggestedActId = 'A9'; 
-     if(b.id === 'B_G6') suggestedActId = 'A10'; 
-     if(b.id === 'B_G7') suggestedActId = 'A12'; 
+  if (b.id === 'B_T') {
+      // معالجة التأخير (كل 5 مرات = يوم غياب)
+      const totalTardies = occurrences + 1;
+      const equivalentAbsenceDays = Math.floor(totalTardies / 5);
+      
+      if (equivalentAbsenceDays === 0) {
+          // لم يصل لـ 5 مرات بعد
+          let lvl = 1 + occurrences;
+          if(lvl === 1) suggestedActId = 'A1';
+          else if(lvl === 2) suggestedActId = 'A2';
+          else if(lvl >= 3) suggestedActId = 'A3';
+          msg = `✨ تأخر رقم ${totalTardies}. (يُحسب كل 5 تأخيرات كيوم غياب، لم يكتمل العدد بعد).`;
+      } else {
+          // وصل لـ 5 أو أكثر
+          isAbsenceEquiv = true;
+          if (equivalentAbsenceDays === 1) suggestedActId = 'A3'; // يعادل يومان غياب (مستوى 1)
+          else if (equivalentAbsenceDays === 2) suggestedActId = 'A4'; // يعادل 5 أيام (مستوى 2)
+          else if (equivalentAbsenceDays === 3) suggestedActId = 'A5'; // 8 أيام (مستوى 3)
+          else if (equivalentAbsenceDays === 4) suggestedActId = 'A6'; // 10 أيام (مستوى 4)
+          else if (equivalentAbsenceDays === 5) suggestedActId = 'A8'; // 15 يوم (مستوى 5)
+          else if (equivalentAbsenceDays >= 6) suggestedActId = 'A10'; // 30 يوم (مستوى 6)
+          
+          msg = `<span style="color:#dc2626">⚠️ تنبيه هام:</span> هذا التأخر رقم ${totalTardies}، ويعادل <b>${equivalentAbsenceDays} يوم/أيام غياب</b> بدون عذر. تم تصعيد الإجراء إلى إجراءات الغياب بناءً على اللائحة.`;
+      }
+  } else if (b.cat === 'غياب') {
+      if(b.id === 'B_G1') suggestedActId = 'A2'; 
+      if(b.id === 'B_G2') suggestedActId = 'A3'; 
+      if(b.id === 'B_G3') suggestedActId = 'A4'; 
+      if(b.id === 'B_G4') suggestedActId = 'A5'; 
+      if(b.id === 'B_G5') suggestedActId = 'A8'; 
+      if(b.id === 'B_G6') suggestedActId = 'A10'; 
+      if(b.id === 'B_G7') suggestedActId = 'A12'; 
+      msg = `✨ تم اقتراح الإجراء وفقاً لجدول الغياب في اللائحة.`;
+  } else {
+      // التدرج العادي للسلوكيات
+      let escalatedLevel = (b.level || 1) + occurrences;
+      if (escalatedLevel > 7) escalatedLevel = 7;
+      
+      if(escalatedLevel === 1) suggestedActId = 'A1'; 
+      else if(escalatedLevel === 2) suggestedActId = 'A2'; 
+      else if(escalatedLevel === 3) suggestedActId = 'A3'; 
+      else if(escalatedLevel === 4) suggestedActId = 'A4'; 
+      else if(escalatedLevel === 5) suggestedActId = 'A6'; 
+      else if(escalatedLevel === 6) suggestedActId = 'A8'; 
+      else if(escalatedLevel >= 7) suggestedActId = 'A10'; 
+      
+      if(occurrences > 0) {
+        msg = `✨ تدرج تلقائي بناءً على:<br>
+        • مستوى السلوك الأساسي: ${b.level}<br>
+        • مرات التكرار السابقة: ${occurrences}<br>
+        • المستوى النهائي المقترح: ${escalatedLevel}`;
+      } else {
+        msg = `✨ هذا هو تسجيل المرة الأولى لهذا السلوك (المستوى ${b.level}).`;
+      }
   }
 
   if(!gA(suggestedActId)) suggestedActId = 'A1';
@@ -626,16 +666,8 @@ function suggestAction(){
   }
   
   if(suggestMsg) {
-    if(occurrences > 0) {
-      suggestMsg.style.display='block';
-      suggestMsg.innerHTML = `✨ تم اقتراح هذا الإجراء تلقائياً بناءً على:<br>
-      • المستوى الأساسي للسلوك: ${b.level}<br>
-      • عدد التكرارات السابقة: ${occurrences}<br>
-      • التقييم النهائي: المستوى ${escalatedLevel}`;
-    } else {
-      suggestMsg.style.display='block';
-      suggestMsg.innerHTML = `✨ هذا هو تسجيل المرة الأولى لهذا السلوك (المستوى ${escalatedLevel}).`;
-    }
+    suggestMsg.style.display='block';
+    suggestMsg.innerHTML = msg;
   }
   
   onActChange();
@@ -724,6 +756,11 @@ function saveRec(){
   const pastIncidents = DB.records.filter(r => r.studentId === E.sid && r.behaviorId === E.bid);
   const occurrenceCount = pastIncidents.length + 1;
 
+  let isAbsenceEquiv = false;
+  if (E.bid === 'B_T' && occurrenceCount >= 5) {
+      isAbsenceEquiv = true;
+  }
+
   const r={
     id:uid0('R'), studentId:E.sid,
     behaviorId:E.bid, behaviorName:finalBehName,
@@ -732,14 +769,14 @@ function saveRec(){
     userId:uid, userName:u?u.name:'', userTitle:u?u.title:'',
     points:finalPoints, note:E.note, actionNote:E.an, createdAt:Date.now(),
     occurrenceCount: occurrenceCount,
-    meetWith: E.meetWith,
-    reviewedBy: E.reviewedBy
+    reviewedBy: E.reviewedBy,
+    isAbsenceEquiv: isAbsenceEquiv
   };
   
   DB.records.unshift(r);
   save();toast('✓ تم الحفظ');
   showActions(r.id);
-  E={sid:'',bid:'',aid:'',note:'',uid:DB.users[0]?.id||'',an:'',customBeh:'',customAct:'',meetWith:'',reviewedBy:''};
+  E={sid:'',bid:'',aid:'',note:'',uid:DB.users[0]?.id||'',an:'',customBeh:'',customAct:'',reviewedBy:''};
   render();
 }
 function uid0(p){return p+Date.now()+Math.floor(Math.random()*1000)}
@@ -753,11 +790,11 @@ function renderRecords(){
   const list=fr();const tp=list.reduce((s,r)=>s+(r.points||0),0);
   return `<div class="space-y-4"><header style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px"><div><h1 style="font-size:24px;font-weight:900">📋 سجل السلوكيات</h1><p style="font-size:13px;color:#64748b;margin-top:4px">${list.length} سجل · ${tp} نقطة</p></div><div style="display:flex;gap:8px"><button onclick="xls()" class="bg-white border-2 border-slate-200 font-bold px-4 py-2 rounded-xl text-sm">📊 Excel</button><button onclick="pRecs()" class="bg-white border-2 border-slate-200 font-bold px-4 py-2 rounded-xl text-sm">🖨️ طباعة</button></div></header>
   <div class="bg-white rounded-2xl p-4 shadow-sm space-y-3"><div class="grid grid-cols-2 md:grid-cols-5 gap-2"><input value="${esc(RF.q)}" oninput="RF.q=this.value;render()" placeholder="🔍 بحث..." class="rounded-xl border-2 border-slate-200 px-3 py-2 text-sm col-span-2 md:col-span-1"><select onchange="RF.g=this.value;render()" class="rounded-xl border-2 border-slate-200 px-3 py-2 text-sm font-bold bg-white"><option value="">كل الصفوف</option>${GR.map(g=>`<option ${RF.g==g?'selected':''}>${g}</option>`).join('')}</select><select onchange="RF.sc=this.value;render()" class="rounded-xl border-2 border-slate-200 px-3 py-2 text-sm font-bold bg-white"><option value="">كل الشعب</option>${SC.map(s=>`<option ${RF.sc==s?'selected':''}>${s}</option>`).join('')}</select><input type="date" value="${RF.f}" onchange="RF.f=this.value;render()" class="rounded-xl border-2 border-slate-200 px-3 py-2 text-sm"><input type="date" value="${RF.t}" onchange="RF.t=this.value;render()" class="rounded-xl border-2 border-slate-200 px-3 py-2 text-sm"></div><button onclick="RF={q:'',g:'',sc:'',f:'',t:''};render()" style="font-size:12px;font-weight:bold;color:#64748b">✕ مسح</button></div>
-  <div class="bg-white rounded-2xl shadow-sm overflow-hidden"><div style="overflow-x:auto"><table style="width:100%;font-size:14px"><thead style="background:#f8fafc;border-bottom:1px solid #e2e8f0"><tr style="text-align:right"><th style="padding:12px;font-weight:900;font-size:12px">التاريخ</th><th style="padding:12px;font-weight:900;font-size:12px">الطالب</th><th style="padding:12px;font-weight:900;font-size:12px">الصف</th><th style="padding:12px;font-weight:900;font-size:12px">السلوك (التكرار)</th><th style="padding:12px;font-weight:900;font-size:12px">النقاط</th><th style="padding:12px;font-weight:900;font-size:12px">الإجراء</th><th style="padding:12px;font-weight:900;font-size:12px" class="np">إجراءات</th></tr></thead><tbody>${list.map(r=>{const s=gS(r.studentId);const fu=DB.followups.find(f=>f.recordId===r.id);const fs=fu?(fu.status==='yes'?'<span style="font-size:10px;padding:2px 6px;border-radius:4px;background:#d1fae5;color:#065f46;font-weight:bold">حضر</span>':fu.status==='no'?'<span style="font-size:10px;padding:2px 6px;border-radius:4px;background:#fee2e2;color:#991b1b;font-weight:bold">لم يحضر</span>':'<span style="font-size:10px;padding:2px 6px;border-radius:4px;background:#fef3c7;color:#92400e;font-weight:bold">⏰</span>'):'';return `<tr style="border-bottom:1px solid #f1f5f9"><td style="padding:12px;font-size:12px">${fmtD(r.createdAt)}</td><td style="padding:12px;font-weight:bold;font-size:12px">${s?esc(s.name):'—'}</td><td style="padding:12px;font-size:12px">${s?s.grade+'/'+s.section:'—'}</td><td style="padding:12px;font-size:12px">${esc(r.behaviorName||'—')} ${r.occurrenceCount>1?`<span style="background:#fee2e2;color:#dc2626;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:bold">المرة ${r.occurrenceCount}</span>`:''}</td><td style="padding:12px;font-size:12px;font-weight:bold;color:#dc2626">${r.points||0}</td><td style="padding:12px;font-size:12px">${esc(r.actionName||'—')} ${fs}</td><td style="padding:12px" class="np"><div style="display:flex;gap:4px"><button onclick="pRec('${r.id}')" style="padding:6px;border-radius:8px" title="طباعة">🖨️</button><button onclick="waRec('${r.id}')" style="padding:6px;border-radius:8px" title="واتساب">💬</button><button onclick="waRecPDF('${r.id}')" style="padding:6px;border-radius:8px" title="PDF">📄</button><button onclick="delRec('${r.id}')" style="padding:6px;border-radius:8px" title="حذف">🗑️</button></div></td></tr>`}).join('')}${list.length===0?'<tr><td colspan="7" style="text-align:center;padding:48px;color:#94a3b8">لا سجلات</td></tr>':''}</tbody></table></div></div></div>`;
+  <div class="bg-white rounded-2xl shadow-sm overflow-hidden"><div style="overflow-x:auto"><table style="width:100%;font-size:14px"><thead style="background:#f8fafc;border-bottom:1px solid #e2e8f0"><tr style="text-align:right"><th style="padding:12px;font-weight:900;font-size:12px">التاريخ (المسجل)</th><th style="padding:12px;font-weight:900;font-size:12px">الطالب</th><th style="padding:12px;font-weight:900;font-size:12px">الصف</th><th style="padding:12px;font-weight:900;font-size:12px">السلوك (التكرار)</th><th style="padding:12px;font-weight:900;font-size:12px">النقاط</th><th style="padding:12px;font-weight:900;font-size:12px">الإجراء</th><th style="padding:12px;font-weight:900;font-size:12px" class="np">إجراءات</th></tr></thead><tbody>${list.map(r=>{const s=gS(r.studentId);const fu=DB.followups.find(f=>f.recordId===r.id);const fs=fu?(fu.status==='yes'?'<span style="font-size:10px;padding:2px 6px;border-radius:4px;background:#d1fae5;color:#065f46;font-weight:bold">حضر</span>':fu.status==='no'?'<span style="font-size:10px;padding:2px 6px;border-radius:4px;background:#fee2e2;color:#991b1b;font-weight:bold">لم يحضر</span>':'<span style="font-size:10px;padding:2px 6px;border-radius:4px;background:#fef3c7;color:#92400e;font-weight:bold">⏰</span>'):'';return `<tr style="border-bottom:1px solid #f1f5f9"><td style="padding:12px;font-size:12px">${fmtD(r.createdAt)}<br><span style="font-size:10px;color:#64748b">👤 ${esc(r.userName||'—')}</span></td><td style="padding:12px;font-weight:bold;font-size:12px">${s?esc(s.name):'—'}</td><td style="padding:12px;font-size:12px">${s?s.grade+'/'+s.section:'—'}</td><td style="padding:12px;font-size:12px">${esc(r.behaviorName||'—')} ${r.occurrenceCount>1||r.isAbsenceEquiv?`<span style="background:#fee2e2;color:#dc2626;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:bold">المرة ${r.occurrenceCount}</span>`:''}${r.isAbsenceEquiv?'<br><span style="font-size:10px;color:#dc2626;font-weight:bold">(يعادل غياب)</span>':''}</td><td style="padding:12px;font-size:12px;font-weight:bold;color:#dc2626">${r.points||0}</td><td style="padding:12px;font-size:12px">${esc(r.actionName||'—')} ${fs}</td><td style="padding:12px" class="np"><div style="display:flex;gap:4px"><button onclick="pRec('${r.id}')" style="padding:6px;border-radius:8px" title="طباعة">🖨️</button><button onclick="waRec('${r.id}')" style="padding:6px;border-radius:8px" title="واتساب">💬</button><button onclick="waRecPDF('${r.id}')" style="padding:6px;border-radius:8px" title="PDF">📄</button><button onclick="delRec('${r.id}')" style="padding:6px;border-radius:8px" title="حذف">🗑️</button></div></td></tr>`}).join('')}${list.length===0?'<tr><td colspan="7" style="text-align:center;padding:48px;color:#94a3b8">لا سجلات</td></tr>':''}</tbody></table></div></div></div>`;
 }
 function fr(){return DB.records.filter(r=>{const s=gS(r.studentId);if(!s)return false;if(RF.q){const x=RF.q.trim();if(!(s.name.includes(x)||(r.behaviorName||'').includes(x)))return false}if(RF.g&&s.grade!==+RF.g)return false;if(RF.sc&&s.section!==+RF.sc)return false;if(RF.f&&r.createdAt<new Date(RF.f).getTime())return false;if(RF.t&&r.createdAt>new Date(RF.t).getTime()+864e5)return false;return true})}
 function delRec(id){if(!confirm('حذف؟'))return;DB.records=DB.records.filter(r=>r.id!==id);DB.followups=DB.followups.filter(f=>f.recordId!==id);save();render()}
-function xls(){const rows=[['التاريخ','الطالب','الصف','الشعبة','السلوك','التكرار','النقاط','الإجراء','نص اللائحة','المستخدم']];fr().forEach(r=>{const s=gS(r.studentId);rows.push([fmtD(r.createdAt),s?s.name:'',s?s.grade:'',s?s.section:'',r.behaviorName||'',r.occurrenceCount||1,r.points||0,r.actionName||'',r.regulationText||'',r.userName||''])});const ws=XLSX.utils.aoa_to_sheet(rows);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'المخالفات');XLSX.writeFile(wb,'سجل.xlsx')}
+function xls(){const rows=[['التاريخ','المسجل','الطالب','الصف','الشعبة','السلوك','التكرار','النقاط','الإجراء','نص اللائحة']];fr().forEach(r=>{const s=gS(r.studentId);rows.push([fmtD(r.createdAt),r.userName||'',s?s.name:'',s?s.grade:'',s?s.section:'',r.behaviorName||'',r.occurrenceCount||1,r.points||0,r.actionName||'',r.regulationText||''])});const ws=XLSX.utils.aoa_to_sheet(rows);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'المخالفات');XLSX.writeFile(wb,'سجل.xlsx')}
 function pRec(id){const r=DB.records.find(x=>x.id===id);if(!r)return;prt(recordHTML(r))}
 function waRec(id){
   const r=DB.records.find(x=>x.id===id);if(!r)return;
@@ -862,7 +899,7 @@ function dlH(id){if(!confirm('حذف؟'))return;DB.health=DB.health.filter(x=>x.
 /* ============ التحويل الصحي ============ */
 let HT='';
 function renderHealthTransfer(){
-  return `<div class="max-w-4xl space-y-5"><header><h1 style="font-size:24px;font-weight:900">🌙 التحويل للوحدة الصحية</h1><p style="font-size:13px;color:#64748b;margin-top:4px">📅 ${today()}</p></header><div class="bg-white rounded-2xl p-6 shadow-sm space-y-4">
+  return `<div class="max-w-4xl space-y-5"><header><h1 style="font-size:24px;font-weight:900">التحويل للوحدة الصحية</h1><p style="font-size:13px;color:#64748b;margin-top:4px">📅 ${today()}</p></header><div class="bg-white rounded-2xl p-6 shadow-sm space-y-4">
   <div><label style="display:block;font-size:14px;font-weight:bold;margin-bottom:8px">اختيار الطالب</label><div class="grid grid-cols-1 md:grid-cols-3 gap-2 mb-2"><div style="position:relative"><input id="htS" placeholder="اكتب..." oninput="sHt()" class="w-full rounded-xl border-2 border-slate-200 px-3 py-2.5 text-sm"><div id="htD" class="dd hidden"></div></div><select id="htG" onchange="sHt()" class="rounded-xl border-2 border-slate-200 px-3 py-2.5 text-sm font-bold bg-white"><option value="">كل الصفوف</option>${GR.map(g=>`<option>${g}</option>`).join('')}</select><select id="htSc" onchange="sHt()" class="rounded-xl border-2 border-slate-200 px-3 py-2.5 text-sm font-bold bg-white"><option value="">كل الشعب</option>${SC.map(s=>`<option>${s}</option>`).join('')}</select></div><div id="htP"></div></div>
   <div><label style="display:block;font-size:14px;font-weight:bold;margin-bottom:8px">سبب التحويل</label><textarea id="htR" rows="2" class="w-full rounded-xl border-2 border-slate-200 px-3 py-2 text-sm" placeholder="اختياري..."></textarea></div>
   <div><label style="display:block;font-size:14px;font-weight:bold;margin-bottom:8px">المُسجل *</label><select id="htU" class="w-full rounded-xl border-2 border-slate-200 px-3 py-2.5 text-sm font-bold bg-white">${DB.users.map(u=>`<option value="${u.id}">${esc(u.name)} — ${esc(u.title)}</option>`).join('')}</select></div>
@@ -884,7 +921,7 @@ function renderHealthReport(){
   <div class="bg-white rounded-2xl p-5 shadow-sm"><h3 style="font-weight:900;margin-bottom:16px">📊 التوزيع حسب الصفوف</h3><div style="display:flex;flex-direction:column;gap:12px">${GR.map(g=>`<div style="display:flex;align-items:center;gap:12px"><div style="width:64px;font-size:14px;font-weight:bold">الصف ${g}</div><div style="flex:1;height:20px;background:#f1f5f9;border-radius:8px;overflow:hidden"><div class="bg-p" style="height:100%;width:${(byG[g]/mx)*100}%"></div></div><div style="width:40px;text-align:left;font-size:12px;font-weight:bold">${byG[g]}</div></div>`).join('')}</div></div>
   <div class="bg-white rounded-2xl shadow-sm overflow-hidden"><table style="width:100%;font-size:14px"><thead style="background:#f8fafc;border-bottom:1px solid #e2e8f0"><tr style="text-align:right"><th style="padding:12px;font-weight:900;font-size:12px">التاريخ</th><th style="padding:12px;font-weight:900;font-size:12px">الطالب</th><th style="padding:12px;font-weight:900;font-size:12px">الصف/الشعبة</th><th style="padding:12px;font-weight:900;font-size:12px">السبب</th></tr></thead><tbody>${list.map(h=>`<tr style="border-bottom:1px solid #f1f5f9"><td style="padding:12px;font-size:12px">${fmtD(h.createdAt)}</td><td style="padding:12px;font-weight:bold;font-size:12px">${esc(h.student.name)}</td><td style="padding:12px;font-size:12px">${h.student.grade}/${h.student.section}</td><td style="padding:12px;font-size:12px">${esc(h.reason||'—')}</td></tr>`).join('')}${list.length===0?'<tr><td colspan="4" style="text-align:center;padding:48px;color:#94a3b8">لا تحويلات</td></tr>':''}</tbody></table></div></div>`;
 }
-function pHR(){const list=DB.referrals.map(h=>({...h,student:gS(h.studentId)})).filter(h=>h.student);const rows=list.map(h=>`<tr><td style="border:1px solid #999;padding:6px;font-size:11px">${fmtD(h.createdAt)}</td><td style="border:1px solid #999;padding:6px;font-size:11px">${esc(h.student.name)}</td><td style="border:1px solid #999;padding:6px;font-size:11px;text-align:center">${h.student.grade}/${h.student.section}</td><td style="border:1px solid #999;padding:6px;font-size:11px">${esc(h.reason||'—')}</td></tr>`).join('');prt(`<div style="max-width:900px;margin:auto">${rHdr()}<div style="text-align:center;font-weight:900;font-size:14px;margin-bottom:12px">🌙 تقرير تحويلات الوحدة الصحية (${list.length}) 🌙</div><table style="width:100%;border-collapse:collapse;font-size:11px"><thead><tr style="background:var(--c-primary);color:white"><th style="border:1px solid #999;padding:7px">التاريخ</th><th style="border:1px solid #999;padding:7px">الطالب</th><th style="border:1px solid #999;padding:7px">الصف/الشعبة</th><th style="border:1px solid #999;padding:7px">السبب</th></tr></thead><tbody>${rows}</tbody></table>${rFtr()}</div>`)}
+function pHR(){const list=DB.referrals.map(h=>({...h,student:gS(h.studentId)})).filter(h=>h.student);const rows=list.map(h=>`<tr><td style="border:1px solid #999;padding:6px;font-size:11px">${fmtD(h.createdAt)}</td><td style="border:1px solid #999;padding:6px;font-size:11px">${esc(h.student.name)}</td><td style="border:1px solid #999;padding:6px;font-size:11px;text-align:center">${h.student.grade}/${h.student.section}</td><td style="border:1px solid #999;padding:6px;font-size:11px">${esc(h.reason||'—')}</td></tr>`).join('');prt(`<div style="max-width:900px;margin:auto">${rHdr()}<div style="text-align:center;font-weight:900;font-size:14px;margin-bottom:12px">تقرير تحويلات الوحدة الصحية (${list.length})</div><table style="width:100%;border-collapse:collapse;font-size:11px"><thead><tr style="background:var(--c-primary);color:white"><th style="border:1px solid #999;padding:7px">التاريخ</th><th style="border:1px solid #999;padding:7px">الطالب</th><th style="border:1px solid #999;padding:7px">الصف/الشعبة</th><th style="border:1px solid #999;padding:7px">السبب</th></tr></thead><tbody>${rows}</tbody></table>${rFtr()}</div>`)}
 
 /* ============ المستخدمون ============ */
 function renderUsers(){return `<div class="space-y-4"><header style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px"><div><h1 style="font-size:24px;font-weight:900">👤 إدارة المستخدمين</h1><p style="font-size:13px;color:#64748b;margin-top:4px">${DB.users.length} مستخدم</p></div><button onclick="edU('')" class="bg-p text-white font-bold px-4 py-2.5 rounded-xl text-sm">+ إضافة</button></header>
@@ -900,15 +937,20 @@ function renderBehaviors(){
   return `<div class="space-y-4"><header style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px"><div><h1 style="font-size:24px;font-weight:900">⚠️ إدارة السلوكيات والمخالفات</h1><p style="font-size:13px;color:#64748b;margin-top:4px">${DB.behaviors.filter(b=>b.active).length} نشطة / ${DB.behaviors.length}</p></div><button onclick="edB('')" class="bg-p text-white font-bold px-4 py-2.5 rounded-xl text-sm">+ إضافة</button></header>
   <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
     <div style="overflow-x:auto"><table style="width:100%;font-size:14px">
-      <thead style="background:#f8fafc;border-bottom:1px solid #e2e8f0"><tr style="text-align:right"><th style="padding:12px;font-weight:900;font-size:12px">التصنيف</th><th style="padding:12px;font-weight:900;font-size:12px">البند</th><th style="padding:12px;font-weight:900;font-size:12px">المستوى</th><th style="padding:12px;font-weight:900;font-size:12px">النقاط</th><th style="padding:12px;font-weight:900;font-size:12px">الحالة</th><th style="padding:12px;font-weight:900;font-size:12px">إجراءات</th></tr></thead>
-      <tbody>${cats.map(cat=>DB.behaviors.filter(b=>b.cat===cat).map(b=>`<tr style="border-bottom:1px solid #f1f5f9">
-        <td style="padding:12px;font-size:11px;font-weight:bold;color:var(--p)">${cat}</td>
-        <td style="padding:12px;font-weight:bold;font-size:12px">${esc(b.name)}</td>
-        <td style="padding:12px;font-size:12px">${b.level}</td>
-        <td style="padding:12px;font-size:12px"><span style="background:#fef2f2;color:#dc2626;padding:4px 8px;border-radius:4px;font-weight:bold">${b.points}</span></td>
-        <td style="padding:12px"><button onclick="tgB('${b.id}')" style="font-size:11px;font-weight:bold;padding:4px 8px;border-radius:4px;${b.active?'background:var(--s);color:var(--p)':'background:#f1f5f9;color:#64748b'}">${b.active?'✓ نشط':'معطل'}</button></td>
-        <td style="padding:12px"><button onclick="edB('${b.id}')" style="padding:6px">✏️</button><button onclick="dlB('${b.id}')" style="padding:6px">🗑️</button></td>
-      </tr>`).join('')).join('')}</tbody>
+      <thead style="background:#f8fafc;border-bottom:1px solid #e2e8f0"><tr style="text-align:right"><th style="padding:12px;font-weight:900;font-size:12px">التصنيف</th><th style="padding:12px;font-weight:900;font-size:12px">البند</th><th style="padding:12px;font-weight:900;font-size:12px">المستوى</th><th style="padding:12px;font-weight:900;font-size:12px">التدرج المتوقع (تكرار)</th><th style="padding:12px;font-weight:900;font-size:12px">النقاط</th><th style="padding:12px;font-weight:900;font-size:12px">الحالة</th><th style="padding:12px;font-weight:900;font-size:12px">إجراءات</th></tr></thead>
+      <tbody>${cats.map(cat=>DB.behaviors.filter(b=>b.cat===cat).map(b=>{
+        let escStr = `<span style="background:#ecfdf5;color:#047857;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:bold">م${b.level}</span> ➔ <span style="background:#fef3c7;color:#d97706;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:bold">م${b.level+1}</span> ➔ <span style="background:#fee2e2;color:#dc2626;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:bold">م${b.level+2}</span>`;
+        if(b.id==='B_T') escStr = `<span style="font-size:10px;color:#dc2626;font-weight:bold">كل 5 مرات = يوم غياب</span>`;
+        if(b.cat==='غياب') escStr = `<span style="font-size:10px;color:#dc2626;font-weight:bold">حسب أيام الغياب</span>`;
+        return `<tr style="border-bottom:1px solid #f1f5f9">
+          <td style="padding:12px;font-size:11px;font-weight:bold;color:var(--p)">${cat}</td>
+          <td style="padding:12px;font-weight:bold;font-size:12px">${esc(b.name)}</td>
+          <td style="padding:12px;font-size:12px">${b.level}</td>
+          <td style="padding:12px;font-size:12px">${escStr}</td>
+          <td style="padding:12px;font-size:12px"><span style="background:#fef2f2;color:#dc2626;padding:4px 8px;border-radius:4px;font-weight:bold">${b.points}</span></td>
+          <td style="padding:12px"><button onclick="tgB('${b.id}')" style="font-size:11px;font-weight:bold;padding:4px 8px;border-radius:4px;${b.active?'background:var(--s);color:var(--p)':'background:#f1f5f9;color:#64748b'}">${b.active?'✓ نشط':'معطل'}</button></td>
+          <td style="padding:12px"><button onclick="edB('${b.id}')" style="padding:6px">✏️</button><button onclick="dlB('${b.id}')" style="padding:6px">🗑️</button></td>
+        </tr>`}).join('')).join('')}</tbody>
     </table></div>
   </div></div>`;
 }
@@ -951,7 +993,7 @@ function svA(id){const n=document.getElementById('aN').value.trim();const d=docu
 function dlA(id){if(!confirm('حذف؟'))return;DB.actions=DB.actions.filter(a=>a.id!==id);save();render()}
 
 /* ============ التقارير ============ */
-function renderReports(){return `<div class="space-y-5"><header><h1 style="font-size:24px;font-weight:900">📄 التقارير الرسمية</h1><p style="font-size:13px;color:#64748b;margin-top:4px">📅 ${today()}</p></header><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">${rc('rptStu()','👤','تقرير طالب','سجل كامل')}${rc('rptGrade()','🏫','تقرير صف','كشف الطلبة')}${rc('pRecs()','📋','كشف المخالفات','حسب الفلاتر')}${rc('cardsStu()','📇','كشف طلبة','أسماء وأرقام')}${rc('go(\'hreport\')','📊','تقرير الوحدة الصحية','🌙 إحصائية')}</div></div>`}
+function renderReports(){return `<div class="space-y-5"><header><h1 style="font-size:24px;font-weight:900">📄 التقارير الرسمية</h1><p style="font-size:13px;color:#64748b;margin-top:4px">📅 ${today()}</p></header><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">${rc('rptStu()','👤','تقرير طالب','سجل كامل')}${rc('rptGrade()','🏫','تقرير صف','كشف الطلبة')}${rc('pRecs()','📋','كشف المخالفات','حسب الفلاتر')}${rc('cardsStu()','📇','كشف طلبة','أسماء وأرقام')}${rc('go(\'hreport\')','📊','تقرير الوحدة الصحية','إحصائية')}</div></div>`}
 function rc(a,i,t,d){return `<button onclick="${a}" class="card bg-white rounded-2xl p-5 shadow-sm text-right"><div class="ic w-12 h-12 bg-ps text-p text-2xl mb-2">${i}</div><div style="font-weight:900">${t}</div><div style="font-size:12px;color:#64748b;margin-top:4px">${d}</div></button>`}
 let RP='';
 function rptStu(){RP='';document.getElementById('mdl').innerHTML=`<div class="mdl" onclick="if(event.target===this)this.remove()"><div class="bg-white rounded-2xl p-6 w-full max-w-md"><h3 style="font-weight:900;font-size:18px;margin-bottom:16px">تقرير طالب</h3><div style="position:relative;margin-bottom:12px"><input id="rS" placeholder="ابحث..." oninput="sRS()" class="w-full rounded-xl border-2 border-slate-200 px-3 py-2 text-sm"><div id="rD" class="dd hidden"></div></div><div id="rP"></div><div style="display:flex;gap:8px;margin-top:16px"><button onclick="pRS()" class="flex-1 bg-p text-white font-bold py-2.5 rounded-xl">🖨️ طباعة</button><button onclick="waRS()" class="flex-1 bg-emerald-600 text-white font-bold py-2.5 rounded-xl">💬 واتساب</button><button onclick="this.closest('.mdl').remove()" class="px-3 bg-slate-100 font-bold py-2.5 rounded-xl">إلغاء</button></div></div></div>`}
