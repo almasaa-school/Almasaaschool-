@@ -1,9 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>منصة السلوك الطلابي — المسعى v18.3</title>
+<title>منصة السلوك الطلابي — المسعى v19</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -23,7 +24,6 @@ body{font-family:'Cairo',sans-serif;background:#F1F5F9;margin:0}
 </head>
 <body>
 
-<!-- ============ شاشة الدخول ============ -->
 <div id="loginScreen" class="fixed inset-0 bg-emerald-900 flex items-center justify-center p-4 z-[100] overflow-auto">
   <div class="bg-white rounded-3xl p-8 w-full max-w-md shadow-2xl my-6">
     <div class="text-center mb-6">
@@ -46,7 +46,6 @@ body{font-family:'Cairo',sans-serif;background:#F1F5F9;margin:0}
   </div>
 </div>
 
-<!-- ============ التطبيق ============ -->
 <div id="appScreen" class="hidden min-h-screen flex flex-col lg:flex-row-reverse">
   <div id="sidebarOverlay" class="fixed inset-0 bg-black/50 hidden z-40 lg:hidden" onclick="toggleSidebar()"></div>
 
@@ -88,7 +87,7 @@ body{font-family:'Cairo',sans-serif;background:#F1F5F9;margin:0}
 
 <script>
 /* ============================================================
-   1) الثوابت
+   1) الثوابت والبيانات
 ============================================================ */
 const SUPABASE_URL='https://pyuquzmknolznsanksml.supabase.co';
 const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB5dXF1em1rbm9sem5zYW5rc21sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEwNDQ0MDcsImV4cCI6MjEwNjYyMDQwN30.SG3a-9Ly_fZNSi8f8F0McvU5BNbjNIIO0wNxV-MXlgM';
@@ -109,56 +108,80 @@ const DEFAULT_ACTIONS=[
   {id:'A11',name:'رفع للجنة بالمديرية (فصل نهائي)',level:6,desc:'رفع موضوع الطالب للجنة بالمديرية لإصدار قرار بفصله نهائياً.'}
 ];
 
-const DEFAULT_BEHAVIORS=[
-  {id:'B_T',name:'تأخر عن الطابور الصباحي',cat:'تأخر دراسي',points:1,level:1,escalation:['A1','A2','A3','A4','A5']},
-  {id:'B_G1',name:'غياب بدون عذر (يومان)',cat:'غياب',points:1,level:1,escalation:['A2','A3','A4','A5','A6']},
-  {id:'B_G2',name:'غياب بدون عذر (5 أيام)',cat:'غياب',points:2,level:2,escalation:['A3','A4','A5','A6','A8']},
-  {id:'B_G3',name:'غياب بدون عذر (8 أيام)',cat:'غياب',points:3,level:3,escalation:['A4','A5','A6','A8','A11']},
-  {id:'B_G4',name:'غياب بدون عذر (10 أيام)',cat:'غياب',points:4,level:4,escalation:['A5','A6','A8','A11']},
-  {id:'B1',name:'الإخلال بنظام الطابور',cat:'الانضباط السلوكي',points:1,level:1,escalation:['A1','A2','A3','A4','A5']},
-  {id:'B2',name:'عدم الالتزام بالزي المدرسي',cat:'الانضباط السلوكي',points:1,level:1,escalation:['A1','A2','A3','A4','A5']},
-  {id:'B3',name:'العبث بمرافق المدرسة',cat:'الانضباط السلوكي',points:1,level:1,escalation:['A1','A2','A3','A4','A5']},
-  {id:'B4',name:'الإساءة بالأقول لزميل',cat:'الانضباط السلوكي',points:1,level:1,escalation:['A1','A2','A3','A4','A5']},
-  {id:'B5',name:'عدم المحافظة على النظافة',cat:'الانضباط السلوكي',points:1,level:1,escalation:['A1','A2','A3','A4','A5']},
-  {id:'B6',name:'عدم إحضار الكتب والأدوات',cat:'الانضباط السلوكي',points:1,level:1,escalation:['A1','A2','A3','A4','A5']},
-  {id:'B16',name:'تزوير محرر مدرسي',cat:'الانضباط السلوكي',points:2,level:2,escalation:['A2','A3','A4','A5','A6']},
-  {id:'B18',name:'الشجار وتهديد الزملاء',cat:'الانضباط السلوكي',points:3,level:3,escalation:['A3','A4','A5','A6','A8']},
-  {id:'B21',name:'إحضار أجهزة سمعية وبصرية',cat:'الانضباط السلوكي',points:4,level:4,escalation:['A4','A5','A6','A8','A11']},
-  {id:'B23',name:'حيازة مواد ضارة',cat:'الانضباط السلوكي',points:4,level:4,escalation:['A4','A5','A6','A8','A11']},
-  {id:'B27',name:'الإساءة للرموز الوطنية',cat:'الانضباط السلوكي',points:5,level:5,escalation:['A5','A6','A8','A11']},
-  {id:'B33',name:'التدخين أو المخدرات',cat:'الانضباط السلوكي',points:5,level:5,escalation:['A5','A6','A8','A11']},
-  {id:'B_OTHER',name:'سلوك آخر (يدوي)',cat:'أخرى',points:1,level:1,escalation:['A1','A2','A3','A4','A5'],custom:true}
+// السلوكيات الجديدة بناءً على لائحة شؤون الطلبة
+const NEW_BEHAVIORS = [
+  // 1- الانضباط العام والزي
+  {id:'N1', name:'عدم الالتزام بالزي المدرسي', cat:'انضباط عام', points:1, level:1, escalation:['A1','A2','A3','A4','A5']},
+  {id:'N2', name:'عدم إحضار الكتب والدفاتر والأدوات المدرسية والملابس الرياضية', cat:'انضباط عام', points:1, level:1, escalation:['A1','A2','A3','A4','A5']},
+  {id:'N3', name:'الإهمال في أداء الواجبات أو الأنشطة المدرسية', cat:'انضباط عام', points:1, level:1, escalation:['A1','A2','A3','A4','A5']},
+  {id:'N4', name:'النوم في أثناء الحصص أو الأنشطة المدرسية', cat:'انضباط عام', points:1, level:1, escalation:['A1','A2','A3','A4','A5']},
+  {id:'N5', name:'تناول المأكولات أو المشروبات في غير الوقت المخصص', cat:'انضباط عام', points:1, level:1, escalation:['A1','A2','A3','A4','A5']},
+  {id:'N6', name:'الهروب من المدرسة', cat:'انضباط عام', points:3, level:3, escalation:['A3','A4','A5','A6','A8']},
+  // 2- التعامل مع الآخرين
+  {id:'N7', name:'عدم الإنصات لتوجيهات المعلم', cat:'تعامل مع الآخرين', points:1, level:1, escalation:['A1','A2','A3','A4','A5']},
+  {id:'N8', name:'التسبب في الإزعاج بالقرب من الصفوف الدراسية', cat:'تعامل مع الآخرين', points:1, level:1, escalation:['A1','A2','A3','A4','A5']},
+  {id:'N9', name:'عدم مراعاة الاحترام الواجب في التعامل مع المعلمين', cat:'تعامل مع الآخرين', points:2, level:2, escalation:['A2','A3','A4','A5','A6']},
+  {id:'N10', name:'الإساءة بالقول إلى أحد زملائه', cat:'تعامل مع الآخرين', points:2, level:2, escalation:['A2','A3','A4','A5','A6']},
+  {id:'N11', name:'الاعتداء بألفاظ نابية على أحد زملائه', cat:'تعامل مع الآخرين', points:3, level:3, escalation:['A3','A4','A5','A6','A8']},
+  {id:'N12', name:'الشجار وتهديد زملائه', cat:'تعامل مع الآخرين', points:3, level:3, escalation:['A3','A4','A5','A6','A8']},
+  {id:'N13', name:'الاعتداء على زملائه وإيذائهم بدنياً', cat:'تعامل مع الآخرين', points:4, level:4, escalation:['A4','A5','A6','A8','A11']},
+  {id:'N14', name:'الاستيلاء على المتعلقات الشخصية لزملائه', cat:'تعامل مع الآخرين', points:3, level:3, escalation:['A3','A4','A5','A6','A8']},
+  {id:'N15', name:'الإساءة بالقول إلى موظفي المدرسة أو العاملين بها', cat:'تعامل مع الآخرين', points:4, level:4, escalation:['A4','A5','A6','A8','A11']},
+  {id:'N16', name:'الاعتداء على موظفي المدرسة أو العاملين بها وإيذائهم بدنياً', cat:'تعامل مع الآخرين', points:5, level:5, escalation:['A5','A6','A8','A11']},
+  {id:'N17', name:'التحريض على الاعتداء الجنسي أو البدني على أحد زملائه', cat:'تعامل مع الآخرين', points:5, level:5, escalation:['A5','A6','A8','A11']},
+  {id:'N18', name:'ارتكاب الاعتداء الجنسي أو البدني على أحد زملائه', cat:'تعامل مع الآخرين', points:5, level:5, escalation:['A5','A6','A8','A11']},
+  // 3- إتلاف الممتلكات والنظافة
+  {id:'N19', name:'العبث بمرافق المدرسة ووسائل النقل المدرسية', cat:'إتلاف ممتلكات', points:2, level:2, escalation:['A2','A3','A4','A5','A6']},
+  {id:'N20', name:'عدم المحافظة على نظافة الفصل وغيره من مرافق المدرسة', cat:'إتلاف ممتلكات', points:1, level:1, escalation:['A1','A2','A3','A4','A5']},
+  {id:'N21', name:'الكتابة على جدران المدرسة', cat:'إتلاف ممتلكات', points:2, level:2, escalation:['A2','A3','A4','A5','A6']},
+  {id:'N22', name:'إتلاف متعلقات أي من زملائه أو موظفي المدرسة', cat:'إتلاف ممتلكات', points:3, level:3, escalation:['A3','A4','A5','A6','A8']},
+  {id:'N23', name:'عدم المحافظة على المظهر الشخصي (قصات شعر، مساحيق تجميل، الخ)', cat:'إتلاف ممتلكات', points:1, level:1, escalation:['A1','A2','A3','A4','A5']},
+  // 4- النظام والتزوير
+  {id:'N24', name:'الإخلال بنظام الطابور أو الحصص الدراسية', cat:'نظام وتزوير', points:1, level:1, escalation:['A1','A2','A3','A4','A5']},
+  {id:'N25', name:'الإخلال بنظام سير الامتحانات', cat:'نظام وتزوير', points:3, level:3, escalation:['A3','A4','A5','A6','A8']},
+  {id:'N26', name:'تزوير أحد المحررات المدرسية', cat:'نظام وتزوير', points:4, level:4, escalation:['A4','A5','A6','A8','A11']},
+  {id:'N27', name:'تزوير توقيع ولي أمره', cat:'نظام وتزوير', points:4, level:4, escalation:['A4','A5','A6','A8','A11']},
+  {id:'N28', name:'حيازة أو تداول أو استعمال أي مواد ضارة', cat:'نظام وتزوير', points:4, level:4, escalation:['A4','A5','A6','A8','A11']},
+  {id:'N29', name:'التحريض على إثارة الفوضى أو الإضراب', cat:'نظام وتزوير', points:5, level:5, escalation:['A5','A6','A8','A11']},
+  {id:'N30', name:'القيام بأي سلوك يخالف الآداب والنظام العام', cat:'نظام وتزوير', points:5, level:5, escalation:['A5','A6','A8','A11']},
+  // 5- السلامة والمواد الممنوعة
+  {id:'N31', name:'التدخين أو تناول المخدرات والمؤثرات العقلية', cat:'سلامة ومواد ممنوعة', points:5, level:5, escalation:['A5','A6','A8','A11']},
+  {id:'N32', name:'الترويج وتداول المخدرات والمؤثرات العقلية', cat:'سلامة ومواد ممنوعة', points:5, level:5, escalation:['A5','A6','A8','A11']},
+  {id:'N33', name:'عدم الالتزام بلبس الكمامات', cat:'سلامة ومواد ممنوعة', points:1, level:1, escalation:['A1','A2','A3','A4','A5']},
+  {id:'N34', name:'عدم الالتزام بالتباعد الجسدي', cat:'سلامة ومواد ممنوعة', points:1, level:1, escalation:['A1','A2','A3','A4','A5']},
+  {id:'N35', name:'عدم الالتزام بضوابط استخدام وسائل النقل المدرسية', cat:'سلامة ومواد ممنوعة', points:2, level:2, escalation:['A2','A3','A4','A5','A6']},
+  // 6- السلوكيات الإلكترونية والتعليم عن بعد
+  {id:'N36', name:'عدم الالتزام بالتعليمات في الجلسات الافتراضية', cat:'تعليم إلكتروني', points:1, level:1, escalation:['A1','A2','A3','A4','A5']},
+  {id:'N37', name:'عدم الالتزام بحضور الدروس عبر نظام التعليم الإلكتروني', cat:'تعليم إلكتروني', points:2, level:2, escalation:['A2','A3','A4','A5','A6']},
+  {id:'N38', name:'عدم تسليم الواجبات والأعمال عبر نظام التعليم الإلكتروني', cat:'تعليم إلكتروني', points:1, level:1, escalation:['A1','A2','A3','A4','A5']},
+  {id:'N39', name:'إرسال تعليقات تسيء بمكانة المعلم داخل المنصة', cat:'تعليم إلكتروني', points:3, level:3, escalation:['A3','A4','A5','A6','A8']},
+  {id:'N40', name:'تصوير المعلم أثناء الشرح', cat:'تعليم إلكتروني', points:4, level:4, escalation:['A4','A5','A6','A8','A11']},
+  {id:'N41', name:'فتح أو إرسال أي مواقع مخلة للآداب', cat:'تعليم إلكتروني', points:5, level:5, escalation:['A5','A6','A8','A11']},
+  {id:'N42', name:'إرسال روابط أو صور مسيئة في الواجبات', cat:'تعليم إلكتروني', points:5, level:5, escalation:['A5','A6','A8','A11']},
+  {id:'N43', name:'بوح محتويات المنصة وتصويرها ونشرها', cat:'تعليم إلكتروني', points:4, level:4, escalation:['A4','A5','A6','A8','A11']},
+  {id:'N44', name:'نشر وتصوير الواجبات بين الزملاء', cat:'تعليم إلكتروني', points:2, level:2, escalation:['A2','A3','A4','A5','A6']},
+  {id:'N45', name:'إحضار الأجهزة السمعية والبصرية (هواتف، كاميرات)', cat:'تعليم إلكتروني', points:3, level:3, escalation:['A3','A4','A5','A6','A8']},
+  {id:'N46', name:'إساءة استخدام الحاسب الآلي بالمدرسة', cat:'تعليم إلكتروني', points:3, level:3, escalation:['A3','A4','A5','A6','A8']},
+  // 7- القيم الوطنية والدينية
+  {id:'N47', name:'عدم احترام الدين والتقاليد والإرث الثقافي العماني', cat:'قيم ووطنية', points:4, level:4, escalation:['A4','A5','A6','A8','A11']},
+  {id:'N48', name:'الترويج للأمور المذهبية أو الأفكار الهدامة', cat:'قيم ووطنية', points:5, level:5, escalation:['A5','A6','A8','A11']},
+  {id:'N49', name:'تعمد الإساءة إلى الرموز الوطنية', cat:'قيم ووطنية', points:5, level:5, escalation:['A5','A6','A8','A11']},
+  
+  {id:'B_OTHER', name:'سلوك آخر (يدوي)', cat:'أخرى', points:1, level:1, escalation:['A1','A2','A3','A4','A5'], custom:true}
 ];
 
-const DEFAULT_STUDENTS=[
-  ['أحمد بن سالم الرواحي',5,1],['محمد بن خالد البلوشي',5,1],['يوسف بن علي المعمري',5,2],
-  ['عبدالله بن حمد الحارثي',5,2],['سعيد بن راشد الكندي',5,3],['خالد بن ناصر الفارسي',6,1],
-  ['سلطان بن ماجد الشكيلي',6,1],['حمزة بن ياسر العامري',6,2],['طلال بن سعيد الهنائي',6,2],
-  ['فهد بن عبدالرحمن الزدجالي',6,3],['بدر بن سليمان الريامي',7,1],['مازن بن حمدان الحجري',7,1],
-  ['معاذ بن طارق السعدي',7,2],['أيمن بن وليد المقبالي',7,2],['راشد بن سيف الخروصي',7,3],
-  ['هلال بن منصور الغافري',8,1],['نبيل بن عامر الحوسني',8,1],['قيس بن مروان الوهيبي',8,2],
-  ['زياد بن فارس اليعقوبي',8,2],['مروان بن أيمن السيابي',8,3],['حاتم بن صالح العبري',9,1],
-  ['عمار بن نبيل الجابري',9,1],['أنس بن كمال الرئيسي',9,2],['بلال بن هيثم المخيني',9,2],
-  ['جعفر بن عادل الشعيلي',9,3]
-];
-
-/* ============================================================
-   2) إدارة البيانات
-============================================================ */
 let DB = {};
 let session={role:null,studentId:null,name:'',userId:null};
 let currentPage='home', formDirty=false;
 let lastLocalSave=0;
 let charts = {};
+let selectedSearchStudentId = null; // للبحث الذكي
 
 function initDB(){
   const defaultDB = {
-    students: DEFAULT_STUDENTS.map((s,i)=>({
-      id:'S'+(i+1),name:s[0],grade:s[1],section:s[2],phone:'',
-      health:{bloodType:'',allergies:'',chronic:'',medications:'',emergencyName:'',emergencyPhone:'',notes:''}
-    })),
+    students: [],
     records: [],
-    behaviors: JSON.parse(JSON.stringify(DEFAULT_BEHAVIORS)),
+    behaviors: JSON.parse(JSON.stringify(NEW_BEHAVIORS)),
     actions: JSON.parse(JSON.stringify(DEFAULT_ACTIONS)),
     users: [{ id: 'U1', username: 'almasaa', password: '', role: 'admin', name: 'مدير المدرسة' }],
     healthReferrals: [],
@@ -170,15 +193,18 @@ function initDB(){
     }
   };
   
-  const saved = localStorage.getItem('almasaa_v18') || localStorage.getItem('almasaa_v17');
+  const saved = localStorage.getItem('almasaa_v19') || localStorage.getItem('almasaa_v18');
   if(saved){
     try{
       const parsed = JSON.parse(saved);
       DB = Object.assign({}, defaultDB, parsed);
-      DB.students = Array.isArray(DB.students) ? DB.students : defaultDB.students;
+      // دمج السلوكيات الجديدة إذا لم تكن موجودة
+      const existingIds = new Set(DB.behaviors.map(b => b.id));
+      NEW_BEHAVIORS.forEach(nb => {
+         if(!existingIds.has(nb.id)) DB.behaviors.push(nb);
+      });
+      DB.students = Array.isArray(DB.students) ? DB.students : [];
       DB.records = Array.isArray(DB.records) ? DB.records : [];
-      DB.behaviors = Array.isArray(DB.behaviors) ? DB.behaviors : defaultDB.behaviors;
-      DB.actions = Array.isArray(DB.actions) ? DB.actions : defaultDB.actions;
       DB.users = Array.isArray(DB.users) ? DB.users : defaultDB.users;
       DB.healthReferrals = Array.isArray(DB.healthReferrals) ? DB.healthReferrals : [];
       DB.alerts = Array.isArray(DB.alerts) ? DB.alerts : [];
@@ -192,7 +218,7 @@ function initDB(){
 
 function saveDB(){
   lastLocalSave=Date.now();
-  localStorage.setItem('almasaa_v18',JSON.stringify(DB));
+  localStorage.setItem('almasaa_v19',JSON.stringify(DB));
   if(CLOUD.enabled && navigator.onLine) cloudPush();
 }
 
@@ -206,9 +232,6 @@ async function cloudPush(){
   if(CLOUD.pendingPush){ CLOUD.pendingPush=false; cloudPush(); }
 }
 
-/* ============================================================
-   3) المزامنة الذكية (لا تقطع تفاعل المستخدم)
-============================================================ */
 function shouldSkipRender(){
   const ae = document.activeElement;
   if(ae){
@@ -234,7 +257,7 @@ async function cloudPull(silent=true){
       if(incoming !== current){
         DB = data.payload;
         if(!DB.records) DB.records = [];
-        localStorage.setItem('almasaa_v18', JSON.stringify(DB));
+        localStorage.setItem('almasaa_v19', JSON.stringify(DB));
         
         if(!formDirty && !shouldSkipRender() && !document.getElementById('appScreen').classList.contains('hidden')){
           const scrollY = window.scrollY;
@@ -267,9 +290,6 @@ function manualSync(){
   cloudPush().then(()=>{ lastLocalSave=0; return cloudPull(false); }).finally(()=>{ b.textContent=old; b.disabled=false; });
 }
 
-/* ============================================================
-   4) محرك التدرج السلوكي
-============================================================ */
 function getEscalation(behavior){
   if(behavior && Array.isArray(behavior.escalation) && behavior.escalation.length) return behavior.escalation;
   const map={1:['A1','A2','A3','A4','A5'],2:['A2','A3','A4','A5','A6'],3:['A3','A4','A5','A6','A8'],4:['A4','A5','A6','A8','A11'],5:['A5','A6','A8','A11'],6:['A8','A11']};
@@ -300,14 +320,10 @@ function getAtRiskStudents(){
   return out;
 }
 
-/* ============================================================
-   5) الدخول والتنقل
-============================================================ */
 function doLogin(){
   const u=document.getElementById('loginUser').value.trim();
   const p=document.getElementById('loginPass').value.trim();
   const found = DB.users.find(user => user.username === u && user.password === p);
-  
   if(found){
     session={role:found.role, studentId:found.studentId, name:found.name, userId:found.id};
     document.getElementById('loginScreen').classList.add('hidden');
@@ -386,6 +402,7 @@ function renderMenu(){
 function renderPage(page='home'){
   currentPage=page;
   formDirty=false;
+  selectedSearchStudentId = null; // تصفير البحث عند تغيير الصفحة
   renderMenu();
   
   const sb = document.getElementById('sidebar');
@@ -410,7 +427,79 @@ function renderPage(page='home'){
 }
 
 /* ============================================================
-   6) الرئيسية
+   2) محرك البحث الذكي (Widget)
+============================================================ */
+function renderStudentSearchWidget(targetInputName, onChangeCallback = '') {
+  return `
+    <div class="bg-slate-50 border-2 border-slate-200 rounded-xl p-4 mb-4">
+      <h4 class="font-bold text-sm text-emerald-800 mb-3 flex items-center gap-2">🔍 البحث عن طالب (بالصف، الشعبة، أو الاسم)</h4>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-2 mb-3">
+        <select id="searchGrade" onchange="filterSearchStudents('${targetInputName}','${onChangeCallback}')" class="border-2 border-slate-200 rounded-lg p-2.5 text-sm bg-white">
+          <option value="">كل الصفوف</option>
+          ${GRADES.map(g => `<option value="${g}">صف ${g}</option>`).join('')}
+        </select>
+        <select id="searchSection" onchange="filterSearchStudents('${targetInputName}','${onChangeCallback}')" class="border-2 border-slate-200 rounded-lg p-2.5 text-sm bg-white">
+          <option value="">كل الشعب</option>
+          ${SECTIONS.map(s => `<option value="${s}">شعبة ${s}</option>`).join('')}
+        </select>
+        <input type="text" id="searchName" oninput="filterSearchStudents('${targetInputName}','${onChangeCallback}')" placeholder="اكتب حروفاً من اسم الطالب..." class="border-2 border-slate-200 rounded-lg p-2.5 text-sm">
+      </div>
+      <div id="searchResults" class="max-h-48 overflow-y-auto space-y-1 bg-white border border-slate-200 rounded-lg hidden"></div>
+      <div id="selectedStudentDisplay" class="mt-3 text-sm font-bold text-emerald-700 hidden bg-emerald-50 p-2.5 rounded-lg border border-emerald-200"></div>
+      <input type="hidden" id="${targetInputName}" value="">
+    </div>
+  `;
+}
+
+function filterSearchStudents(targetInputName, onChangeCallback) {
+  const grade = document.getElementById('searchGrade').value;
+  const section = document.getElementById('searchSection').value;
+  const name = document.getElementById('searchName').value.trim();
+
+  const resultsDiv = document.getElementById('searchResults');
+  
+  if (!grade && !section && !name) {
+    resultsDiv.classList.add('hidden');
+    return;
+  }
+
+  let matches = DB.students;
+  if (grade) matches = matches.filter(s => String(s.grade) === grade);
+  if (section) matches = matches.filter(s => String(s.section) === section);
+  if (name) matches = matches.filter(s => s.name.includes(name));
+
+  // أخذ أول 30 نتيجة كحد أقصى لتسريع العرض
+  const displayMatches = matches.slice(0, 30);
+
+  if (displayMatches.length === 0) {
+    resultsDiv.innerHTML = '<div class="text-sm text-slate-400 p-3 text-center">لا توجد نتائج مطابقة</div>';
+  } else {
+    resultsDiv.innerHTML = displayMatches.map(s => `
+      <div onclick="selectSearchStudent('${s.id}', '${s.name.replace(/'/g, "\\'")} (صف ${s.grade}/${s.section})', '${targetInputName}', '${onChangeCallback}')" class="p-2.5 text-sm hover:bg-emerald-50 cursor-pointer border-b border-slate-100 last:border-0 flex justify-between items-center">
+        <span>${s.name}</span>
+        <span class="text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full">صف ${s.grade}/${s.section}</span>
+      </div>
+    `).join('');
+  }
+  resultsDiv.classList.remove('hidden');
+}
+
+function selectSearchStudent(id, displayName, targetInputName, onChangeCallback) {
+  selectedSearchStudentId = id;
+  document.getElementById(targetInputName).value = id;
+  document.getElementById('searchResults').classList.add('hidden');
+  
+  const displayEl = document.getElementById('selectedStudentDisplay');
+  displayEl.innerHTML = `✅ تم اختيار: <span class="font-black">${displayName}</span>`;
+  displayEl.classList.remove('hidden');
+
+  if (onChangeCallback && typeof window[onChangeCallback] === 'function') {
+    window[onChangeCallback]();
+  }
+}
+
+/* ============================================================
+   3) الرئيسية
 ============================================================ */
 function renderHome(main){
   const points = DB.records.reduce((sum, r) => sum + (r.points || 0), 0);
@@ -489,16 +578,17 @@ function renderHome(main){
 }
 
 /* ============================================================
-   7) تسجيل سلوك
+   4) تسجيل سلوك (مع محرك البحث الذكي)
 ============================================================ */
 function renderEntry(main){
-  const studentOptions=DB.students.map(s=>`<option value="${s.id}">${s.name} (صف ${s.grade}/${s.section})</option>`).join('');
   const behaviorOptions=DB.behaviors.map(b=>`<option value="${b.id}">${b.name} — [${b.cat}]</option>`).join('');
   main.innerHTML=`
     <h2 class="text-2xl font-black mb-6">تسجيل سلوك</h2>
-    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 max-w-3xl space-y-4">
-      <div><label class="block font-bold mb-1">الطالب <span class="text-red-500">*</span></label>
-        <select id="selStudent" class="w-full border-2 border-slate-200 rounded-xl p-3" onchange="onEntryChange()"><option value="">اختر الطالب...</option>${studentOptions}</select></div>
+    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 max-w-4xl space-y-4">
+      
+      <!-- محرك البحث الذكي -->
+      ${renderStudentSearchWidget('selectedStudentId', 'onEntryChange')}
+
       <div><label class="block font-bold mb-1">السلوك <span class="text-red-500">*</span></label>
         <select id="selBehavior" class="w-full border-2 border-slate-200 rounded-xl p-3" onchange="onEntryChange()"><option value="">اختر السلوك...</option>${behaviorOptions}</select></div>
       <div id="customBox" class="hidden"><label class="block font-bold mb-1">وصف السلوك (يدوي) <span class="text-red-500">*</span></label>
@@ -524,8 +614,8 @@ function renderEntry(main){
 }
 
 function onEntryChange(){
-  const sid=document.getElementById('selStudent').value;
-  const bid=document.getElementById('selBehavior').value;
+  const sid = document.getElementById('selectedStudentId').value;
+  const bid = document.getElementById('selBehavior').value;
   formDirty=!!(sid||bid);
   document.getElementById('customBox').classList.toggle('hidden',bid!=='B_OTHER');
   const preview=document.getElementById('escalationPreview');
@@ -566,7 +656,7 @@ function updateRegBox(){
 }
 
 function saveRecord(){
-  const sid=document.getElementById('selStudent').value;
+  const sid=document.getElementById('selectedStudentId').value;
   const bid=document.getElementById('selBehavior').value;
   const aid=document.getElementById('selAction').value;
   const customName=document.getElementById('customName')?.value.trim()||'';
@@ -602,7 +692,7 @@ function saveRecord(){
 }
 
 /* ============================================================
-   8) سجل السلوكيات (مع بحث محسّن)
+   5) سجل السلوكيات
 ============================================================ */
 let recordsSearchTimer = null;
 
@@ -651,7 +741,6 @@ function applyRecordsFilters(){
   const cat=document.getElementById('filterCat')?.value||'';
   const month=document.getElementById('filterMonth')?.value||'';
   
-  // خرائط للبحث السريع
   const studentsMap = new Map();
   DB.students.forEach(st => studentsMap.set(st.id, st));
   const behaviorsMap = new Map();
@@ -702,7 +791,7 @@ function deleteRecord(id){
 }
 
 /* ============================================================
-   9) التحليل المتقدم
+   6) التحليل المتقدم
 ============================================================ */
 function renderAnalysis(main){
   main.innerHTML = `
@@ -769,19 +858,15 @@ function renderAnalysis(main){
 }
 
 /* ============================================================
-   10) الوحدة الصحية
+   7) الوحدة الصحية (مُحدثة بالبحث)
 ============================================================ */
 function renderHealthIdentity(main){
-  const studentOptions=DB.students.map(s=>`<option value="${s.id}">${s.name} (صف ${s.grade}/${s.section})</option>`).join('');
   main.innerHTML=`
     <h2 class="text-2xl font-black mb-6">هويتي الصحية</h2>
     <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 max-w-3xl space-y-4">
-      <div>
-        <label class="block font-bold mb-1">اختر الطالب</label>
-        <select id="healthStudent" class="w-full border-2 border-slate-200 rounded-xl p-3" onchange="loadHealthData()">
-          <option value="">اختر...</option>${studentOptions}
-        </select>
-      </div>
+      
+      ${renderStudentSearchWidget('healthStudentId', 'loadHealthData')}
+
       <div id="healthForm" class="space-y-4 hidden">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div><label class="block font-bold mb-1">فصيلة الدم</label><input type="text" id="hBlood" class="w-full border-2 border-slate-200 rounded-xl p-3"></div>
@@ -799,7 +884,7 @@ function renderHealthIdentity(main){
 }
 
 function loadHealthData(){
-  const sid = document.getElementById('healthStudent').value;
+  const sid = document.getElementById('healthStudentId').value;
   const form = document.getElementById('healthForm');
   if(!sid){ form.classList.add('hidden'); return; }
   form.classList.remove('hidden');
@@ -815,7 +900,7 @@ function loadHealthData(){
 }
 
 function saveHealthData(){
-  const sid = document.getElementById('healthStudent').value;
+  const sid = document.getElementById('healthStudentId').value;
   const s = DB.students.find(x => x.id === sid);
   s.health = {
     bloodType: document.getElementById('hBlood').value.trim(),
@@ -831,12 +916,12 @@ function saveHealthData(){
 }
 
 function renderHealthTransfer(main){
-  const studentOptions=DB.students.map(s=>`<option value="${s.id}">${s.name} (صف ${s.grade}/${s.section})</option>`).join('');
   main.innerHTML=`
     <h2 class="text-2xl font-black mb-6">تحويل للوحدة الصحية</h2>
     <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 max-w-3xl space-y-4">
-      <div><label class="block font-bold mb-1">اختر الطالب</label>
-        <select id="refStudent" class="w-full border-2 border-slate-200 rounded-xl p-3"><option value="">اختر...</option>${studentOptions}</select></div>
+      
+      ${renderStudentSearchWidget('refStudentId', '')}
+
       <div><label class="block font-bold mb-1">سبب التحويل</label>
         <input type="text" id="refReason" class="w-full border-2 border-slate-200 rounded-xl p-3" placeholder="مثال: صداع مستمر، إصابة أثناء الرياضة..."></div>
       <div><label class="block font-bold mb-1">ملاحظات</label>
@@ -847,7 +932,7 @@ function renderHealthTransfer(main){
 }
 
 function saveHealthTransfer(){
-  const sid = document.getElementById('refStudent').value;
+  const sid = document.getElementById('refStudentId').value;
   const reason = document.getElementById('refReason').value.trim();
   const notes = document.getElementById('refNotes').value.trim();
   if(!sid || !reason) return showToast('⚠️ يرجى اختيار الطالب وكتابة السبب', 'error');
@@ -893,7 +978,7 @@ function renderHealthReport(main){
 }
 
 /* ============================================================
-   11) إدارة المستخدمين والسلوكيات والإجراءات
+   8) باقي الدوال (المستخدمين، السلوكيات، الإجراءات، إلخ)
 ============================================================ */
 function renderUsers(main){
   main.innerHTML=`
@@ -1048,9 +1133,6 @@ function deleteAction(id){
   saveDB(); renderPage('actions');
 }
 
-/* ============================================================
-   12) التنبيهات والإعدادات والتقارير
-============================================================ */
 function renderAlerts(main){
   const atRisk = getAtRiskStudents();
   main.innerHTML=`
@@ -1106,9 +1188,6 @@ function saveSettings(){
   saveDB(); showToast('تم الحفظ ✓');
 }
 
-/* ============================================================
-   13) إدارة الطلبة (مع الهاتف، اللصق، وCSV)
-============================================================ */
 function renderStudents(main){
   const cards=DB.students.map(s=>{
     const cnt=DB.records.filter(r=>r.studentId===s.id).length;
@@ -1171,7 +1250,7 @@ function confirmAddStudent(){
     name, grade, section, phone,
     health:{bloodType:'',allergies:'',chronic:'',medications:'',emergencyName:'',emergencyPhone:'',notes:''}
   });
-  saveDB(); closeModal(); refreshParentDropdown(); showToast('تمت الإضافة ✓'); renderPage('students');
+  saveDB(); closeModal(); showToast('تمت الإضافة ✓'); renderPage('students');
 }
 
 function editStudent(id){
@@ -1201,25 +1280,19 @@ function confirmEditStudent(id){
   s.grade=parseInt(document.getElementById('eGrade').value);
   s.section=parseInt(document.getElementById('eSection').value);
   s.phone=document.getElementById('ePhone').value.trim();
-  saveDB(); closeModal(); refreshParentDropdown(); showToast('تم التعديل ✓'); renderPage('students');
+  saveDB(); closeModal(); showToast('تم التعديل ✓'); renderPage('students');
 }
 
 function deleteStudent(id){
   if(DB.records.some(r=>r.studentId===id)) return showToast('⚠️ لا يمكن الحذف — الطالب لديه سجلات','error');
   if(!confirm('حذف هذا الطالب؟')) return;
   DB.students=DB.students.filter(x=>x.id!==id);
-  saveDB(); refreshParentDropdown(); showToast('تم الحذف'); renderPage('students');
+  saveDB(); showToast('تم الحذف'); renderPage('students');
 }
 
 function viewStudentDetail(id){
   const s=DB.students.find(x=>x.id===id); if(!s) return;
   const recs=DB.records.filter(r=>r.studentId===id).sort((a,b)=>b.createdAt-a.createdAt);
-  const atRiskInfo=[];
-  DB.behaviors.forEach(b=>{
-    if(b.id==='B_OTHER') return;
-    const st=getEscalationState(id,b.id);
-    if(st&&st.pastCount>=st.esc.length-1) atRiskInfo.push({behavior:b,count:st.pastCount,total:st.esc.length});
-  });
   showModal(`
     <div class="flex justify-between items-center mb-4 flex-wrap gap-2 no-print">
       <h3 class="text-xl font-black">${s.name} — صف ${s.grade}/${s.section}</h3>
@@ -1228,10 +1301,6 @@ function viewStudentDetail(id){
         <button onclick="closeModal()" class="bg-slate-200 text-slate-700 font-bold px-3 py-2 rounded-lg text-sm">إغلاق</button>
       </div>
     </div>
-    ${atRiskInfo.length?`<div class="bg-red-50 border-2 border-red-300 rounded-xl p-3 mb-4">
-      <div class="font-bold text-red-800 text-sm mb-2">🚨 وصل للخطوة الأخيرة في:</div>
-      ${atRiskInfo.map(a=>`<div class="text-xs text-red-700">• ${a.behavior.name} — ${a.count} تكرار</div>`).join('')}
-    </div>`:''}
     <div class="bg-slate-50 rounded-xl p-3 mb-4 flex justify-between items-center">
       <div class="text-sm"><strong>إجمالي السجلات:</strong> ${recs.length}</div>
       <div class="text-sm text-blue-700 font-bold"><strong>📞 الهاتف:</strong> ${s.phone || 'غير مسجل'}</div>
@@ -1297,9 +1366,6 @@ function openPrintStudent(studentId){
   setTimeout(()=>{iframe.contentWindow.focus();iframe.contentWindow.print();setTimeout(()=>iframe.remove(),1500);},400);
 }
 
-/* ============================================================
-   14) اللصق الدفعي و CSV
-============================================================ */
 function openBulkPasteModal(){
   showModal(`
     <div class="flex justify-between items-center mb-4 no-print">
@@ -1312,25 +1378,19 @@ function openBulkPasteModal(){
         <li><code class="bg-white px-1 rounded">الاسم</code> → صف 5/1</li>
         <li><code class="bg-white px-1 rounded">الاسم, الصف, الشعبة</code></li>
         <li><code class="bg-white px-1 rounded">الاسم, الصف, الشعبة, الهاتف</code></li>
-        <li>الفواصل المقبولة: <code>,</code> أو <code>،</code> أو <kbd>Tab</kbd></li>
       </ul>
     </div>
-    <textarea id="bulkPasteArea" rows="10" class="w-full border-2 border-slate-200 rounded-xl p-3 font-mono text-sm" placeholder="أحمد بن سالم الرواحي
-محمد بن خالد البلوشي, 6, 2
-يوسف بن علي المعمري	5	3
-عبدالله بن حمد الحارثي، 7، 1
-سعيد بن راشد الكندي, 5, 3, 99001122"></textarea>
+    <textarea id="bulkPasteArea" rows="10" class="w-full border-2 border-slate-200 rounded-xl p-3 font-mono text-sm" placeholder="أحمد بن سالم, 5, 1, 99001122"></textarea>
     <div id="bulkPreview" class="mt-3"></div>
     <button onclick="processBulkPaste()" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-black py-3 rounded-xl mt-4 shadow-md">✓ إضافة الطلبة</button>
   `);
   const ta = document.getElementById('bulkPasteArea');
   ta.addEventListener('input', previewBulkPaste);
   ta.addEventListener('paste', function(){ setTimeout(previewBulkPaste, 60); });
-  ta.addEventListener('change', previewBulkPaste);
 }
 
 function parseBulkLine(rawLine){
-  if(rawLine === null || rawLine === undefined) return null;
+  if(!rawLine) return null;
   let line = String(rawLine).trim();
   if(!line) return null;
   line = line.replace(/[\u0660-\u0669]/g, d => String.fromCharCode(d.charCodeAt(0) - 0x0660));
@@ -1344,19 +1404,11 @@ function parseBulkLine(rawLine){
   const name = parts[0] || '';
   if(!name) return null;
   let grade = 5;
-  if(parts[1]){
-    const g = parseInt(parts[1]);
-    if(!isNaN(g) && GRADES.includes(g)) grade = g;
-  }
+  if(parts[1]){ const g = parseInt(parts[1]); if(!isNaN(g) && GRADES.includes(g)) grade = g; }
   let section = 1;
-  if(parts[2]){
-    const s = parseInt(parts[2]);
-    if(!isNaN(s) && SECTIONS.includes(s)) section = s;
-  }
+  if(parts[2]){ const s = parseInt(parts[2]); if(!isNaN(s) && SECTIONS.includes(s)) section = s; }
   let phone = '';
-  if(parts[3]){
-    phone = parts[3].replace(/[^\d+\-\s]/g, '').trim();
-  }
+  if(parts[3]){ phone = parts[3].replace(/[^\d+\-\s]/g, '').trim(); }
   return { name, grade, section, phone };
 }
 
@@ -1364,31 +1416,13 @@ function previewBulkPaste(){
   const txt = document.getElementById('bulkPasteArea').value;
   const preview = document.getElementById('bulkPreview');
   if(!preview) return;
-  if(!txt.trim()){
-    preview.innerHTML = '<div class="text-xs text-slate-400">لم يتم التعرف على أي أسماء بعد...</div>';
-    return;
-  }
-  const lines = txt.split(/\r?\n/);
-  const parsed = [];
-  for(let i = 0; i < lines.length; i++){
-    const p = parseBulkLine(lines[i]);
-    if(p) parsed.push(p);
-  }
-  if(!parsed.length){
-    preview.innerHTML = '<div class="text-xs text-red-500">⚠️ لم يتم التعرف على أي أسماء صالحة</div>';
-    return;
-  }
+  if(!txt.trim()){ preview.innerHTML = '<div class="text-xs text-slate-400">لم يتم التعرف على أي أسماء بعد...</div>'; return; }
+  const parsed = txt.split(/\r?\n/).map(parseBulkLine).filter(Boolean);
+  if(!parsed.length){ preview.innerHTML = '<div class="text-xs text-red-500">⚠️ لم يتم التعرف على أي أسماء صالحة</div>'; return; }
   preview.innerHTML = `
     <div class="text-xs font-bold text-emerald-700 mb-2">معاينة (${parsed.length} طالب):</div>
     <div class="max-h-40 overflow-y-auto bg-slate-50 rounded-lg p-2 space-y-1 border border-slate-200">
-      ${parsed.map((s, i) => `
-        <div class="text-xs text-slate-700 border-b border-slate-200 last:border-b-0 py-1">
-          <span class="text-slate-400 ml-1">${i+1}.</span>
-          <strong>${s.name}</strong>
-          <span class="text-slate-500">— صف ${s.grade}/${s.section}</span>
-          ${s.phone ? `<span class="text-blue-600 font-bold mr-1">📞 ${s.phone}</span>` : ''}
-        </div>
-      `).join('')}
+      ${parsed.map((s, i) => `<div class="text-xs text-slate-700 border-b border-slate-200 last:border-b-0 py-1"><span class="text-slate-400 ml-1">${i+1}.</span> <strong>${s.name}</strong> <span class="text-slate-500">— صف ${s.grade}/${s.section}</span> ${s.phone ? `<span class="text-blue-600 font-bold mr-1">📞 ${s.phone}</span>` : ''}</div>`).join('')}
     </div>
   `;
 }
@@ -1396,12 +1430,7 @@ function previewBulkPaste(){
 function processBulkPaste(){
   const txt = document.getElementById('bulkPasteArea').value;
   if(!txt.trim()) return showToast('⚠️ لم تلصق أي بيانات', 'error');
-  const lines = txt.split(/\r?\n/);
-  const parsed = [];
-  for(let i = 0; i < lines.length; i++){
-    const p = parseBulkLine(lines[i]);
-    if(p) parsed.push(p);
-  }
+  const parsed = txt.split(/\r?\n/).map(parseBulkLine).filter(Boolean);
   if(!parsed.length) return showToast('⚠️ لم يتم التعرف على أي أسماء صالحة', 'error');
   if(!confirm(`سيتم إضافة ${parsed.length} طالب. متابعة؟`)) return;
 
@@ -1409,238 +1438,72 @@ function processBulkPaste(){
   const seen = new Set();
   parsed.forEach(p => {
     const key = p.name + '|' + p.grade + '|' + p.section;
-    if(seen.has(key) || DB.students.some(s => s.name === p.name && s.grade === p.grade && s.section === p.section)){
-      skipped++; return;
-    }
+    if(seen.has(key) || DB.students.some(s => s.name === p.name && s.grade === p.grade && s.section === p.section)){ skipped++; return; }
     seen.add(key);
-    DB.students.push({
-      id: 'S' + Date.now() + Math.random().toString(36).slice(2, 6),
-      name: p.name,
-      grade: p.grade,
-      section: p.section,
-      phone: p.phone || '',
-      health: {bloodType:'', allergies:'', chronic:'', medications:'', emergencyName:'', emergencyPhone:'', notes:''}
-    });
+    DB.students.push({ id: 'S' + Date.now() + Math.random().toString(36).slice(2, 6), name: p.name, grade: p.grade, section: p.section, phone: p.phone || '', health: {bloodType:'', allergies:'', chronic:'', medications:'', emergencyName:'', emergencyPhone:'', notes:''} });
     added++;
   });
-  saveDB(); closeModal(); refreshParentDropdown();
+  saveDB(); closeModal();
   showToast(`✅ تمت إضافة ${added}${skipped ? ` (تم تجاهل ${skipped} مكرر)` : ''}`);
   renderPage('students');
 }
 
-function escapeCSV(val){
-  if(val === null || val === undefined) return '';
-  const str = String(val);
-  if(str.includes(',') || str.includes('"') || str.includes('\n') || str.includes('\r')){
-    return '"' + str.replace(/"/g, '""') + '"';
-  }
-  return str;
-}
-
-function downloadCSV(filename, rows){
+function exportStudentsCSV(){
+  if(!DB.students.length) return showToast('لا يوجد طلبة للتصدير', 'error');
+  const rows = [['الاسم','الصف','الشعبة','الهاتف']];
+  DB.students.forEach(s => rows.push([s.name, s.grade, s.section, s.phone || '']));
   const BOM = '\uFEFF';
-  const csv = BOM + rows.map(r => r.map(escapeCSV).join(',')).join('\r\n');
+  const csv = BOM + rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\r\n');
   const blob = new Blob([csv], {type: 'text/csv;charset=utf-8;'});
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = filename;
+  a.download = `الطلبة-${new Date().toISOString().split('T')[0]}.csv`;
   a.click();
-  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-}
-
-function exportStudentsCSV(){
-  if(!DB.students.length) return showToast('لا يوجد طلبة للتصدير', 'error');
-  const rows = [['الاسم','الصف','الشعبة','الهاتف','فصيلة الدم','الحساسية','أمراض مزمنة','ملاحظات صحية']];
-  DB.students.forEach(s => {
-    const h = s.health || {};
-    rows.push([s.name, s.grade, s.section, s.phone || '', h.bloodType || '', h.allergies || '', h.chronic || '', h.notes || '']);
-  });
-  downloadCSV(`الطلبة-${new Date().toISOString().split('T')[0]}.csv`, rows);
   showToast('تم تصدير ملف CSV ✓');
 }
 
 function exportRecordsCSV(){
   if(!DB.records.length) return showToast('لا توجد سجلات للتصدير', 'error');
-  const rows = [['التاريخ','الطالب','الصف','الشعبة','الهاتف','السلوك','التصنيف','الإجراء','الخطوة','الإجمالي','من تتم مقابلته','يراجع الأستاذ','ملاحظات']];
+  const rows = [['التاريخ','الطالب','الصف','الشعبة','السلوك','الإجراء','الخطوة']];
   DB.records.forEach(r => {
     const s = DB.students.find(x => x.id === r.studentId) || {};
-    const b = DB.behaviors.find(x => x.id === r.behaviorId) || {};
-    rows.push([
-      new Date(r.createdAt).toLocaleDateString('ar-OM'),
-      s.name || '', s.grade || '', s.section || '', s.phone || '',
-      r.behaviorName || '', b.cat || '',
-      r.actionName || '',
-      r.escalationStep || '', r.escalationTotal || '',
-      r.metWith || '', r.teacher || '', r.notes || ''
-    ]);
+    rows.push([new Date(r.createdAt).toLocaleDateString('ar-OM'), s.name || '', s.grade || '', s.section || '', r.behaviorName, r.actionName, `${r.escalationStep||''}/${r.escalationTotal||''}`]);
   });
-  downloadCSV(`السجلات-${new Date().toISOString().split('T')[0]}.csv`, rows);
+  const BOM = '\uFEFF';
+  const csv = BOM + rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\r\n');
+  const blob = new Blob([csv], {type: 'text/csv;charset=utf-8;'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `السجلات-${new Date().toISOString().split('T')[0]}.csv`;
+  a.click();
   showToast('تم تصدير ملف CSV ✓');
-}
-
-function openCSVImportModal(){
-  showModal(`
-    <div class="flex justify-between items-center mb-4 no-print">
-      <h3 class="text-xl font-black">📁 استيراد طلبة من CSV</h3>
-      <button onclick="closeModal()" class="bg-slate-200 text-slate-700 font-bold px-3 py-2 rounded-lg text-sm">إغلاق</button>
-    </div>
-    <div class="bg-blue-50 border-r-4 border-blue-500 p-3 rounded-lg text-sm mb-4">
-      <strong>تنسيق الملف المطلوب:</strong>
-      <div class="text-xs mt-2 font-mono bg-white p-2 rounded border whitespace-pre">الاسم,الصف,الشعبة,الهاتف
-أحمد بن سالم,5,1,99001122
-محمد بن خالد,5,2,</div>
-    </div>
-    <label class="block w-full bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-4 rounded-xl text-center cursor-pointer">
-      📎 اختر ملف CSV
-      <input type="file" accept=".csv,.txt" onchange="handleCSVFile(event)" class="hidden">
-    </label>
-    <div id="csvPreview" class="mt-3"></div>
-  `);
-}
-
-function parseCSVLine(line, sep=','){
-  const result = [];
-  let cur = '';
-  let inQuote = false;
-  for(let i = 0; i < line.length; i++){
-    const c = line[i];
-    if(c === '"'){
-      if(inQuote && line[i+1] === '"'){ cur += '"'; i++; }
-      else inQuote = !inQuote;
-    } else if(c === sep && !inQuote){
-      result.push(cur); cur = '';
-    } else {
-      cur += c;
-    }
-  }
-  result.push(cur);
-  return result;
-}
-
-function handleCSVFile(event){
-  const file = event.target.files[0];
-  if(!file) return;
-  const reader = new FileReader();
-  reader.onload = ev => {
-    let text = ev.target.result;
-    if(text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
-    const lines = text.split(/\r?\n/).filter(l => l.trim());
-    if(!lines.length) return showToast('الملف فارغ', 'error');
-
-    const separator = lines[0].includes(';') ? ';' : (lines[0].includes('\t') ? '\t' : ',');
-
-    let startIdx = 0;
-    const header = lines[0].toLowerCase();
-    if(header.includes('اسم') || header.includes('name') || header.includes('الصف') || header.includes('هاتف')){
-      startIdx = 1;
-    }
-
-    const parsed = [];
-    for(let i = startIdx; i < lines.length; i++){
-      const parts = parseCSVLine(lines[i], separator);
-      if(!parts.length) continue;
-      const name = (parts[0] || '').trim();
-      if(!name) continue;
-      const grade = parts[1] ? parseInt(parts[1]) : 5;
-      const section = parts[2] ? parseInt(parts[2]) : 1;
-      const phone = parts[3] ? parts[3].trim() : '';
-      parsed.push({
-        name,
-        grade: GRADES.includes(grade) ? grade : 5,
-        section: SECTIONS.includes(section) ? section : 1,
-        phone
-      });
-    }
-
-    if(!parsed.length) return showToast('لم يتم العثور على بيانات صالحة', 'error');
-    window._csvParsed = parsed;
-
-    document.getElementById('csvPreview').innerHTML = `
-      <div class="text-xs font-bold text-emerald-700 mb-2">تم العثور على ${parsed.length} طالب — معاينة:</div>
-      <div class="max-h-48 overflow-y-auto bg-slate-50 rounded-lg p-2 space-y-1 mb-3">
-        ${parsed.slice(0, 30).map((s, i) => `<div class="text-xs text-slate-700"><span class="text-slate-400">${i+1}.</span> <strong>${s.name}</strong> — صف ${s.grade}/${s.section}${s.phone ? ` — 📞 <span class="text-blue-600">${s.phone}</span>` : ''}</div>`).join('')}
-        ${parsed.length > 30 ? `<div class="text-xs text-slate-400 mt-1">... و ${parsed.length - 30} طالب آخر</div>` : ''}
-      </div>
-      <button onclick="confirmCSVImport()" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-black py-3 rounded-xl">✓ استيراد ${parsed.length} طالب</button>
-    `;
-  };
-  reader.readAsText(file, 'utf-8');
-}
-
-function confirmCSVImport(){
-  const parsed = window._csvParsed || [];
-  if(!parsed.length) return showToast('لا توجد بيانات', 'error');
-  let added = 0, skipped = 0;
-  parsed.forEach(p => {
-    if(DB.students.some(s => s.name === p.name && s.grade === p.grade && s.section === p.section)){
-      skipped++; return;
-    }
-    DB.students.push({
-      id: 'S' + Date.now() + Math.random().toString(36).slice(2, 6),
-      name: p.name,
-      grade: p.grade,
-      section: p.section,
-      phone: p.phone || '',
-      health: {bloodType:'', allergies:'', chronic:'', medications:'', emergencyName:'', emergencyPhone:'', notes:''}
-    });
-    added++;
-  });
-  saveDB(); closeModal(); refreshParentDropdown(); window._csvParsed = null;
-  showToast(`✅ تمت إضافة ${added}${skipped ? ` (تم تجاهل ${skipped} مكرر)` : ''}`);
-  renderPage('students');
-}
-
-/* ============================================================
-   15) ولي الأمر
-============================================================ */
-function refreshParentDropdown(){
-  const sel=document.getElementById('parentStudent');
-  if(!sel) return;
-  const opts=['<option value="">— اختر —</option>'].concat(
-    DB.students.map(s=>`<option value="${s.id}">${s.name} (صف ${s.grade}/${s.section})</option>`)
-  ).join('');
-  sel.innerHTML=opts;
 }
 
 function renderMyChild(main){
   const s=DB.students.find(x=>x.id===session.studentId);
   if(!s){main.innerHTML='<div class="bg-white p-8 rounded-2xl shadow-md text-center text-slate-500">الطالب غير موجود. تواصل مع المدرسة.</div>';return;}
   const recs=DB.records.filter(r=>r.studentId===s.id).sort((a,b)=>b.createdAt-a.createdAt);
-  const atRiskInfo=[];
-  DB.behaviors.forEach(b=>{
-    if(b.id==='B_OTHER') return;
-    const st=getEscalationState(s.id,b.id);
-    if(st&&st.pastCount>=st.esc.length-1) atRiskInfo.push({behavior:b,count:st.pastCount,total:st.esc.length});
-  });
-  
   main.innerHTML=`
     <div class="bg-gradient-to-l from-emerald-700 to-emerald-900 text-white rounded-2xl p-6 mb-6 shadow-lg">
       <div class="text-sm opacity-80">أهلاً بك</div>
       <div class="text-2xl font-black mt-1">${s.name}</div>
       <div class="text-sm opacity-90 mt-1">صف ${s.grade} / شعبة ${s.section}</div>
     </div>
-    ${atRiskInfo.length?`<div class="bg-red-50 border-2 border-red-300 rounded-2xl p-4 mb-6">
-      <div class="font-black text-red-800 text-sm mb-2">🚨 تنبيه مهم — وصل ابنكم للخطوة الأخيرة في:</div>
-      ${atRiskInfo.map(a=>`<div class="text-sm text-red-700 mb-1">• ${a.behavior.name} — تكرار ${a.count} مرة</div>`).join('')}
-    </div>`:''}
     <h3 class="font-black text-lg mb-3">📋 سجل السلوكيات (${recs.length})</h3>
     <div class="space-y-3">
       ${recs.length?recs.map(r=>`
         <div class="bg-white rounded-xl p-4 shadow-sm border-r-4 border-emerald-600">
           <div class="flex justify-between items-start mb-2 flex-wrap gap-2">
             <div class="font-bold text-slate-800">${r.behaviorName}</div>
-            <div class="text-xs text-slate-500">${new Date(r.createdAt).toLocaleDateString('ar-OM',{year:'numeric',month:'long',day:'numeric'})}</div>
+            <div class="text-xs text-slate-500">${new Date(r.createdAt).toLocaleDateString('ar-OM')}</div>
           </div>
           <div class="text-sm text-emerald-700 font-bold">▸ ${r.actionName}</div>
           ${r.notes?`<div class="text-xs text-slate-600 mt-2 bg-slate-50 p-2 rounded">📝 ${r.notes}</div>`:''}
-        </div>`).join(''):'<div class="bg-white p-8 rounded-xl shadow-md text-center text-slate-400">لا يوجد سجلات — نأمل أن يبقى ابنكم متفوقاً سلوكياً 🌟</div>'}
+        </div>`).join(''):'<div class="bg-white p-8 rounded-xl shadow-md text-center text-slate-400">لا يوجد سجلات 🌟</div>'}
     </div>
   `;
 }
 
-/* ============================================================
-   16) أدوات مساعدة وطباعة
-============================================================ */
 function showModal(content){
   document.getElementById('modalRoot').innerHTML=`
     <div class="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center p-4" onclick="if(event.target===this) closeModal()">
@@ -1662,8 +1525,8 @@ function showToast(msg,type='success'){
 
 function openPrintModal(recordId){
   const record=DB.records.find(x=>x.id===recordId); if(!record) return;
-  const student=DB.students.find(x=>x.id===record.studentId)||{name:'—',grade:'—',section:'—'};
-  const behavior=DB.behaviors.find(x=>x.id===record.behaviorId)||{name:record.behaviorName,cat:'—'};
+  const student=DB.students.find(x=>x.id===record.studentId)||{};
+  const behavior=DB.behaviors.find(x=>x.id===record.behaviorId)||{};
   const esc=record.escalationPath||getEscalation(behavior);
   const stepIdx=(record.escalationStep||1)-1;
   const html=buildPrintSheet(record,student,behavior,esc,stepIdx);
@@ -1675,9 +1538,7 @@ function openPrintModal(recordId){
         <button onclick="closeModal()" class="bg-slate-200 text-slate-700 font-bold px-4 py-2 rounded-lg text-sm">إغلاق</button>
       </div>
     </div>
-    <div class="bg-white border rounded-lg overflow-auto" style="max-height:75vh">
-      ${html.replace(/<\/?html[^>]*>|<\/?head[^>]*>|<style>[\s\S]*?<\/style>|<\/?body[^>]*>|<\/?meta[^>]*>|<!DOCTYPE[^>]*>/gi,'')}
-    </div>`);
+    <div class="bg-white border rounded-lg overflow-auto" style="max-height:75vh">${html.replace(/<\/?html[^>]*>|<\/?head[^>]*>|<style>[\s\S]*?<\/style>|<\/?body[^>]*>|<\/?meta[^>]*>|<!DOCTYPE[^>]*>/gi,'')}</div>`);
 }
 
 function buildPrintSheet(record,student,behavior,esc,stepIdx){
@@ -1707,10 +1568,7 @@ function buildPrintSheet(record,student,behavior,esc,stepIdx){
     .signature div{padding-top:25px;border-top:1px dashed #94A3B8;text-align:center}
     .footer{text-align:center;margin-top:25px;font-size:9px;color:#94A3B8;border-top:1px solid #E2E8F0;padding-top:8px}
   </style></head><body>
-    <div class="header">
-      <div class="sub">بسم الله الرحمن الرحيم</div><div class="sub">سلطنة عُمان — وزارة التربية والتعليم</div>
-      <h1>${schoolName}</h1><div class="sub">تقرير إجراء سلوكي طلابي</div>
-    </div>
+    <div class="header"><div class="sub">بسم الله الرحمن الرحيم</div><div class="sub">سلطنة عُمان — وزارة التربية والتعليم</div><h1>${schoolName}</h1><div class="sub">تقرير إجراء سلوكي طلابي</div></div>
     <div class="title">تقرير سلوك — ${record.behaviorName}</div>
     <div class="section"><h3>بيانات الطالب</h3><div class="grid">
       <div class="field"><strong>الاسم:</strong> ${student.name}</div>
@@ -1726,18 +1584,14 @@ function buildPrintSheet(record,student,behavior,esc,stepIdx){
     </div></div>
     <div class="section"><h3>التسلسل التصاعدي للإجراءات (${record.escalationTotal} خطوات)</h3>
       <div class="escalation">${escHTML}</div>
-      <div class="reason"><strong>الإجراء المتخذ:</strong> ${record.actionName}<br>
-        <strong>السبب:</strong> تطبيقاً للتسلسل التصاعدي المعتمد لهذا السلوك، ووصولاً للخطوة <strong>${record.escalationStep}</strong> من <strong>${record.escalationTotal}</strong> بعد <strong>${pastCount}</strong> تكرار سابق.</div>
+      <div class="reason"><strong>الإجراء المتخذ:</strong> ${record.actionName}<br><strong>السبب:</strong> تطبيقاً للتسلسل التصاعدي المعتمد لهذا السلوك، ووصولاً للخطوة <strong>${record.escalationStep}</strong> من <strong>${record.escalationTotal}</strong> بعد <strong>${pastCount}</strong> تكرار سابق.</div>
     </div>
     ${record.regulationText?`<div class="section"><h3>النص اللائحي</h3><div class="field">${record.regulationText}</div></div>`:''}
     <div class="section"><h3>ملاحظات ومتابعة</h3>
       <div class="field"><strong>من تتم مقابلته:</strong> ${record.metWith||'—'}</div>
       <div class="field" style="margin-top:6px"><strong>ملاحظات:</strong> ${record.notes||'—'}</div>
     </div>
-    <div class="signature">
-      <div>يراجع الأستاذ: ${record.teacher||'—'}</div>
-      <div>مدير المدرسة / المساعد</div>
-    </div>
+    <div class="signature"><div>يراجع الأستاذ: ${record.teacher||'—'}</div><div>مدير المدرسة / المساعد</div></div>
     <div class="footer">تم إنشاء هذا التقرير آلياً من منصة السلوك الطلابي — مدرسة المسعى<br>${new Date().toLocaleString('ar-OM')}</div>
   </body></html>`;
 }
@@ -1780,8 +1634,7 @@ function printMonthlyReport(){
     tbody tr:nth-child(even){background:#F8FAFC}
     .center{text-align:center}
   </style></head><body>
-    <div class="header"><div class="sub">بسم الله الرحمن الرحيم — وزارة التربية والتعليم</div>
-      <h1>${schoolName}</h1><div class="sub">التقرير الشهري للسلوك الطلابي</div></div>
+    <div class="header"><div class="sub">بسم الله الرحمن الرحيم — وزارة التربية والتعليم</div><h1>${schoolName}</h1><div class="sub">التقرير الشهري للسلوك الطلابي</div></div>
     <div class="title">شهر: ${monthName}</div>
     <table><thead><tr><th>التاريخ</th><th>الطالب</th><th>الصف</th><th>السلوك</th><th>الإجراء</th><th class="center">الخطوة</th></tr></thead><tbody>
     ${recs.map(r=>{const s=DB.students.find(x=>x.id===r.studentId)||{};return `<tr><td>${new Date(r.createdAt).toLocaleDateString('ar-OM')}</td><td>${s.name||'—'}</td><td>${s.grade||'—'}/${s.section||'—'}</td><td>${r.behaviorName}</td><td>${r.actionName}</td><td class="center">${r.escalationStep||'—'}/${r.escalationTotal||'—'}</td></tr>`;}).join('')}
@@ -1815,13 +1668,18 @@ function exportExcel(){
   showToast('تم التصدير ✓');
 }
 
+function refreshParentDropdown(){
+  const sel=document.getElementById('parentStudent');
+  if(!sel) return;
+  sel.innerHTML=['<option value="">— اختر —</option>'].concat(DB.students.map(s=>`<option value="${s.id}">${s.name} (صف ${s.grade}/${s.section})</option>`)).join('');
+}
+
 /* ============================================================
-   17) بدء التشغيل
+   بدء التشغيل
 ============================================================ */
 initDB();
 refreshParentDropdown();
 
-// استئناف الرسم المؤجل عند مغادرة حقل الإدخال
 document.addEventListener('focusout', () => {
   setTimeout(() => {
     if(pendingRender && !shouldSkipRender() && !document.getElementById('appScreen').classList.contains('hidden')){
@@ -1833,7 +1691,6 @@ document.addEventListener('focusout', () => {
   }, 800);
 });
 
-// المزامنة الدورية: 3 دقائق، ولا تعمل أثناء تفاعل المستخدم
 setInterval(()=>{
   if(!navigator.onLine) return;
   if(document.getElementById('appScreen').classList.contains('hidden')) return;
@@ -1847,3 +1704,4 @@ window.addEventListener('offline',()=>showToast('⚠️ وضع عدم الاتص
 </script>
 </body>
 </html>
+```
