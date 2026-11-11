@@ -7,9 +7,9 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
-  body { font-family: 'Cairo', sans-serif; background: #F1F5F9; }
-  .hidden { display: none !important; }
-  @media print { .no-print { display: none !important; } }
+body { font-family: 'Cairo', sans-serif; background: #F1F5F9; margin: 0; }
+.hidden { display: none !important; }
+@media print { .no-print { display: none !important; } }
 </style>
 </head>
 <body class="text-slate-800">
@@ -72,17 +72,16 @@ const BEHAVIORS = [
   {id:'B_G2', name:'غياب بدون عذر (5 أيام)', cat:'غياب', points:2, level:2},
   {id:'B_G3', name:'غياب بدون عذر (8 أيام)', cat:'غياب', points:3, level:3},
   {id:'B_G4', name:'غياب بدون عذر (10 أيام)', cat:'غياب', points:4, level:4},
-  {id:'B1', name:'الإخلال بنظام الطابور أو الحصص', cat:'الانضباط السلوكي', points:1, level:1},
+  {id:'B1', name:'الإخلال بنظام الطابور', cat:'الانضباط السلوكي', points:1, level:1},
   {id:'B2', name:'عدم الالتزام بالزي المدرسي', cat:'الانضباط السلوكي', points:1, level:1},
   {id:'B3', name:'العبث بمرافق المدرسة', cat:'الانضباط السلوكي', points:1, level:1},
   {id:'B4', name:'الإساءة بالأقول لزميل', cat:'الانضباط السلوكي', points:1, level:1},
   {id:'B5', name:'عدم المحافظة على النظافة', cat:'الانضباط السلوكي', points:1, level:1},
-  {id:'B16', name:'تزوير محرر مدرسي أو توقيع', cat:'الانضباط السلوكي', points:2, level:2},
+  {id:'B6', name:'عدم إحضار الكتب والأدوات', cat:'الانضباط السلوكي', points:1, level:1},
+  {id:'B16', name:'تزوير محرر مدرسي', cat:'الانضباط السلوكي', points:2, level:2},
   {id:'B18', name:'الشجار وتهديد الزملاء', cat:'الانضباط السلوكي', points:3, level:3},
-  {id:'B19', name:'الاعتداء بالألفاظ النابية', cat:'الانضباط السلوكي', points:3, level:3},
   {id:'B21', name:'إحضار أجهزة سمعية وبصرية', cat:'الانضباط السلوكي', points:4, level:4},
-  {id:'B23', name:'حيازة مواد ضارة أو أدوات حادة', cat:'الانضباط السلوكي', points:4, level:4},
-  {id:'B24', name:'الاعتداء على الزملاء بدنياً', cat:'الانضباط السلوكي', points:4, level:4},
+  {id:'B23', name:'حيازة مواد ضارة', cat:'الانضباط السلوكي', points:4, level:4},
   {id:'B27', name:'الإساءة للرموز الوطنية', cat:'الانضباط السلوكي', points:5, level:5},
   {id:'B33', name:'التدخين أو المخدرات', cat:'الانضباط السلوكي', points:5, level:5},
   {id:'B_OTHER', name:'سلوك آخر (يدوي)', cat:'أخرى', points:1, level:1}
@@ -105,7 +104,11 @@ const DEFAULT_STUDENTS = [
   ['عبدالله بن حمد الحارثي',5,2],['سعيد بن راشد الكندي',5,3],['خالد بن ناصر الفارسي',6,1],
   ['سلطان بن ماجد الشكيلي',6,1],['حمزة بن ياسر العامري',6,2],['طلال بن سعيد الهنائي',6,2],
   ['فهد بن عبدالرحمن الزدجالي',6,3],['بدر بن سليمان الريامي',7,1],['مازن بن حمدان الحجري',7,1],
-  ['معاذ بن طارق السعدي',7,2],['أيمن بن وليد المقبالي',7,2],['راشد بن سيف الخروصي',7,3]
+  ['معاذ بن طارق السعدي',7,2],['أيمن بن وليد المقبالي',7,2],['راشد بن سيف الخروصي',7,3],
+  ['هلال بن منصور الغافري',8,1],['نبيل بن عامر الحوسني',8,1],['قيس بن مروان الوهيبي',8,2],
+  ['زياد بن فارس اليعقوبي',8,2],['مروان بن أيمن السيابي',8,3],['حاتم بن صالح العبري',9,1],
+  ['عمار بن نبيل الجابري',9,1],['أنس بن كمال الرئيسي',9,2],['بلال بن هيثم المخيني',9,2],
+  ['جعفر بن عادل الشعيلي',9,3]
 ];
 
 // ================= إدارة البيانات =================
@@ -117,7 +120,6 @@ function initDB() {
   if (saved) {
     try { DB = JSON.parse(saved); } catch(e) {}
   }
-  // إذا كانت البيانات فارغة، ننشئ طلبة افتراضيين
   if (!DB.students || DB.students.length === 0) {
     DB.students = DEFAULT_STUDENTS.map((s, i) => ({
       id: 'S' + (i+1), name: s[0], grade: s[1], section: s[2], phone: ''
