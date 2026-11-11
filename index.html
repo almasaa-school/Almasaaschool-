@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>منصة السلوك الطلابي — المسعى v18.1</title>
+<title>منصة السلوك الطلابي — المسعى v18.3</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -48,11 +48,8 @@ body{font-family:'Cairo',sans-serif;background:#F1F5F9;margin:0}
 
 <!-- ============ التطبيق ============ -->
 <div id="appScreen" class="hidden min-h-screen flex flex-col lg:flex-row-reverse">
-  
-  <!-- الخلفية المعتمة للجوال -->
   <div id="sidebarOverlay" class="fixed inset-0 bg-black/50 hidden z-40 lg:hidden" onclick="toggleSidebar()"></div>
 
-  <!-- القائمة الجانبية (تم إزالة إعداد وتصميم) -->
   <aside id="sidebar" class="fixed lg:sticky top-0 right-0 w-72 h-screen bg-white shadow-xl z-50 transform translate-x-full lg:translate-x-0 transition-transform duration-300 flex flex-col no-print">
     <div class="p-5 border-b bg-emerald-50 flex items-center justify-between">
       <div class="flex items-center gap-3">
@@ -66,18 +63,14 @@ body{font-family:'Cairo',sans-serif;background:#F1F5F9;margin:0}
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
       </button>
     </div>
-    
     <nav class="flex-1 overflow-y-auto p-3 space-y-1" id="navMenu"></nav>
-    
     <div class="p-4 border-t space-y-2 bg-slate-50">
       <button onclick="manualSync()" id="syncBtn" class="w-full text-right px-4 py-2.5 rounded-xl text-sm font-bold bg-blue-100 text-blue-700 hover:bg-blue-200 transition">🔄 مزامنة السحابة</button>
       <button onclick="doLogout()" class="w-full text-right px-4 py-2.5 rounded-xl text-sm font-bold bg-red-100 text-red-700 hover:bg-red-200 transition">🚪 تسجيل الخروج</button>
     </div>
   </aside>
 
-  <!-- المحتوى الرئيسي -->
   <main class="flex-1 p-4 lg:p-8 overflow-x-hidden w-full">
-    <!-- شريط علوي للجوال -->
     <header class="lg:hidden flex items-center justify-between mb-4 bg-white p-4 rounded-2xl shadow-sm">
       <div class="flex items-center gap-2">
         <div class="w-8 h-8 bg-emerald-700 rounded-lg flex items-center justify-center text-white font-bold text-sm">م</div>
@@ -87,7 +80,6 @@ body{font-family:'Cairo',sans-serif;background:#F1F5F9;margin:0}
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
       </button>
     </header>
-
     <div id="mainContent"></div>
   </main>
 </div>
@@ -96,12 +88,14 @@ body{font-family:'Cairo',sans-serif;background:#F1F5F9;margin:0}
 
 <script>
 /* ============================================================
-   1) الثوابت والبيانات الافتراضية
+   1) الثوابت
 ============================================================ */
 const SUPABASE_URL='https://pyuquzmknolznsanksml.supabase.co';
 const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB5dXF1em1rbm9sem5zYW5rc21sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEwNDQ0MDcsImV4cCI6MjEwNjYyMDQwN30.SG3a-9Ly_fZNSi8f8F0McvU5BNbjNIIO0wNxV-MXlgM';
 let sbClient=null; try{ if(window.supabase) sbClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY); }catch(e){}
 const CLOUD={enabled:!!sbClient,syncing:false,pendingPush:false};
+let pendingRender = false;
+
 const GRADES=[5,6,7,8,9], SECTIONS=[1,2,3,4,5,6,7];
 
 const DEFAULT_ACTIONS=[
@@ -169,8 +163,8 @@ function initDB(){
     users: [{ id: 'U1', username: 'almasaa', password: '', role: 'admin', name: 'مدير المدرسة' }],
     healthReferrals: [],
     alerts: [],
-    settings: { 
-      schoolName: 'مدرسة المسعى للبنين (٥-٩)', 
+    settings: {
+      schoolName: 'مدرسة المسعى للبنين (٥-٩)',
       principal: 'حسن علي إبراهيم البلوشي',
       directorate: 'المديرية العامة للتعليم بمحافظة شمال الباطنة'
     }
@@ -199,7 +193,7 @@ function initDB(){
 function saveDB(){
   lastLocalSave=Date.now();
   localStorage.setItem('almasaa_v18',JSON.stringify(DB));
-  if(CLOUD.enabled&&navigator.onLine) cloudPush();
+  if(CLOUD.enabled && navigator.onLine) cloudPush();
 }
 
 async function cloudPush(){
@@ -212,26 +206,58 @@ async function cloudPush(){
   if(CLOUD.pendingPush){ CLOUD.pendingPush=false; cloudPush(); }
 }
 
+/* ============================================================
+   3) المزامنة الذكية (لا تقطع تفاعل المستخدم)
+============================================================ */
+function shouldSkipRender(){
+  const ae = document.activeElement;
+  if(ae){
+    const tag = ae.tagName;
+    if(tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA' || ae.isContentEditable) return true;
+  }
+  const modal = document.getElementById('modalRoot');
+  if(modal && modal.innerHTML.trim() !== '') return true;
+  return false;
+}
+
 async function cloudPull(silent=true){
-  if(!sbClient||CLOUD.syncing||!navigator.onLine) return;
-  if(Date.now()-lastLocalSave<3000){ return; }
+  if(!sbClient || CLOUD.syncing || !navigator.onLine) return;
+  if(Date.now() - lastLocalSave < 3000) return;
+  
   try{
-    CLOUD.syncing=true;
-    const {data}=await sbClient.from('app_data').select('payload').eq('id','main').single();
-    if(data&&data.payload&&data.payload.students){
-      const incoming=JSON.stringify(data.payload), current=JSON.stringify(DB);
-      if(incoming!==current){
-        DB=data.payload;
-        if(!DB.records) DB.records=[];
-        localStorage.setItem('almasaa_v18',JSON.stringify(DB));
-        if(!formDirty&&!document.getElementById('appScreen').classList.contains('hidden')){
+    CLOUD.syncing = true;
+    const {data} = await sbClient.from('app_data').select('payload').eq('id','main').single();
+    if(data && data.payload && data.payload.students){
+      const incoming = JSON.stringify(data.payload);
+      const current = JSON.stringify(DB);
+      
+      if(incoming !== current){
+        DB = data.payload;
+        if(!DB.records) DB.records = [];
+        localStorage.setItem('almasaa_v18', JSON.stringify(DB));
+        
+        if(!formDirty && !shouldSkipRender() && !document.getElementById('appScreen').classList.contains('hidden')){
+          const scrollY = window.scrollY;
           renderPage(currentPage);
+          setTimeout(() => window.scrollTo(0, scrollY), 0);
+          pendingRender = false;
+        } else {
+          pendingRender = true;
         }
         if(!silent) showToast('تمت المزامنة ✓');
+      } 
+      else if(pendingRender && !shouldSkipRender() && !document.getElementById('appScreen').classList.contains('hidden')){
+        const scrollY = window.scrollY;
+        renderPage(currentPage);
+        setTimeout(() => window.scrollTo(0, scrollY), 0);
+        pendingRender = false;
+      }
+      else if(!silent){
+        showToast('بياناتك محدثة مسبقاً');
       }
     }
-  }catch(e){ console.warn('cloudPull',e); }
-  CLOUD.syncing=false;
+  }catch(e){ console.warn('cloudPull', e); }
+  CLOUD.syncing = false;
 }
 
 function manualSync(){
@@ -242,12 +268,12 @@ function manualSync(){
 }
 
 /* ============================================================
-   3) محرك التدرج السلوكي
+   4) محرك التدرج السلوكي
 ============================================================ */
 function getEscalation(behavior){
-  if(behavior&&Array.isArray(behavior.escalation)&&behavior.escalation.length) return behavior.escalation;
+  if(behavior && Array.isArray(behavior.escalation) && behavior.escalation.length) return behavior.escalation;
   const map={1:['A1','A2','A3','A4','A5'],2:['A2','A3','A4','A5','A6'],3:['A3','A4','A5','A6','A8'],4:['A4','A5','A6','A8','A11'],5:['A5','A6','A8','A11'],6:['A8','A11']};
-  return map[behavior.level]||map[1];
+  return map[behavior.level] || map[1];
 }
 
 function getEscalationState(studentId,behaviorId){
@@ -265,7 +291,7 @@ function getAtRiskStudents(){
     DB.behaviors.forEach(b=>{
       if(b.id==='B_OTHER') return;
       const st=getEscalationState(s.id,b.id);
-      if(st&&st.pastCount>=st.esc.length-1){
+      if(st && st.pastCount>=st.esc.length-1){
         const lastAct=DB.actions.find(a=>a.id===st.esc[st.esc.length-1]);
         out.push({student:s,behavior:b,count:st.pastCount,total:st.esc.length,lastAction:lastAct});
       }
@@ -275,7 +301,7 @@ function getAtRiskStudents(){
 }
 
 /* ============================================================
-   4) الدخول والتنقل
+   5) الدخول والتنقل
 ============================================================ */
 function doLogin(){
   const u=document.getElementById('loginUser').value.trim();
@@ -384,7 +410,7 @@ function renderPage(page='home'){
 }
 
 /* ============================================================
-   5) الرئيسية
+   6) الرئيسية
 ============================================================ */
 function renderHome(main){
   const points = DB.records.reduce((sum, r) => sum + (r.points || 0), 0);
@@ -463,7 +489,7 @@ function renderHome(main){
 }
 
 /* ============================================================
-   6) تسجيل سلوك
+   7) تسجيل سلوك
 ============================================================ */
 function renderEntry(main){
   const studentOptions=DB.students.map(s=>`<option value="${s.id}">${s.name} (صف ${s.grade}/${s.section})</option>`).join('');
@@ -576,8 +602,10 @@ function saveRecord(){
 }
 
 /* ============================================================
-   7) سجل السلوكيات
+   8) سجل السلوكيات (مع بحث محسّن)
 ============================================================ */
+let recordsSearchTimer = null;
+
 function renderRecords(main){
   const gradeOpts=[`<option value="">كل الصفوف</option>`].concat(GRADES.map(g=>`<option value="${g}">صف ${g}</option>`)).join('');
   const catOpts=[`<option value="">كل التصنيفات</option>`].concat(
@@ -593,7 +621,7 @@ function renderRecords(main){
     </div>
     <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 mb-6 space-y-3">
       <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
-        <input type="text" id="filterSearch" placeholder="🔎 بحث بالاسم..." class="border-2 border-slate-200 rounded-xl p-2.5 text-sm" oninput="applyRecordsFilters()">
+        <input type="text" id="filterSearch" placeholder="🔎 بحث بالاسم..." class="border-2 border-slate-200 rounded-xl p-2.5 text-sm" oninput="debouncedRecordsFilter()">
         <select id="filterGrade" class="border-2 border-slate-200 rounded-xl p-2.5 text-sm" onchange="applyRecordsFilters()">${gradeOpts}</select>
         <select id="filterCat" class="border-2 border-slate-200 rounded-xl p-2.5 text-sm" onchange="applyRecordsFilters()">${catOpts}</select>
         <input type="month" id="filterMonth" class="border-2 border-slate-200 rounded-xl p-2.5 text-sm" onchange="applyRecordsFilters()">
@@ -612,17 +640,28 @@ function renderRecords(main){
   applyRecordsFilters();
 }
 
+function debouncedRecordsFilter(){
+  clearTimeout(recordsSearchTimer);
+  recordsSearchTimer = setTimeout(applyRecordsFilters, 250);
+}
+
 function applyRecordsFilters(){
   const q=(document.getElementById('filterSearch')?.value||'').trim().toLowerCase();
   const grade=document.getElementById('filterGrade')?.value||'';
   const cat=document.getElementById('filterCat')?.value||'';
   const month=document.getElementById('filterMonth')?.value||'';
   
+  // خرائط للبحث السريع
+  const studentsMap = new Map();
+  DB.students.forEach(st => studentsMap.set(st.id, st));
+  const behaviorsMap = new Map();
+  DB.behaviors.forEach(b => behaviorsMap.set(b.id, b));
+  
   const filtered=DB.records.slice().reverse().filter(r=>{
-    const s=DB.students.find(x=>x.id===r.studentId)||{};
+    const s=studentsMap.get(r.studentId)||{};
     if(q && !(s.name||'').toLowerCase().includes(q)) return false;
     if(grade && String(s.grade)!==grade) return false;
-    const b=DB.behaviors.find(x=>x.id===r.behaviorId);
+    const b=behaviorsMap.get(r.behaviorId);
     if(cat && b && b.cat!==cat) return false;
     if(month){
       const d=new Date(r.createdAt);
@@ -637,7 +676,7 @@ function applyRecordsFilters(){
   if(!body) return;
   
   body.innerHTML=filtered.length?filtered.map(r=>{
-    const s=DB.students.find(x=>x.id===r.studentId)||{name:'—',grade:'—',section:'—'};
+    const s=studentsMap.get(r.studentId)||{name:'—',grade:'—',section:'—'};
     const stepInfo=r.escalationStep?`${r.escalationStep}/${r.escalationTotal}`:'—';
     return `<tr class="border-b hover:bg-slate-50">
       <td class="p-3 text-xs whitespace-nowrap">${new Date(r.createdAt).toLocaleDateString('ar-OM')}</td>
@@ -663,7 +702,7 @@ function deleteRecord(id){
 }
 
 /* ============================================================
-   8) التحليل المتقدم
+   9) التحليل المتقدم
 ============================================================ */
 function renderAnalysis(main){
   main.innerHTML = `
@@ -730,7 +769,7 @@ function renderAnalysis(main){
 }
 
 /* ============================================================
-   9) الوحدة الصحية
+   10) الوحدة الصحية
 ============================================================ */
 function renderHealthIdentity(main){
   const studentOptions=DB.students.map(s=>`<option value="${s.id}">${s.name} (صف ${s.grade}/${s.section})</option>`).join('');
@@ -854,7 +893,7 @@ function renderHealthReport(main){
 }
 
 /* ============================================================
-   10) إدارة المستخدمين والسلوكيات والإجراءات
+   11) إدارة المستخدمين والسلوكيات والإجراءات
 ============================================================ */
 function renderUsers(main){
   main.innerHTML=`
@@ -1010,7 +1049,7 @@ function deleteAction(id){
 }
 
 /* ============================================================
-   11) التنبيهات والإعدادات والتقارير
+   12) التنبيهات والإعدادات والتقارير
 ============================================================ */
 function renderAlerts(main){
   const atRisk = getAtRiskStudents();
@@ -1068,7 +1107,7 @@ function saveSettings(){
 }
 
 /* ============================================================
-   12) إدارة الطلبة (مع الهاتف، اللصق، وCSV)
+   13) إدارة الطلبة (مع الهاتف، اللصق، وCSV)
 ============================================================ */
 function renderStudents(main){
   const cards=DB.students.map(s=>{
@@ -1259,7 +1298,7 @@ function openPrintStudent(studentId){
 }
 
 /* ============================================================
-   13) اللصق الدفعي و CSV
+   14) اللصق الدفعي و CSV
 ============================================================ */
 function openBulkPasteModal(){
   showModal(`
@@ -1268,68 +1307,112 @@ function openBulkPasteModal(){
       <button onclick="closeModal()" class="bg-slate-200 text-slate-700 font-bold px-3 py-2 rounded-lg text-sm">إغلاق</button>
     </div>
     <div class="bg-blue-50 border-r-4 border-blue-500 p-3 rounded-lg text-sm mb-4">
-      <strong>طريقة الاستخدام:</strong>
+      <strong>الصيغ المدعومة:</strong>
       <ul class="list-disc pr-6 mt-1 text-xs space-y-1">
-        <li>كل سطر = طالب واحد.</li>
-        <li>الصيغة: <code class="bg-white px-1 rounded">الاسم، الصف، الشعبة، الهاتف</code></li>
-        <li>الحقول اختيارية ما عدا الاسم.</li>
-        <li>يمكن استخدام الفاصلة (,) أو العربية (،) أو Tab.</li>
+        <li><code class="bg-white px-1 rounded">الاسم</code> → صف 5/1</li>
+        <li><code class="bg-white px-1 rounded">الاسم, الصف, الشعبة</code></li>
+        <li><code class="bg-white px-1 rounded">الاسم, الصف, الشعبة, الهاتف</code></li>
+        <li>الفواصل المقبولة: <code>,</code> أو <code>،</code> أو <kbd>Tab</kbd></li>
       </ul>
     </div>
-    <textarea id="bulkPasteArea" rows="10" class="w-full border-2 border-slate-200 rounded-xl p-3 font-mono text-sm" placeholder="أحمد بن سالم الرواحي, 5, 1, 99001122
-محمد بن خالد البلوشي, 5, 1
-يوسف بن علي المعمري, 5, 2, 91234567
-عبدالله بن حمد الحارثي"></textarea>
+    <textarea id="bulkPasteArea" rows="10" class="w-full border-2 border-slate-200 rounded-xl p-3 font-mono text-sm" placeholder="أحمد بن سالم الرواحي
+محمد بن خالد البلوشي, 6, 2
+يوسف بن علي المعمري	5	3
+عبدالله بن حمد الحارثي، 7، 1
+سعيد بن راشد الكندي, 5, 3, 99001122"></textarea>
     <div id="bulkPreview" class="mt-3"></div>
     <button onclick="processBulkPaste()" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-black py-3 rounded-xl mt-4 shadow-md">✓ إضافة الطلبة</button>
   `);
-  document.getElementById('bulkPasteArea').addEventListener('input', previewBulkPaste);
+  const ta = document.getElementById('bulkPasteArea');
+  ta.addEventListener('input', previewBulkPaste);
+  ta.addEventListener('paste', function(){ setTimeout(previewBulkPaste, 60); });
+  ta.addEventListener('change', previewBulkPaste);
 }
 
-function parseBulkLine(line){
-  const parts = line.split(/[,\u060C\t|]/).map(p => p.trim());
+function parseBulkLine(rawLine){
+  if(rawLine === null || rawLine === undefined) return null;
+  let line = String(rawLine).trim();
+  if(!line) return null;
+  line = line.replace(/[\u0660-\u0669]/g, d => String.fromCharCode(d.charCodeAt(0) - 0x0660));
+  line = line.replace(/[\u06F0-\u06F9]/g, d => String.fromCharCode(d.charCodeAt(0) - 0x06F0));
+  let parts = line.split(/[,\u060C\t|;]/);
+  if(parts.length === 1){
+    const bySpaces = line.split(/\s{2,}/);
+    if(bySpaces.length > 1) parts = bySpaces;
+  }
+  parts = parts.map(p => p.trim());
   const name = parts[0] || '';
   if(!name) return null;
-  const grade = parts[1] ? parseInt(parts[1]) : 5;
-  const section = parts[2] ? parseInt(parts[2]) : 1;
-  const phone = (parts[3] || '').replace(/[^\d+\-\s]/g, '').trim();
-  return {
-    name,
-    grade: GRADES.includes(grade) ? grade : 5,
-    section: SECTIONS.includes(section) ? section : 1,
-    phone
-  };
+  let grade = 5;
+  if(parts[1]){
+    const g = parseInt(parts[1]);
+    if(!isNaN(g) && GRADES.includes(g)) grade = g;
+  }
+  let section = 1;
+  if(parts[2]){
+    const s = parseInt(parts[2]);
+    if(!isNaN(s) && SECTIONS.includes(s)) section = s;
+  }
+  let phone = '';
+  if(parts[3]){
+    phone = parts[3].replace(/[^\d+\-\s]/g, '').trim();
+  }
+  return { name, grade, section, phone };
 }
 
 function previewBulkPaste(){
   const txt = document.getElementById('bulkPasteArea').value;
-  const lines = txt.split(/\r?\n/).filter(l => l.trim());
-  const parsed = lines.map(parseBulkLine).filter(Boolean);
   const preview = document.getElementById('bulkPreview');
-  if(!parsed.length){
+  if(!preview) return;
+  if(!txt.trim()){
     preview.innerHTML = '<div class="text-xs text-slate-400">لم يتم التعرف على أي أسماء بعد...</div>';
+    return;
+  }
+  const lines = txt.split(/\r?\n/);
+  const parsed = [];
+  for(let i = 0; i < lines.length; i++){
+    const p = parseBulkLine(lines[i]);
+    if(p) parsed.push(p);
+  }
+  if(!parsed.length){
+    preview.innerHTML = '<div class="text-xs text-red-500">⚠️ لم يتم التعرف على أي أسماء صالحة</div>';
     return;
   }
   preview.innerHTML = `
     <div class="text-xs font-bold text-emerald-700 mb-2">معاينة (${parsed.length} طالب):</div>
-    <div class="max-h-40 overflow-y-auto bg-slate-50 rounded-lg p-2 space-y-1">
-      ${parsed.map((s, i) => `<div class="text-xs text-slate-700"><span class="text-slate-400">${i+1}.</span> <strong>${s.name}</strong> — صف ${s.grade}/${s.section}${s.phone ? ` — 📞 <span class="text-blue-600">${s.phone}</span>` : ''}</div>`).join('')}
+    <div class="max-h-40 overflow-y-auto bg-slate-50 rounded-lg p-2 space-y-1 border border-slate-200">
+      ${parsed.map((s, i) => `
+        <div class="text-xs text-slate-700 border-b border-slate-200 last:border-b-0 py-1">
+          <span class="text-slate-400 ml-1">${i+1}.</span>
+          <strong>${s.name}</strong>
+          <span class="text-slate-500">— صف ${s.grade}/${s.section}</span>
+          ${s.phone ? `<span class="text-blue-600 font-bold mr-1">📞 ${s.phone}</span>` : ''}
+        </div>
+      `).join('')}
     </div>
   `;
 }
 
 function processBulkPaste(){
   const txt = document.getElementById('bulkPasteArea').value;
-  const lines = txt.split(/\r?\n/).filter(l => l.trim());
-  const parsed = lines.map(parseBulkLine).filter(Boolean);
-  if(!parsed.length) return showToast('⚠️ لم يتم التعرف على أي أسماء', 'error');
+  if(!txt.trim()) return showToast('⚠️ لم تلصق أي بيانات', 'error');
+  const lines = txt.split(/\r?\n/);
+  const parsed = [];
+  for(let i = 0; i < lines.length; i++){
+    const p = parseBulkLine(lines[i]);
+    if(p) parsed.push(p);
+  }
+  if(!parsed.length) return showToast('⚠️ لم يتم التعرف على أي أسماء صالحة', 'error');
   if(!confirm(`سيتم إضافة ${parsed.length} طالب. متابعة؟`)) return;
 
   let added = 0, skipped = 0;
+  const seen = new Set();
   parsed.forEach(p => {
-    if(DB.students.some(s => s.name === p.name && s.grade === p.grade && s.section === p.section)){
+    const key = p.name + '|' + p.grade + '|' + p.section;
+    if(seen.has(key) || DB.students.some(s => s.name === p.name && s.grade === p.grade && s.section === p.section)){
       skipped++; return;
     }
+    seen.add(key);
     DB.students.push({
       id: 'S' + Date.now() + Math.random().toString(36).slice(2, 6),
       name: p.name,
@@ -1406,10 +1489,6 @@ function openCSVImportModal(){
       <div class="text-xs mt-2 font-mono bg-white p-2 rounded border whitespace-pre">الاسم,الصف,الشعبة,الهاتف
 أحمد بن سالم,5,1,99001122
 محمد بن خالد,5,2,</div>
-      <ul class="list-disc pr-6 mt-2 text-xs space-y-1">
-        <li>صف العنوان الأول اختياري (يُتخطى تلقائياً).</li>
-        <li>الهاتف اختياري — اتركه فارغاً إذا لم يوجد.</li>
-      </ul>
     </div>
     <label class="block w-full bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-4 rounded-xl text-center cursor-pointer">
       📎 اختر ملف CSV
@@ -1512,7 +1591,7 @@ function confirmCSVImport(){
 }
 
 /* ============================================================
-   14) ولي الأمر
+   15) ولي الأمر
 ============================================================ */
 function refreshParentDropdown(){
   const sel=document.getElementById('parentStudent');
@@ -1560,7 +1639,7 @@ function renderMyChild(main){
 }
 
 /* ============================================================
-   15) أدوات مساعدة وطباعة
+   16) أدوات مساعدة وطباعة
 ============================================================ */
 function showModal(content){
   document.getElementById('modalRoot').innerHTML=`
@@ -1737,16 +1816,30 @@ function exportExcel(){
 }
 
 /* ============================================================
-   16) بدء التشغيل
+   17) بدء التشغيل
 ============================================================ */
 initDB();
 refreshParentDropdown();
 
+// استئناف الرسم المؤجل عند مغادرة حقل الإدخال
+document.addEventListener('focusout', () => {
+  setTimeout(() => {
+    if(pendingRender && !shouldSkipRender() && !document.getElementById('appScreen').classList.contains('hidden')){
+      const scrollY = window.scrollY;
+      renderPage(currentPage);
+      setTimeout(() => window.scrollTo(0, scrollY), 0);
+      pendingRender = false;
+    }
+  }, 800);
+});
+
+// المزامنة الدورية: 3 دقائق، ولا تعمل أثناء تفاعل المستخدم
 setInterval(()=>{
   if(!navigator.onLine) return;
   if(document.getElementById('appScreen').classList.contains('hidden')) return;
+  if(shouldSkipRender()) return;
   if(!formDirty) cloudPull(true);
-},60000);
+}, 180000);
 
 window.addEventListener('online',()=>showToast('عاد الاتصال بالإنترنت'));
 window.addEventListener('offline',()=>showToast('⚠️ وضع عدم الاتصال','error'));
